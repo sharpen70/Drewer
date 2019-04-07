@@ -20,7 +20,6 @@ import org.gu.dcore.antlr4.EDLGParser.ProgramContext;
 import org.gu.dcore.antlr4.EDLGParser.TermsContext;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.TermFactory;
-import org.gu.dcore.indexing.Vocabulary;
 import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.ExRule;

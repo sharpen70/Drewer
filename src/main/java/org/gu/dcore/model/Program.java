@@ -3,8 +3,6 @@ package org.gu.dcore.model;
 import java.io.PrintStream;
 import java.util.List;
 
-import org.gu.dcore.indexing.Vocabulary;
-
 /**
  * This is the class of Datalog+- program 
  * @author sharpen
