@@ -14,7 +14,7 @@ import org.gu.dcore.antlr4.EDLGBaseVisitor;
 import org.gu.dcore.antlr4.EDLGLexer;
 import org.gu.dcore.antlr4.EDLGParser;
 import org.gu.dcore.antlr4.EDLGParser.AtomContext;
-import org.gu.dcore.antlr4.EDLGParser.BodyContext;
+import org.gu.dcore.antlr4.EDLGParser.AtomsetContext;
 import org.gu.dcore.antlr4.EDLGParser.ExruleContext;
 import org.gu.dcore.antlr4.EDLGParser.ProgramContext;
 import org.gu.dcore.antlr4.EDLGParser.TermsContext;
@@ -22,6 +22,7 @@ import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
+import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ExRule;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
@@ -77,21 +78,28 @@ public class ProgramLoarder {
 	private class ExRuleVisitor extends EDLGBaseVisitor<ExRule> {
 		@Override
 		public ExRule visitExrule(ExruleContext ctx) {
-			AtomVisitor atomVisitor = new AtomVisitor();
+			AtomSetVisitor atomSetVisitor = new AtomSetVisitor();
 			
-			Atom head = ctx.head().atom().accept(atomVisitor);
-			
-			List<Atom> body = new ArrayList<>();
-			
-			BodyContext _body = ctx.body();
-			
-			while(_body != null) {
-				if(_body.atom() != null)
-					body.add(_body.atom().accept(atomVisitor));
-				_body = _body.body();
-			}
+			AtomSet head = ctx.atomset(0).accept(atomSetVisitor);
+			AtomSet body = ctx.atomset(1).accept(atomSetVisitor);
 					
 			return new ExRule(head, body);
+		}
+	}
+	
+	private class AtomSetVisitor extends EDLGBaseVisitor<AtomSet> {
+		@Override
+		public AtomSet visitAtomset(AtomsetContext ctx) {
+			AtomVisitor atomVisitor = new AtomVisitor();
+			
+			ArrayList<Atom> atomset = new ArrayList<>();
+			
+			while(ctx != null) {
+				atomset.add(ctx.atom().accept(atomVisitor));
+				ctx = ctx.atomset();
+			}
+			
+			return new AtomSet(atomset);
 		}
 	}
 	
@@ -104,7 +112,7 @@ public class ProgramLoarder {
 			int arity = 0;
 			int value = 0;
 			
-			List<Term> terms = new ArrayList<>();
+			ArrayList<Term> terms = new ArrayList<>();
 			
 			TermsContext _terms = ctx.terms();
 			

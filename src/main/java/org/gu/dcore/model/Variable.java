@@ -20,6 +20,6 @@ public class Variable implements Term {
 	
 	@Override
 	public String toString() {
-		return "" + this.value;
+		return "?" + this.value;
 	}
 }

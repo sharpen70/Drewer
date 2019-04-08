@@ -5,11 +5,9 @@ grammar EDLG;
  */
 program     : exrule* EOF ;
 
-exrule      : head '<-' body ';' ;
+exrule      : atomset '<-' atomset ';' ;
 
-head        : atom ;
-
-body        : atom | atom ',' body ;
+atomset     : atom | atom ',' atomset ;
 
 atom        : predicate '(' terms ')' ;
 

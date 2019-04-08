@@ -1,6 +1,7 @@
 package org.gu.dcore.model;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -13,17 +14,17 @@ import org.gu.dcore.interf.Term;
  */
 public class Atom {
 	private Predicate p;
-	private List<Term> terms;
+	private ArrayList<Term> terms;
 	private Set<Variable> vars;
 	
-	public Atom(Predicate p, List<Term> terms) {
+	public Atom(Predicate p, ArrayList<Term> terms) {
 		this.p = p;
 		this.terms = terms;
 	}
 	/**
 	 * @return the p
 	 */
-	public Predicate getP() {
+	public Predicate getPredicate() {
 		return p;
 	}
 	/**
@@ -35,20 +36,18 @@ public class Atom {
 	/**
 	 * @return the terms
 	 */
-	public List<Term> getTerms() {
+	public ArrayList<Term> getTerms() {
 		return terms;
 	}
 	/**
 	 * @param terms the terms to set
 	 */
-	public void setTerms(List<Term> terms) {
+	public void setTerms(ArrayList<Term> terms) {
 		this.terms = terms;
 	}
-	/**
-	 * @param outstream the stream of output
-	 * Print out the atom. 
-	 */
-	public void print(PrintStream outstream) {
+	
+	@Override
+	public String toString() {
 		String out = p.getName();
 		out = out + "(";
 		
@@ -62,6 +61,6 @@ public class Atom {
 		
 		out = out + ")";
 		
-		outstream.print(out);
+		return out;
 	}
 }

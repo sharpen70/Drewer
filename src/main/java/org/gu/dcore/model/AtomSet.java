@@ -1,15 +1,46 @@
 package org.gu.dcore.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class AtomSet {
+public class AtomSet implements Iterable<Atom> {
 	private ArrayList<Atom> atoms;
 	
 	public AtomSet(ArrayList<Atom> _atoms) {
 		this.atoms = _atoms;
 	}
 	
+	public AtomSet(Atom atom) {
+		this.atoms = new ArrayList<>();
+		this.atoms.add(atom);
+	}
+	
 	public ArrayList<Atom> getAtoms() {
 		return this.atoms;
+	}
+	
+	public Atom getAtom(int i) {
+		return this.atoms.get(i);
+	}
+	
+	public int size() {
+		return this.atoms.size();
+	}
+	
+	@Override
+	public Iterator<Atom> iterator() {
+		return atoms.iterator();
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		
+		for(int i = 0; i < atoms.size(); i++) {
+			s += atoms.get(i);
+			if(i != atoms.size() - 1) s += ", ";
+		}
+		
+		return s;
 	}
 }

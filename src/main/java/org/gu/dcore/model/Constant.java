@@ -13,20 +13,20 @@ public class Constant implements Term {
 	
 	
 	public Constant(String _name, long _id) {
-		name = _name;
-		id = _id;
+		this.name = _name;
+		this.id = _id;
 	}
 	
 	public long getId() {
-		return id;
+		return this.id;
 	}
 	
 	public String getName() {
-		return name;
+		return this.name;
 	}
 	
 	@Override
 	public String toString() {
-		return name;
+		return this.name;
 	}
 }
