@@ -22,4 +22,16 @@ public class Variable implements Term {
 	public String toString() {
 		return "?" + this.value;
 	}
+	
+	@Override
+	public int hashCode() {
+		return this.value;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Variable)) return false;
+		Variable _obj = (Variable) obj;
+		return this.value == _obj.value;
+	}
 }
