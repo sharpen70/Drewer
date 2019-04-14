@@ -2,6 +2,7 @@ package org.gu.dcore.model;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,11 +40,26 @@ public class Atom {
 	public ArrayList<Term> getTerms() {
 		return terms;
 	}
+	
+	public Term getTerm(int i) {
+		return this.terms.get(i);
+	}
+	
 	/**
 	 * @param terms the terms to set
 	 */
 	public void setTerms(ArrayList<Term> terms) {
 		this.terms = terms;
+	}
+	
+	public Set<Variable> getVariable() {
+		Set<Variable> vars = new HashSet<>();
+		
+		for(Term t : this.terms) {
+			if(t instanceof Variable) vars.add((Variable) t);
+		}
+		
+		return vars;
 	}
 	
 	@Override

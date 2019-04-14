@@ -1,20 +1,83 @@
 package org.gu.dcore.model;
 
+import java.util.Map;
+import java.util.Set;
+
+import org.gu.dcore.reasoning.TermType;
+
 public class ExRule {
 	private AtomSet head;
 	private AtomSet body;
+	
+	private Set<Variable> existentials = null;
+	private Set<Variable> frontier = null;
+	private Map<Variable, TermType> vartype = null; 
+	
+	private int var_bound = -1;
 	
 	public ExRule(AtomSet head, AtomSet body) {
 		this.head = head;
 		this.body = body;
 	}
-
+	
 	public AtomSet getHead() {
 		return this.head;
 	}
 	
 	public AtomSet getBody() {
 		return this.body;
+	}
+	
+//	public Set<Variable> getExistentials() {
+//		if(this.existentials == null) this.computeFrontierAndExistentials();
+//		return this.existentials;
+//	}
+//	
+//	public Set<Variable> getFrontier() {
+//		if(this.frontier == null) this.computeFrontierAndExistentials();
+//		return this.frontier;
+//	}
+	
+	public TermType getVarType(Variable v) {
+		if(this.vartype == null) this.computeFrontierAndExistentials();
+		return this.vartype.get(v);
+	}
+	
+	public int getVarBound() {
+		if(this.var_bound == -1) this.computeFrontierAndExistentials();
+		return this.var_bound;
+	}
+	
+//	private void computeFrontierAndExistentials() {
+//		Set<Variable> body_vars = this.body.getVariable();
+//		Set<Variable> head_vars = this.head.getVariable();
+//		
+//		this.existentials = new HashSet<>();
+//		this.frontier = new HashSet<>();
+//		
+//		for(Variable v : head_vars) {
+//			if(body_vars.contains(v)) this.frontier.add(v);
+//			else this.existentials.add(v);
+//		}
+//		
+//		this.var_bound = body_vars.size() + this.existentials.size();
+//	}
+	
+	private void computeFrontierAndExistentials() {
+		Set<Variable> body_vars = this.body.getVariable();
+		Set<Variable> head_vars = this.head.getVariable();
+		
+//		this.existentials = new HashSet<>();
+//		this.frontier = new HashSet<>();
+		this.var_bound = body_vars.size();
+		
+		for(Variable v : head_vars) {
+			if(body_vars.contains(v)) this.vartype.put(v, TermType.FRONTIER);
+			else {
+				this.vartype.put(v, TermType.EXISTENTIAL);
+				this.var_bound++;
+			}
+		}
 	}
 	
 	@Override

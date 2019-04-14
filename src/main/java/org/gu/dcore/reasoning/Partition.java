@@ -18,7 +18,7 @@ public class Partition {
 		this.categories = new LinkedList<>();
 	}
 	
-	public void add(Term e1, Term e2) {
+	public boolean add(Term e1, Term e2) {
 		boolean e1_in = false;
 		boolean e2_in = false;
 		
@@ -58,6 +58,60 @@ public class Partition {
 		if(e1_in && !e2_in) first.add(e2);
 		if(!e1_in && e2_in) first.add(e1);
 		if(!e1_in && !e2_in) this.addCategory(e1, e2);
+		
+		return true;
+	}
+	
+	/*
+	 * return 1: valid partition without separating mappings, 
+	 * 			i.e., a partition for single piece unifier 
+	 * 
+	 *		  0: valid partition with separating mappings
+	 *
+	 *	     -1: invalid partition
+	 */
+	public int add(Term e1, TermType t1, Term e2, TermType t2) {
+		boolean e1_in = false;
+		boolean e2_in = false;
+		
+		Set<Term> first = null;
+		
+		Iterator<Set<Term>> it = this.categories.iterator();
+
+		while(it.hasNext()) {
+			Set<Term> cur = it.next();
+			boolean this_turn = false; 
+			
+			if(e1_in && e2_in) break;
+			
+			if(!e1_in && cur.contains(e1)) {
+				if(first == null) {
+					first = cur;
+					e1_in = true;
+					this_turn = true;
+				}
+				else {
+					first.addAll(cur);
+					it.remove();
+				}
+			}
+			if(!e2_in && cur.contains(e2)) {
+				if(first == null) {
+					first = cur;
+					e2_in = true;
+				}
+				else {
+					first.addAll(cur);
+					if(!this_turn) it.remove();
+				}
+			}
+		}
+		
+		if(e1_in && !e2_in) first.add(e2);
+		if(!e1_in && e2_in) first.add(e1);
+		if(!e1_in && !e2_in) this.addCategory(e1, e2);
+		
+		return true;
 	}
 	
 	public Substitution getSubstitution() {

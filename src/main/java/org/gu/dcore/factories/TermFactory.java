@@ -12,7 +12,10 @@ public class TermFactory {
 	private long id = 0;
 	
 	private Variable[] vars;
+	private Map<String, Integer> vMap = null;
+	
 	private static final int max_var_size = 100;
+	private int var_index = 0;
 	
 	private TermFactory() {
 		this.cMap = new HashMap<>();
@@ -45,5 +48,30 @@ public class TermFactory {
 		}
 		
 		return v;
+	}
+	
+	public Variable createVariable(String identifier) {
+		Integer vi = this.vMap.get(identifier);
+		
+		Variable v;
+		
+		if(vi == null) {
+			v = this.vars[this.var_index];
+			
+			if(v == null) {
+				v = new Variable(this.var_index);
+				this.vars[this.var_index] = v;
+				this.var_index++;
+			}		
+			this.vMap.put(identifier, this.var_index);
+		}
+		else v = this.vars[vi];
+		
+		return v;
+	}
+	
+	public void varReset() {
+		this.var_index = 0;
+		this.vMap.clear();
 	}
 }

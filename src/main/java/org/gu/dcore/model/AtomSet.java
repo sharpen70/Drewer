@@ -1,7 +1,9 @@
 package org.gu.dcore.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class AtomSet implements Iterable<Atom> {
 	private ArrayList<Atom> atoms;
@@ -30,6 +32,16 @@ public class AtomSet implements Iterable<Atom> {
 	@Override
 	public Iterator<Atom> iterator() {
 		return atoms.iterator();
+	}
+	
+	public Set<Variable> getVariable() {
+		Set<Variable> vars = new HashSet<>();
+		
+		for(Atom a : this.atoms) {
+			vars.addAll(a.getVariable());
+		}
+		
+		return vars;
 	}
 	
 	@Override

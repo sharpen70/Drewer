@@ -19,6 +19,7 @@ import org.gu.dcore.antlr4.EDLGParser.ExruleContext;
 import org.gu.dcore.antlr4.EDLGParser.ProgramContext;
 import org.gu.dcore.antlr4.EDLGParser.TermsContext;
 import org.gu.dcore.factories.PredicateFactory;
+import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
@@ -33,9 +34,9 @@ import org.gu.dcore.model.Program;
  * @author sharpen
  * @version 1.0, April 2018
  */
-public class ProgramLoarder {
+public class DcoreParser {
 	
-	public ProgramLoarder() {
+	public DcoreParser() {
 		
 	}
 	
@@ -44,10 +45,15 @@ public class ProgramLoarder {
 	 * @return the Program object corresponding to input
 	 * @throws IOException 
 	 */
-	public Program load(String programFile) throws IOException {		
-		//Parsing
-		CharStream charStream = CharStreams.fromFileName(programFile);
-		
+	public Program parseFile(String programFile) throws IOException {		
+		return this.parse(CharStreams.fromFileName(programFile));
+	}
+	
+	public Program parse(String s) {
+		return this.parse(CharStreams.fromString(s));
+	}
+	
+	public Program parse(CharStream charStream) {
 		EDLGLexer lexer = new EDLGLexer(charStream);
 		
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -80,10 +86,12 @@ public class ProgramLoarder {
 		public ExRule visitExrule(ExruleContext ctx) {
 			AtomSetVisitor atomSetVisitor = new AtomSetVisitor();
 			
+			TermFactory.instance().varReset();
+			
 			AtomSet head = ctx.atomset(0).accept(atomSetVisitor);
 			AtomSet body = ctx.atomset(1).accept(atomSetVisitor);
-					
-			return new ExRule(head, body);
+			
+			return RuleFactory.instance().createRule(head, body);
 		}
 	}
 	
