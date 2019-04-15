@@ -25,6 +25,10 @@ public class AtomSet implements Iterable<Atom> {
 		return this.atoms.get(i);
 	}
 	
+	public boolean contains(Atom a) {
+		return this.atoms.contains(a);
+	}
+	
 	public int size() {
 		return this.atoms.size();
 	}

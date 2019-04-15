@@ -1,9 +1,10 @@
 package org.gu.dcore.reasoning;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import java.util.Set;
 
 import org.gu.dcore.interf.Term;
@@ -11,113 +12,133 @@ import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.Variable;
 
 public class Partition {
-	private List<Set<Term>> categories;
+	/*
+	 * The values of the map are arrays of boolean with size 4
+	 * 1st of array denoting the category contain constant
+	 * 2st of array denoting the category contain existential var
+	 * 3st of array denoting the category contain frontier var
+	 * 4st of array denoting the category contain separating var 
+	 */
+	private Map<Set<Term>, boolean[]> categories;	
+	private Map<Set<Term>, Set<Term>> separating;
+	private Set<Term> sticky;
+	
+	private boolean valid = true;
+	
 	private Substitution substitution = null;
 	
 	public Partition() {
-		this.categories = new LinkedList<>();
+		this.categories = new HashMap<>();
+		this.separating = new HashMap<>();
+		this.sticky = new HashSet<>();
 	}
 	
-	public boolean add(Term e1, Term e2) {
-		boolean e1_in = false;
-		boolean e2_in = false;
-		
-		Set<Term> first = null;
-		
-		Iterator<Set<Term>> it = this.categories.iterator();
-
-		while(it.hasNext()) {
-			Set<Term> cur = it.next();
-			boolean this_turn = false; 
-			
-			if(e1_in && e2_in) break;
-			
-			if(!e1_in && cur.contains(e1)) {
-				if(first == null) {
-					first = cur;
-					e1_in = true;
-					this_turn = true;
-				}
-				else {
-					first.addAll(cur);
-					it.remove();
-				}
-			}
-			if(!e2_in && cur.contains(e2)) {
-				if(first == null) {
-					first = cur;
-					e2_in = true;
-				}
-				else {
-					first.addAll(cur);
-					if(!this_turn) it.remove();
-				}
-			}
-		}
-		
-		if(e1_in && !e2_in) first.add(e2);
-		if(!e1_in && e2_in) first.add(e1);
-		if(!e1_in && !e2_in) this.addCategory(e1, e2);
-		
-		return true;
+	public boolean isValid() {
+		return this.valid;
+	}
+	
+	public boolean isOfSinglePiece() {
+		return this.sticky.isEmpty();
 	}
 	
 	/*
-	 * return 1: valid partition without separating mappings, 
+	 * @param  b: a term from the atomset
+	 * 		   h: a term from the head of existential rule
+	 *  
+	 * @return 1: valid partition without separating mapping to existential, 
 	 * 			i.e., a partition for single piece unifier 
 	 * 
-	 *		  0: valid partition with separating mappings
+	 *		  0: valid partition with separating mapping to existential
 	 *
 	 *	     -1: invalid partition
 	 */
-	public int add(Term e1, TermType t1, Term e2, TermType t2) {
-		boolean e1_in = false;
-		boolean e2_in = false;
+	public void add(Term b, TermType bt, Term h, TermType ht) {
+		Set<Term> sticky_var = new HashSet<>();
 		
-		Set<Term> first = null;
+		boolean b_in = false;
+		boolean h_in = false;
 		
-		Iterator<Set<Term>> it = this.categories.iterator();
-
-		while(it.hasNext()) {
-			Set<Term> cur = it.next();
-			boolean this_turn = false; 
+		Entry<Set<Term>, boolean[]> first = null;
+		
+		if((bt == TermType.CONSTANT && ht == TermType.CONSTANT) ||
+				(bt == TermType.CONSTANT && ht == TermType.EXISTENTIAL))
+		{	this.valid = false; return;  } 
+		
+		for(Entry<Set<Term>, boolean[]> entry : this.categories.entrySet()) {
+			boolean this_round = false;
 			
-			if(e1_in && e2_in) break;
+			Set<Term> category = entry.getKey();
+			boolean[] status = entry.getValue();
 			
-			if(!e1_in && cur.contains(e1)) {
+			Set<Term> sep = this.separating.getOrDefault(category, new HashSet<>());
+			
+			if(b_in && h_in) break;
+			
+			if(!b_in && category.contains(b)) {
+				if(bt == TermType.CONSTANT && (status[0] || status[1])) 
+				{	this.valid = false; return;  } 
+				
+				if(bt == TermType.SEPARATING) {
+					if(status[1]) this.sticky.add(b);
+					this.separating.get(category).add(b);
+				}
+				
 				if(first == null) {
-					first = cur;
-					e1_in = true;
-					this_turn = true;
+					first = entry;
+					b_in = true;
+					this_round = true;
+					this.changeStatus(status, bt);
 				}
 				else {
-					first.addAll(cur);
-					it.remove();
+					first.getKey().addAll(category);
+					this.changeStatus(first.getValue(), bt);
+					this.categories.remove(category);
 				}
 			}
-			if(!e2_in && cur.contains(e2)) {
+			
+			if(!h_in && category.contains(h)) {
+				if(ht == TermType.CONSTANT && (status[0] || status[1])) 
+				{	this.valid = false; return;  } 
+				
+				if(ht == TermType.EXISTENTIAL && (status[0] || status[1] || 
+						status[2])) {	this.valid = false; return;  } 
+				
+				if(ht == TermType.EXISTENTIAL) {
+					Set<Term> _sep = this.separating.get(category);
+					if(!sep.isEmpty()) this.sticky.addAll(sep);
+				}
+				
 				if(first == null) {
-					first = cur;
-					e2_in = true;
+					first = entry;
+					h_in = true;
+					this.changeStatus(status, ht);
 				}
 				else {
-					first.addAll(cur);
-					if(!this_turn) it.remove();
+					first.getKey().addAll(category);
+					this.changeStatus(first.getValue(), ht);
+					if(!this_round) this.categories.remove(category);
 				}
 			}
 		}
 		
-		if(e1_in && !e2_in) first.add(e2);
-		if(!e1_in && e2_in) first.add(e1);
-		if(!e1_in && !e2_in) this.addCategory(e1, e2);
-		
-		return true;
+		if(b_in && !h_in) { first.getKey().add(h); this.changeStatus(first.getValue(), ht); }
+		if(!b_in && h_in) { first.getKey().add(b); this.changeStatus(first.getValue(), bt); }
+		if(!b_in && !h_in) this.addCategory(b, bt, h, ht);
+	}
+	
+	private void changeStatus(boolean[] status, TermType type) {
+		switch(type) {
+			case CONSTANT : status[0] = true; break;
+			case EXISTENTIAL : status[1] = true; break;
+			case FRONTIER : status[2] = true; break;
+			default : break;
+		}
 	}
 	
 	public Substitution getSubstitution() {
 		if(this.substitution == null) {
 			this.substitution = new Substitution();
-			for(Set<Term> category : this.categories) {
+			for(Set<Term> category : this.categories.keySet()) {
 				Term mapto = null;
 				
 				Term last = null;
@@ -140,16 +161,24 @@ public class Partition {
 		return this.substitution;
 	}
 	
-	public void addCategory(Term e1, Term e2) {
+	private void addCategory(Term b, TermType bt, Term h, TermType ht) {
 		Set<Term> category = new HashSet<>();
+		boolean[] status = new boolean[3];
 		
-		category.add(e1);
-		category.add(e2);
+		category.add(b);
+		category.add(h);
 		
-		this.categories.add(category);
+		this.changeStatus(status, bt);
+		this.changeStatus(status, ht);
+		
+		this.categories.put(category, status);
+		
+		if(bt == TermType.SEPARATING) {
+			Set<Term> _sep = new HashSet<>();
+			_sep.add(b);
+			this.separating.put(category, _sep);
+
+			if(ht == TermType.EXISTENTIAL)	this.sticky.add(b);
+		}
 	}	
-	
-	public List<Set<Term>> getCategories() {
-		return this.categories;
-	}
 }

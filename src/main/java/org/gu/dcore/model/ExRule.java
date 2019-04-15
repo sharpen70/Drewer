@@ -3,6 +3,7 @@ package org.gu.dcore.model;
 import java.util.Map;
 import java.util.Set;
 
+import org.gu.dcore.interf.Term;
 import org.gu.dcore.reasoning.TermType;
 
 public class ExRule {
@@ -38,9 +39,10 @@ public class ExRule {
 //		return this.frontier;
 //	}
 	
-	public TermType getVarType(Variable v) {
+	public TermType getTermType(Term t) {
+		if(t instanceof Constant) return TermType.CONSTANT;
 		if(this.vartype == null) this.computeFrontierAndExistentials();
-		return this.vartype.get(v);
+		return this.vartype.get((Variable)t);
 	}
 	
 	public int getVarBound() {
