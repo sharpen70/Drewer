@@ -21,4 +21,8 @@ public class Unifier {
 	public AtomSet getImageOf(AtomSet atomset) {
 		return null;
 	}
+	
+	public boolean isPieceUnifier() {
+		return this.partition.isStickyEmpty();
+	}
 }

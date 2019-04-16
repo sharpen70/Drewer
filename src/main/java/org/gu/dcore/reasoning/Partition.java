@@ -13,11 +13,10 @@ import org.gu.dcore.model.Variable;
 
 public class Partition {
 	/*
-	 * The values of the map are arrays of boolean with size 4
+	 * The values of the map are arrays of boolean with size 3
 	 * 1st of array denoting the category contain constant
 	 * 2st of array denoting the category contain existential var
 	 * 3st of array denoting the category contain frontier var
-	 * 4st of array denoting the category contain separating var 
 	 */
 	private Map<Set<Term>, boolean[]> categories;	
 	private Map<Set<Term>, Set<Term>> separating;
@@ -37,20 +36,13 @@ public class Partition {
 		return this.valid;
 	}
 	
-	public boolean isOfSinglePiece() {
+	public boolean isStickyEmpty() {
 		return this.sticky.isEmpty();
 	}
 	
 	/*
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule
-	 *  
-	 * @return 1: valid partition without separating mapping to existential, 
-	 * 			i.e., a partition for single piece unifier 
-	 * 
-	 *		  0: valid partition with separating mapping to existential
-	 *
-	 *	     -1: invalid partition
 	 */
 	public void add(Term b, TermType bt, Term h, TermType ht) {
 		Set<Term> sticky_var = new HashSet<>();
@@ -135,6 +127,13 @@ public class Partition {
 		}
 	}
 	
+	public Partition join(Partition p) {
+		
+		
+		return null;
+	}
+	
+	private void join()
 	public Substitution getSubstitution() {
 		if(this.substitution == null) {
 			this.substitution = new Substitution();

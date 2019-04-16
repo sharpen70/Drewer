@@ -33,7 +33,7 @@ public class Unify {
 					
 					if(partition.isValid()) {
 						Unifier u = new Unifier(new AtomSet(b), new AtomSet(a), partition);
-						if(partition.isOfSinglePiece()) singlePieceUnifier.add(u);
+						if(u.isPieceUnifier()) singlePieceUnifier.add(u);
 						else preUnifiers.add(u);
 					}
 				}
@@ -46,17 +46,18 @@ public class Unify {
 		while(!toExtend.isEmpty()) {
 			Unifier unifier = toExtend.poll();
 			
+			List<Unifier> extended = extend(unifier, atomset, preUnifiers);
 			
-		}
-		
-		for(Unifier preUnifier : preUnifiers) {
-			
+			for(Unifier u : extended) {
+				if(u.isPieceUnifier()) singlePieceUnifier.add(u);
+				else toExtend.add(u);
+			}
 		}
 		
 		return singlePieceUnifier;	
 	}
 	
-	private static List<Unifier> extend(Unifier unifier, ExRule rule, List<Unifier> preUnifiers, List<Unifier> singlePieceUnifier) {
+	private static List<Unifier> extend(Unifier unifier, AtomSet atomset, List<Unifier> preUnifiers) {
 		
 		
 		return null;
