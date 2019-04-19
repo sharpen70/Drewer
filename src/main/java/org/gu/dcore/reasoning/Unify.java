@@ -7,6 +7,7 @@ import java.util.Queue;
 import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.ExRule;
 
 public class Unify {
@@ -22,17 +23,19 @@ public class Unify {
 			for(Atom b : rule.getHead()) {
 				if(a.getPredicate().equals(b.getPredicate())) {
 					Partition partition = new Partition();
-
+					boolean valid = true;
+					
 					for(int i = 0; i < a.getPredicate().getArity(); i++) {
 						Term at = a.getTerm(i);
 						Term bt = b.getTerm(i);
-						
-						partition.add(at, rule.getTermType(at), bt, rule.getTermType(bt));
-						if(!partition.isValid()) break;
+						TermType atType = at instanceof Constant ? TermType.CONSTANT : TermType.DEFAULT;
+						if(!partition.add(at, atType, bt, rule.getTermType(bt))) {
+							valid = false; break;
+						}
 					}
 					
-					if(partition.isValid()) {
-						Unifier u = new Unifier(new AtomSet(b), new AtomSet(a), partition);
+					if(valid) {
+						Unifier u = new Unifier(new AtomSet(b), new AtomSet(a), partition, atomset, rule);
 						if(u.isPieceUnifier()) singlePieceUnifier.add(u);
 						else preUnifiers.add(u);
 					}

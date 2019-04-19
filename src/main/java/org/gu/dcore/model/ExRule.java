@@ -66,8 +66,8 @@ public class ExRule {
 //	}
 	
 	private void computeFrontierAndExistentials() {
-		Set<Variable> body_vars = this.body.getVariable();
-		Set<Variable> head_vars = this.head.getVariable();
+		Set<Variable> body_vars = this.body.getVariables();
+		Set<Variable> head_vars = this.head.getVariables();
 		
 //		this.existentials = new HashSet<>();
 //		this.frontier = new HashSet<>();
