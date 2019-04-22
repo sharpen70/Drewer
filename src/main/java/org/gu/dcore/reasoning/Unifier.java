@@ -1,6 +1,10 @@
 package org.gu.dcore.reasoning;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -12,20 +16,19 @@ import org.gu.dcore.model.Variable;
 
 public class Unifier {
 	private Partition partition;
-	private AtomSet pB;
-	private AtomSet H;
+	private Set<Atom> pB;
+	private Set<Atom> H;
 	
 	private AtomSet B;
-	private ExRule rule;
+	private Map<Term, List<Atom>> sticky;
 	
-	private Boolean isPieceUnifier = null;
-	
-	public Unifier(AtomSet _pB, AtomSet _H, Partition _partition, AtomSet _B, ExRule _rule) {
+	public Unifier(Set<Atom> _pB, Set<Atom> _H, Partition _partition, AtomSet _B) {
 		this.pB = _pB;
 		this.H = _H;
 		this.partition = _partition;
 		this.B = _B;
-		this.rule = _rule;
+	
+		sticky = new HashMap<>();
 	}
 	
 	public Atom getImageOf(Atom a) {
@@ -36,28 +39,63 @@ public class Unifier {
 		return null;
 	}
 	
-	public boolean isPieceUnifier() {
-		if(this.isPieceUnifier == null) this.isPieceUnifier = checkPieceUnifier();
-		return this.isPieceUnifier;
+	public Unifier extend(Unifier u) {
+		Set<Atom> newpB = new HashSet<>();
+		Set<Atom> newH = new HashSet<>();
+		
+		this.partition.join(u.getPartition());
 	}
 	
-	private boolean checkPieceUnifier() {
-		Set<Term> separating = new HashSet<>();
-		AtomSet minus = AtomSetUtils.minus(this.B, this.pB);
+	public boolean isPieceUnifier() {
+		if(sticky == null) this.computeSticky();
+		return this.sticky.isEmpty();
+	}
+	
+	public Set<Atom> getStickyAtoms() {
+		if(this.sticky == null) this.computeSticky();
 		
-		Set<Variable> var_minus = minus.getVariables();
+		Set<Atom> re = new HashSet<>();
 		
-		for(Variable v : pB.getVariables()) {
-			if(var_minus.contains(v)) separating.add(v);
+		for(List<Atom> atoms : this.sticky.values()) 
+			re.addAll(atoms);
+		
+		return re;
+	}
+	
+	public Partition getPartition() {
+		return this.partition;
+	}
+	
+	private void computeSticky() {
+		this.sticky = new HashMap<>();
+		List<Atom> minus = new LinkedList<>();
+		
+		for(Atom a : this.B) {
+			if(!this.pB.contains(a)) minus.add(a);
+		}
+		
+		Set<Variable> pBvar = new HashSet<>();
+		for(Atom a : pB) pBvar.addAll(a.getVariable());
+		
+		for(Atom a : minus) {
+			for(Variable v : pBvar) {
+				if(a.getVariable().contains(v)) {
+					List<Atom> sticky_atoms = this.sticky.get(v);
+					if(sticky_atoms == null) {
+						sticky_atoms = new LinkedList<>();
+						sticky_atoms.add(a);
+						this.sticky.put(v, sticky_atoms);
+					}
+					else sticky_atoms.add(a);
+				}
+			}
 		}
 		
 		for(Entry<Set<Term>, boolean[]> category : this.partition.categories.entrySet()) {
 			if(category.getValue()[1]) {
-				for(Term t : separating) 
-					if(category.getKey().contains(t)) return false;
+				for(Term t : this.sticky.keySet()) 
+					if(!category.getKey().contains(t)) this.sticky.remove(t);
 			}
 		}
-		
-		return true;
 	}
 }
