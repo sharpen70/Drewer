@@ -6,6 +6,8 @@ import org.gu.dcore.model.ExRule;
 public class RuleFactory {
 	private static RuleFactory factory = null;
 	
+	private long ruleIndex = 0;
+	
 	private RuleFactory() {
 		
 	}
@@ -17,6 +19,6 @@ public class RuleFactory {
 	}
 	
 	public ExRule createRule(AtomSet head, AtomSet body) {
-		return new ExRule(head, body);
+		return new ExRule(head, body, ruleIndex++);
 	}
 }

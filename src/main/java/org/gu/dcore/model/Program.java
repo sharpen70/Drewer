@@ -20,4 +20,23 @@ public class Program implements Iterable<ExRule> {
 	public Iterator<ExRule> iterator() {
 		return this.rules.iterator();
 	}
+	
+	public int size() {
+		return this.rules.size();
+	}
+	
+	public ExRule getRule(int i) {
+		return this.rules.get(i);
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(ExRule r : rules) {
+			s += r.toString();
+			s += "\n";
+		}
+		
+		return s;
+	}
 }

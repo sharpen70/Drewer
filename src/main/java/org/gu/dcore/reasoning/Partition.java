@@ -27,6 +27,16 @@ public class Partition {
 		this.categories = new HashMap<>();
 	}
 	
+	public Partition getCopy() {
+		Partition p = new Partition();
+		
+		for(Entry<Set<Term>, boolean[]> entry : this.categories.entrySet()) {
+			p.categories.put(entry.getKey(), entry.getValue());
+		}
+		
+		return p;
+	}
+	
 	/*
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule
@@ -130,7 +140,6 @@ public class Partition {
 		
 		return true;
 	}
-	
 	
 	private boolean join_category(Partition p, Set<Term> thisCategory, Set<Term> thatCategory) {
 		boolean[] thisStatus = this.categories.get(thisCategory);	

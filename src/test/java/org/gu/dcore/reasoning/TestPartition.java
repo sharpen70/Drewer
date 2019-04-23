@@ -1,7 +1,11 @@
 package org.gu.dcore.reasoning;
 
-import org.gu.dcore.model.Variable;
+import java.util.List;
 
+import org.gu.dcore.model.Program;
+import org.gu.dcore.parsing.DcoreParser;
+
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -30,29 +34,16 @@ public class TestPartition extends TestCase {
      */
     public void test1()
     {
-    	Partition p = new Partition();
+    	DcoreParser parser = new DcoreParser();
     	
-    	p.add(new Variable(1), new Variable(2));
-    	p.add(new Variable(2), new Variable(3));
+    	Program P = parser.parse("Q(X) :- A(X), B(X, Y).\n"
+    			+ "B(X, Y), A(X) :- C(Y).");
     	
-    	System.out.println(p.getCategories());
+    	System.out.println(P);
     	
-        assertTrue( p.getCategories().size() == 1 );
-    }
-    
-    public void test2()
-    {
-    	Partition p = new Partition();
+    	List<Unifier> us = Unify.getSinglePieceUnifier(P.getRule(1), P.getRule(0).getBody());
     	
-    	p.add(new Variable(1), new Variable(2));
-    	p.add(new Variable(2), new Variable(3));
-    	p.add(new Variable(5), new Variable(6));
-    	p.add(new Variable(1), new Variable(6));
-    	p.add(new Variable(1), new Variable(2));
-    	
-    	System.out.println(p.getCategories());
-    	
-        assertTrue( p.getCategories().size() == 1 );
+    	Assert.assertTrue(us.size() == 1);
     }
     
 }

@@ -115,10 +115,8 @@ public class DcoreParser {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
 			String iri = ctx.predicate().getText();
-			Map<String, Integer> vMap = new HashMap<>();
 			
 			int arity = 0;
-			int value = 0;
 			
 			ArrayList<Term> terms = new ArrayList<>();
 			
@@ -129,16 +127,10 @@ public class DcoreParser {
 				String ts = _terms.term().getText();
 				Term t;
 				
-				if(ts.startsWith("?")) {
-					String vstring = ts.substring(1);
-					Integer vv = vMap.get(vstring);
-					if(vv == null) {
-						vv = value++;
-						vMap.put(vstring, vv);
-					}
-					t = TermFactory.instance().createVariable(vv);
-				}
-				else t = TermFactory.instance().createConstant(ts);
+				if(Character.isUpperCase(ts.charAt(0))) 
+					t = TermFactory.instance().createVariable(ts);
+				else 
+					t = TermFactory.instance().createConstant(ts);
 				
 				terms.add(t);
 				_terms = _terms.terms();

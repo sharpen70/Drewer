@@ -10,15 +10,18 @@ public class ExRule {
 	private AtomSet head;
 	private AtomSet body;
 	
+	private long ruleIndex;
+	
 	private Set<Variable> existentials = null;
 	private Set<Variable> frontier = null;
 	private Map<Variable, TermType> vartype = null; 
 	
 	private int var_bound = -1;
 	
-	public ExRule(AtomSet head, AtomSet body) {
+	public ExRule(AtomSet head, AtomSet body, long index) {
 		this.head = head;
 		this.body = body;
+		this.ruleIndex = index;
 	}
 	
 	public AtomSet getHead() {
@@ -84,7 +87,8 @@ public class ExRule {
 	
 	@Override
 	public String toString() {
-		String s = head.toString();
+		String s = "[" + this.ruleIndex + "] "; 
+		s += head.toString();
 		s += " <- ";
 		s += body.toString();
 		s += ".";

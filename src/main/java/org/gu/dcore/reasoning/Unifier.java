@@ -11,7 +11,6 @@ import java.util.Set;
 import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
-import org.gu.dcore.model.ExRule;
 import org.gu.dcore.model.Variable;
 
 public class Unifier {
@@ -43,7 +42,14 @@ public class Unifier {
 		Set<Atom> newpB = new HashSet<>();
 		Set<Atom> newH = new HashSet<>();
 		
-		this.partition.join(u.getPartition());
+		Partition newP = this.partition.getCopy();
+		
+		if(!newP.join(u.partition)) return null;
+		
+		newpB.addAll(u.pB);
+		newH.addAll(u.H);
+		
+		return new Unifier(newpB, newH, newP, this.B);
 	}
 	
 	public boolean isPieceUnifier() {

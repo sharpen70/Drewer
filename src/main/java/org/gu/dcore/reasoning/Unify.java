@@ -17,11 +17,8 @@ import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.ExRule;
 
 public class Unify {
-	public static List<Unifier> getSinglePieceUnifier(ExRule rule, AtomSet atomset) {
-		return null;
-	}
 	
-	private static List<Unifier> getMostGeneralPreUnifier(ExRule rule, AtomSet atomset) {
+	public static List<Unifier> getSinglePieceUnifier(ExRule rule, AtomSet atomset) {
 	//	List<Unifier> preUnifiers = new LinkedList<>();
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
@@ -73,24 +70,35 @@ public class Unify {
 	}
 	
 	private static List<Unifier> extend(Unifier unifier, Map<Atom, List<Unifier>> preUnifiers) {
+		List<Unifier> result = new LinkedList<>();
+		
 		Set<Atom> stickyAtoms = unifier.getStickyAtoms();
 		
-		Queue<Partition> prePartition = new LinkedList<>();
-		prePartition.add(unifier.getPartition());
+		List<Unifier> preq = new LinkedList<>();
+		preq.add(unifier);
 		
 		for(Atom a : stickyAtoms) {
-			while(!prePartition.isEmpty()) {
-				Partition p = prePartition.poll();
+			List<Unifier> temp_preq = new LinkedList<>();
+			
+			for(Unifier pu : preq) {
 				List<Unifier> us = preUnifiers.get(a);
 				
 				if(us == null || us.isEmpty()) continue;
 				
 				for(Unifier u : us) {
-					
+					Unifier extended = pu.extend(u);
+					if(extended != null) temp_preq.add(extended);
 				}
 			}
+			
+			preq = temp_preq;
 		}
 		
-		return null;
+		for(Unifier pu : preq) {
+			if(pu.isPieceUnifier()) result.add(pu);
+			else result.addAll(extend(pu, preUnifiers));
+		}
+		
+		return result;
 	}
 }

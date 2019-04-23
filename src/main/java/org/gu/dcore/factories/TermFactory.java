@@ -19,6 +19,7 @@ public class TermFactory {
 	
 	private TermFactory() {
 		this.cMap = new HashMap<>();
+		this.vMap = new HashMap<>(); 
 		this.vars = new Variable[max_var_size];
 	}
 	
@@ -56,14 +57,14 @@ public class TermFactory {
 		Variable v;
 		
 		if(vi == null) {
-			v = this.vars[this.var_index];
+			v = this.vars[this.var_index];				
+			this.vMap.put(identifier, this.var_index);
 			
 			if(v == null) {
 				v = new Variable(this.var_index);
 				this.vars[this.var_index] = v;
-				this.var_index++;
-			}		
-			this.vMap.put(identifier, this.var_index);
+			}
+			this.var_index++;
 		}
 		else v = this.vars[vi];
 		
