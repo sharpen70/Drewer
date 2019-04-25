@@ -15,17 +15,25 @@ import org.gu.dcore.model.Variable;
 
 public class Unifier {
 	private Partition partition;
-	private Set<Atom> pB;
+	private Set<Atom> B;
 	private Set<Atom> H;
 	
-	private AtomSet B;
-	private Map<Term, List<Atom>> sticky;
+	public Unifier(Set<Atom> pB, Set<Atom> H, Partition partition) {
+		this.B = B;
+		this.H = H;
+		this.partition = partition;
+	}
 	
-	public Unifier(Set<Atom> _pB, Set<Atom> _H, Partition _partition, AtomSet _B) {
-		this.pB = _pB;
-		this.H = _H;
-		this.partition = _partition;
-		this.B = _B;
+	public Partition getPartition() {
+		return this.partition;
+	}
+	
+	public Set<Atom> getB() {
+		return this.B;
+	}
+	
+	public Set<Atom> getH() {
+		return this.H;
 	}
 	
 	public Atom getImageOf(Atom a) {
@@ -40,14 +48,14 @@ public class Unifier {
 		Set<Atom> newpB = new HashSet<>();
 		Set<Atom> newH = new HashSet<>();
 		
-		newpB.addAll(this.pB);
+		newpB.addAll(this.B);
 		newH.addAll(this.H);		
-		newpB.addAll(u.pB);
+		newpB.addAll(u.B);
 		newH.addAll(u.H);
 		
 		Partition newP = this.partition.join(u.partition);
 		
-		return new Unifier(newpB, newH, newP, this.B);
+		return new Unifier(newpB, newH, newP);
 	}
 	
 	public boolean isPieceUnifier() {
@@ -64,10 +72,6 @@ public class Unifier {
 			re.addAll(atoms);
 		
 		return re;
-	}
-	
-	public Partition getPartition() {
-		return this.partition;
 	}
 	
 	private void computeSticky() {

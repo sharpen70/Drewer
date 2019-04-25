@@ -50,7 +50,7 @@ public class Atom {
 		this.terms = terms;
 	}
 	
-	public Set<Variable> getVariable() {
+	public Set<Variable> getVariables() {
 		Set<Variable> vars = new HashSet<>();
 		
 		for(Term t : this.terms) {

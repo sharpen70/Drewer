@@ -33,6 +33,9 @@ public class Partition {
 		return p;
 	}
 	
+	public int getOffset() {
+		return this.var_offset;
+	}
 	/*
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule

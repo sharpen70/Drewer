@@ -12,7 +12,7 @@ public class ExRule {
 	
 	private int ruleIndex;
 	
-	private Map<Variable, TermType> vartype = null; 
+	private Map<Variable, Boolean> headVarType = null; 
 	
 	private int max_var;
 	
@@ -34,49 +34,22 @@ public class ExRule {
 	public int getMaxVar() {
 		return this.max_var;
 	}
-//	public Set<Variable> getExistentials() {
-//		if(this.existentials == null) this.computeFrontierAndExistentials();
-//		return this.existentials;
-//	}
-//	
-//	public Set<Variable> getFrontier() {
-//		if(this.frontier == null) this.computeFrontierAndExistentials();
-//		return this.frontier;
-//	}
 	
-	public TermType getTermType(Term t) {
-		if(t instanceof Constant) return TermType.CONSTANT;
-		if(this.vartype == null) this.computeFrontierAndExistentials();
-		return this.vartype.get((Variable)t);
+	public boolean isExistentialVar(Variable v) {
+		if(this.headVarType == null) this.computeFrontierAndExistentials();
+		return this.headVarType.get(v);
 	}
-	
-//	private void computeFrontierAndExistentials() {
-//		Set<Variable> body_vars = this.body.getVariable();
-//		Set<Variable> head_vars = this.head.getVariable();
-//		
-//		this.existentials = new HashSet<>();
-//		this.frontier = new HashSet<>();
-//		
-//		for(Variable v : head_vars) {
-//			if(body_vars.contains(v)) this.frontier.add(v);
-//			else this.existentials.add(v);
-//		}
-//		
-//		this.var_bound = body_vars.size() + this.existentials.size();
-//	}
 	
 	private void computeFrontierAndExistentials() {
 		Set<Variable> body_vars = this.body.getVariables();
 		Set<Variable> head_vars = this.head.getVariables();
 		
-//		this.existentials = new HashSet<>();
-//		this.frontier = new HashSet<>();
-		this.vartype = new HashMap<>();
+		this.headVarType = new HashMap<>();
 		
 		for(Variable v : head_vars) {
-			if(body_vars.contains(v)) this.vartype.put(v, TermType.FRONTIER);
+			if(body_vars.contains(v)) this.headVarType.put(v, false);
 			else {
-				this.vartype.put(v, TermType.EXISTENTIAL);
+				this.headVarType.put(v, true);
 			}
 		}
 	}
