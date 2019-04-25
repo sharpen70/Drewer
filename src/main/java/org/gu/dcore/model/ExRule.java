@@ -1,5 +1,6 @@
 package org.gu.dcore.model;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,6 +76,7 @@ public class ExRule {
 //		this.existentials = new HashSet<>();
 //		this.frontier = new HashSet<>();
 		this.var_bound = body_vars.size();
+		this.vartype = new HashMap<>();
 		
 		for(Variable v : head_vars) {
 			if(body_vars.contains(v)) this.vartype.put(v, TermType.FRONTIER);

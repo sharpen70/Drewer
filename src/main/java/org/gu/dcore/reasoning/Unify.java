@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 
 import org.gu.dcore.interf.Term;
@@ -32,10 +31,7 @@ public class Unify {
 					for(int i = 0; i < a.getPredicate().getArity(); i++) {
 						Term at = a.getTerm(i);
 						Term bt = b.getTerm(i);
-						TermType atType = at instanceof Constant ? TermType.CONSTANT : TermType.DEFAULT;
-						if(!partition.add(at, atType, bt, rule.getTermType(bt))) {
-							valid = false; break;
-						}
+						partition.add(at, bt);
 					}
 					
 					if(valid) {
@@ -101,4 +97,8 @@ public class Unify {
 		
 		return result;
 	}
-}
+	
+	public static int checkUnifier(Unifier u, AtomSet atomset, ExRule r) {
+		
+	}
+} 

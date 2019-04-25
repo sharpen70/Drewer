@@ -26,8 +26,6 @@ public class Unifier {
 		this.H = _H;
 		this.partition = _partition;
 		this.B = _B;
-	
-		sticky = new HashMap<>();
 	}
 	
 	public Atom getImageOf(Atom a) {
@@ -42,12 +40,12 @@ public class Unifier {
 		Set<Atom> newpB = new HashSet<>();
 		Set<Atom> newH = new HashSet<>();
 		
-		Partition newP = this.partition.getCopy();
-		
-		if(!newP.join(u.partition)) return null;
-		
+		newpB.addAll(this.pB);
+		newH.addAll(this.H);		
 		newpB.addAll(u.pB);
 		newH.addAll(u.H);
+		
+		Partition newP = this.partition.join(u.partition);
 		
 		return new Unifier(newpB, newH, newP, this.B);
 	}

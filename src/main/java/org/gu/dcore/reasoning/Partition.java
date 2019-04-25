@@ -1,11 +1,9 @@
 package org.gu.dcore.reasoning;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.gu.dcore.interf.Term;
@@ -13,26 +11,29 @@ import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.Variable;
 
 public class Partition {
-	/*
-	 * The values of the map are arrays of boolean with size 3
-	 * 1st of array denoting the category contain constant
-	 * 2st of array denoting the category contain existential var
-	 * 3st of array denoting the category contain frontier var
-	 */
-	public Map<Set<Term>, boolean[]> categories;	
+	public Set<Term> pBVar;
+	public Set<Term> HVar;
+	public List<Set<Term>> categories;	
 		
 	private Substitution substitution = null;
 	
 	public Partition() {
-		this.categories = new HashMap<>();
+		this.categories = new LinkedList<>();
+		this.pBVar = new HashSet<>();
+		this.HVar = new HashSet<>();
 	}
 	
 	public Partition getCopy() {
 		Partition p = new Partition();
 		
-		for(Entry<Set<Term>, boolean[]> entry : this.categories.entrySet()) {
-			p.categories.put(entry.getKey(), entry.getValue());
+		for(Set<Term> c : this.categories) {
+			Set<Term> nc = new HashSet<>();
+			nc.addAll(c);
+			p.categories.add(nc);
 		}
+		
+		p.pBVar.addAll(this.pBVar);
+		p.HVar.addAll(this.HVar);
 		
 		return p;
 	}
@@ -41,127 +42,91 @@ public class Partition {
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule
 	 */
-	public boolean add(Term b, TermType bt, Term h, TermType ht) {		
+	public void add(Term b, Term h) {
+		this.pBVar.add(b);
+		this.HVar.add(h);
+		
 		boolean b_in = false;
 		boolean h_in = false;
 		
-		Entry<Set<Term>, boolean[]> first = null;
+		Set<Term> first = null;
 		
-		if((bt == TermType.CONSTANT && (ht == TermType.CONSTANT) ||
-				ht == TermType.EXISTENTIAL))
-			return false;
-		
-		for(Entry<Set<Term>, boolean[]> entry : this.categories.entrySet()) {
-			boolean this_round = false;
-			
-			Set<Term> category = entry.getKey();
-			boolean[] status = entry.getValue();
-			
+		for(Set<Term> category : this.categories) {
+			boolean this_round = false;			
 	
 			if(b_in && h_in) break;
 			
-			if(!b_in && category.contains(b)) {
-				if(bt == TermType.CONSTANT && (status[0] || status[1])) 
-					return false;
-				
+			if(!b_in && category.contains(b)) {				
 				if(first == null) {
-					first = entry;
+					first = category;
 					b_in = true;
 					this_round = true;
-					this.changeStatus(status, bt);
 				}
 				else {
-					first.getKey().addAll(category);
-					this.changeStatus(first.getValue(), bt);
+					first.addAll(category);
 					this.categories.remove(category);
 				}
 			}
 			
-			if(!h_in && category.contains(h)) {
-				if(ht == TermType.CONSTANT && (status[0] || status[1])) 
-					return false;
-				
-				if(ht == TermType.EXISTENTIAL && (status[0] || status[1] || 
-						status[2])) return false;
-				
+			if(!h_in && category.contains(h)) {				
 				if(first == null) {
-					first = entry;
+					first = category;
 					h_in = true;
-					this.changeStatus(status, ht);
 				}
 				else {
-					first.getKey().addAll(category);
-					this.changeStatus(first.getValue(), ht);
+					first.addAll(category);
 					if(!this_round) this.categories.remove(category);
 				}
 			}
 		}
 		
-		if(b_in && !h_in) { first.getKey().add(h); this.changeStatus(first.getValue(), ht); }
-		if(!b_in && h_in) { first.getKey().add(b); this.changeStatus(first.getValue(), bt); }
-		if(!b_in && !h_in) this.addCategory(b, bt, h, ht);
+		if(b_in && !h_in) first.add(h);
+		if(!b_in && h_in) first.add(b); 
+		if(!b_in && !h_in) this.addCategory(b, h);
+	}
+	
+	public Partition join(Partition p) {
+		Partition re = this.getCopy();
 		
-		return true;
-	}
-	
-	private void changeStatus(boolean[] status, TermType type) {
-		switch(type) {
-			case CONSTANT : status[0] = true; break;
-			case EXISTENTIAL : status[1] = true; break;
-			case FRONTIER : status[2] = true; break;
-			default : break;
-		}
-	}
-	
-	public boolean join(Partition p) {		
-		for(Entry<Set<Term>, boolean[]> entry1 : p.categories.entrySet()) {
-			Set<Term> hit = null;
-			List<Set<Term>> addToHit = new LinkedList<>();
+		re.pBVar.addAll(p.pBVar);
+		re.HVar.addAll(p.HVar);
+		
+		Iterator<Set<Term>> it = p.categories.iterator();
+		
+		while(it.hasNext()) {
+			Set<Term> pc = it.next();
 			
-			for(Entry<Set<Term>, boolean[]> entry2 : this.categories.entrySet()) {
-				for(Term t : entry1.getKey()) {
-					if(entry2.getKey().contains(t)) {
+			Set<Term> hit = null;			
+
+			for(Set<Term> tc : re.categories) {
+				for(Term t : pc) {
+					if(tc.contains(t)) {
 						if(hit == null) {
-							hit = entry2.getKey();
-							if(!join_category(p, hit, entry1.getKey())) return false;
+							hit = tc;
+							tc.addAll(pc);
 						}
-						else addToHit.add(entry2.getKey());
+						else {
+							hit.addAll(pc);
+							it.remove();
+						}
 					}
 				}
 			}
 			
-			if(hit == null) this.categories.put(entry1.getKey(), entry1.getValue());
-			
-			for(Set<Term> c : addToHit) {
-				if(!join_category(p, hit, c)) return false;
-				this.categories.remove(c);
+			if(hit == null) {
+				Set<Term> c = new HashSet<>();
+				c.addAll(pc);
+				re.categories.add(c);
 			}
 		}
 		
-		return true;
-	}
-	
-	private boolean join_category(Partition p, Set<Term> thisCategory, Set<Term> thatCategory) {
-		boolean[] thisStatus = this.categories.get(thisCategory);	
-		boolean[] thatStatus = p.categories.get(thatCategory);
-	
-		if(thisStatus[0] && thatStatus[0] || 
-				(thisStatus[1] && (thatStatus[0] || thatStatus[1] || thatStatus[2])) || 
-				(thatStatus[1] && (thisStatus[0] || thisStatus[1] || thisStatus[2])))
-			return false;
-		
-		thisCategory.addAll(thatCategory);
-		thisStatus[0] = thisStatus[0] || thatStatus[0];
-		thisStatus[1] = thisStatus[1] || thatStatus[1];
-		thisStatus[1] = thisStatus[2] || thatStatus[2];
-		
-		return true;
+		return re;
 	}
 	
 	public Substitution getSubstitution() {
 		if(this.substitution == null) {
 			this.substitution = new Substitution();
-			for(Set<Term> category : this.categories.keySet()) {
+			for(Set<Term> category : this.categories) {
 				Term mapto = null;
 				
 				Term last = null;
@@ -184,16 +149,12 @@ public class Partition {
 		return this.substitution;
 	}
 	
-	private void addCategory(Term b, TermType bt, Term h, TermType ht) {
+	private void addCategory(Term b, Term h) {
 		Set<Term> category = new HashSet<>();
-		boolean[] status = new boolean[3];
 		
 		category.add(b);
 		category.add(h);
 		
-		this.changeStatus(status, bt);
-		this.changeStatus(status, ht);
-		
-		this.categories.put(category, status);
+		this.categories.add(category);
 	}	
 }
