@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.gu.dcore.interf.Term;
-
 /**
  * Atom class, without functional terms
  * @author sharpen

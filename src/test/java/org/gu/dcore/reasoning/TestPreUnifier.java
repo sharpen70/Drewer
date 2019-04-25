@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.ExRule;
 import org.gu.dcore.model.Program;
+import org.gu.dcore.model.Term;
 import org.gu.dcore.parsing.DcoreParser;
 
 import junit.framework.Assert;

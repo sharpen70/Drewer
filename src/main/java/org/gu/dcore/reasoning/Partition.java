@@ -6,34 +6,29 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Partition {
-	public Set<Term> pBVar;
-	public Set<Term> HVar;
-	public List<Set<Term>> categories;	
+	public List<Set<Object>> categories;	
 		
-	private Substitution substitution = null;
+	private NormalSubstitution substitution = null;
+	private int var_offset;
 	
-	public Partition() {
+	public Partition(int var_offset) {
 		this.categories = new LinkedList<>();
-		this.pBVar = new HashSet<>();
-		this.HVar = new HashSet<>();
+		this.var_offset = var_offset;
 	}
 	
 	public Partition getCopy() {
-		Partition p = new Partition();
+		Partition p = new Partition(this.var_offset);
 		
-		for(Set<Term> c : this.categories) {
-			Set<Term> nc = new HashSet<>();
+		for(Set<Object> c : this.categories) {
+			Set<Object> nc = new HashSet<>();
 			nc.addAll(c);
 			p.categories.add(nc);
 		}
-		
-		p.pBVar.addAll(this.pBVar);
-		p.HVar.addAll(this.HVar);
 		
 		return p;
 	}
@@ -42,16 +37,13 @@ public class Partition {
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule
 	 */
-	public void add(Term b, Term h) {
-		this.pBVar.add(b);
-		this.HVar.add(h);
-		
+	public void add(Term b, Term h) {		
 		boolean b_in = false;
 		boolean h_in = false;
 		
-		Set<Term> first = null;
+		Set<Object> first = null;
 		
-		for(Set<Term> category : this.categories) {
+		for(Set<Object> category : this.categories) {
 			boolean this_round = false;			
 	
 			if(b_in && h_in) break;
@@ -80,26 +72,23 @@ public class Partition {
 			}
 		}
 		
-		if(b_in && !h_in) first.add(h);
-		if(!b_in && h_in) first.add(b); 
+		if(b_in && !h_in) addTerm(first, h, true);
+		if(!b_in && h_in) addTerm(first, b, false);
 		if(!b_in && !h_in) this.addCategory(b, h);
 	}
 	
 	public Partition join(Partition p) {
 		Partition re = this.getCopy();
 		
-		re.pBVar.addAll(p.pBVar);
-		re.HVar.addAll(p.HVar);
-		
-		Iterator<Set<Term>> it = p.categories.iterator();
+		Iterator<Set<Object>> it = p.categories.iterator();
 		
 		while(it.hasNext()) {
-			Set<Term> pc = it.next();
+			Set<Object> pc = it.next();
 			
-			Set<Term> hit = null;			
+			Set<Object> hit = null;			
 
-			for(Set<Term> tc : re.categories) {
-				for(Term t : pc) {
+			for(Set<Object> tc : re.categories) {
+				for(Object t : pc) {
 					if(tc.contains(t)) {
 						if(hit == null) {
 							hit = tc;
@@ -114,7 +103,7 @@ public class Partition {
 			}
 			
 			if(hit == null) {
-				Set<Term> c = new HashSet<>();
+				Set<Object> c = new HashSet<>();
 				c.addAll(pc);
 				re.categories.add(c);
 			}
@@ -123,15 +112,15 @@ public class Partition {
 		return re;
 	}
 	
-	public Substitution getSubstitution() {
+	public NormalSubstitution getSubstitution() {
 		if(this.substitution == null) {
-			this.substitution = new Substitution();
-			for(Set<Term> category : this.categories) {
-				Term mapto = null;
+			this.substitution = new NormalSubstitution();
+			for(Set<Object> category : this.categories) {
+				Object mapto = null;
 				
-				Term last = null;
+				Object last = null;
 				
-				for(Term t : category) {
+				for(Object t : category) {
 					last = t;
 					if(t instanceof Constant) {
 						mapto = t;
@@ -141,8 +130,8 @@ public class Partition {
 				
 				if(mapto == null) mapto = last;
 				
-				for(Term t : category) {
-					if(!t.equals(mapto)) this.substitution.add((Variable)t, mapto);
+				for(Object t : category) {
+//					if(!t.equals(mapto)) this.substitution.add((Variable)t, mapto);
 				}
 			}
 		}
@@ -150,11 +139,19 @@ public class Partition {
 	}
 	
 	private void addCategory(Term b, Term h) {
-		Set<Term> category = new HashSet<>();
+		Set<Object> category = new HashSet<>();
 		
-		category.add(b);
-		category.add(h);
+		addTerm(category, b, false);
+		addTerm(category, h, true);
 		
 		this.categories.add(category);
-	}	
+	}
+	
+	private void addTerm(Set<Object> c, Term t, boolean withOffset) {
+		if(t instanceof Constant) c.add(t);
+		else {
+			int value = ((Variable)t).getValue();
+			c.add(value + this.var_offset);
+		}
+	}
 }

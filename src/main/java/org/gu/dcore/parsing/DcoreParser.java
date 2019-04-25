@@ -21,12 +21,13 @@ import org.gu.dcore.antlr4.EDLGParser.TermsContext;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
-import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ExRule;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
+import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 
 
 /**
@@ -35,9 +36,12 @@ import org.gu.dcore.model.Program;
  * @version 1.0, April 2018
  */
 public class DcoreParser {
+	private Map<String, Term> vMap;
+	private int max_var;
 	
 	public DcoreParser() {
-		
+		vMap = new HashMap<>();
+		max_var = -1;
 	}
 	
 	/**
@@ -86,12 +90,13 @@ public class DcoreParser {
 		public ExRule visitExrule(ExruleContext ctx) {
 			AtomSetVisitor atomSetVisitor = new AtomSetVisitor();
 			
-			TermFactory.instance().varReset();
+			vMap.clear();
+			max_var = -1;
 			
 			AtomSet head = ctx.atomset(0).accept(atomSetVisitor);
 			AtomSet body = ctx.atomset(1).accept(atomSetVisitor);
 			
-			return RuleFactory.instance().createRule(head, body);
+			return RuleFactory.instance().createRule(head, body, max_var);
 		}
 	}
 	
@@ -127,8 +132,15 @@ public class DcoreParser {
 				String ts = _terms.term().getText();
 				Term t;
 				
-				if(Character.isUpperCase(ts.charAt(0))) 
-					t = TermFactory.instance().createVariable(ts);
+				if(Character.isUpperCase(ts.charAt(0))) {
+					t = vMap.get(ts);
+					if(t == null) {
+						t = TermFactory.instance().createVariable();
+						vMap.put(ts, t);
+					}
+					int value = ((Variable)t).getValue();
+					if(value > max_var) max_var = value;
+				}
 				else 
 					t = TermFactory.instance().createConstant(ts);
 				

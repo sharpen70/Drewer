@@ -1,7 +1,5 @@
 package org.gu.dcore.model;
 
-import org.gu.dcore.interf.Term;
-
 /**
  * Constant class
  * @author sharpen

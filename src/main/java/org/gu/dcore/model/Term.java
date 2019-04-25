@@ -1,4 +1,4 @@
-package org.gu.dcore.interf;
+package org.gu.dcore.model;
 
 /**
  * This interface is for terms in atoms 

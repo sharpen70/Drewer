@@ -9,23 +9,23 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.ExRule;
+import org.gu.dcore.model.Term;
 
 public class Unify {
 	
-	public static List<Unifier> getSinglePieceUnifier(ExRule rule, AtomSet atomset) {
+	public static List<Unifier> getSinglePieceUnifier(ExRule br, ExRule hr) {
 	//	List<Unifier> preUnifiers = new LinkedList<>();
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
 		
-		for(Atom a : atomset) {
-			for(Atom b : rule.getHead()) {
+		for(Atom a : br.getBody()) {
+			for(Atom b : hr.getHead()) {
 				if(a.getPredicate().equals(b.getPredicate())) {
-					Partition partition = new Partition();
+					Partition partition = new Partition(br.getMaxVar());
 					boolean valid = true;
 					
 					for(int i = 0; i < a.getPredicate().getArity(); i++) {
@@ -38,7 +38,7 @@ public class Unify {
 						Set<Atom> B = new HashSet<>(); B.add(a);
 						Set<Atom> H = new HashSet<>(); H.add(b);
 						
-						Unifier u = new Unifier(B, H, partition, atomset);
+						Unifier u = new Unifier(B, H, partition, br.getBody());
 						if(u.isPieceUnifier()) singlePieceUnifiers.add(u);
 						else {
 							List<Unifier> unifiers = preUnifiers.get(a);
@@ -98,7 +98,9 @@ public class Unify {
 		return result;
 	}
 	
-	public static int checkUnifier(Unifier u, AtomSet atomset, ExRule r) {
+	public static int checkUnifier(Unifier u, ExRule br, ExRule hr) {
 		
 	}
+	
+	
 } 

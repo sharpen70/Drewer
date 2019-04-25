@@ -1,4 +1,4 @@
-package org.gu.dcore.interf;
+package org.gu.dcore.model;
 
 /**
  * This is the interface for Rule type objects

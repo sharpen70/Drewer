@@ -1,12 +1,5 @@
 package org.gu.dcore.model;
 
-import org.gu.dcore.interf.Term;
-
-/**
- * Class for variables
- * @author sharpen
- * @version 1.0, April 2018
- */
 public class Variable implements Term {
 	private int value;
 	

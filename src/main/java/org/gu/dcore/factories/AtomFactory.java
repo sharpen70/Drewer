@@ -2,9 +2,9 @@ package org.gu.dcore.factories;
 
 import java.util.ArrayList;
 
-import org.gu.dcore.interf.Term;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Predicate;
+import org.gu.dcore.model.Term;
 
 public class AtomFactory {
 	private static AtomFactory factory = null;

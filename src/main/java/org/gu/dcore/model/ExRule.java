@@ -4,25 +4,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.gu.dcore.interf.Term;
 import org.gu.dcore.reasoning.TermType;
 
 public class ExRule {
 	private AtomSet head;
 	private AtomSet body;
 	
-	private long ruleIndex;
+	private int ruleIndex;
 	
-	private Set<Variable> existentials = null;
-	private Set<Variable> frontier = null;
 	private Map<Variable, TermType> vartype = null; 
 	
-	private int var_bound = -1;
+	private int max_var;
 	
-	public ExRule(AtomSet head, AtomSet body, long index) {
+	public ExRule(AtomSet head, AtomSet body, int index, int max_var) {
 		this.head = head;
 		this.body = body;
 		this.ruleIndex = index;
+		this.max_var = max_var;
 	}
 	
 	public AtomSet getHead() {
@@ -33,6 +31,9 @@ public class ExRule {
 		return this.body;
 	}
 	
+	public int getMaxVar() {
+		return this.max_var;
+	}
 //	public Set<Variable> getExistentials() {
 //		if(this.existentials == null) this.computeFrontierAndExistentials();
 //		return this.existentials;
@@ -47,11 +48,6 @@ public class ExRule {
 		if(t instanceof Constant) return TermType.CONSTANT;
 		if(this.vartype == null) this.computeFrontierAndExistentials();
 		return this.vartype.get((Variable)t);
-	}
-	
-	public int getVarBound() {
-		if(this.var_bound == -1) this.computeFrontierAndExistentials();
-		return this.var_bound;
 	}
 	
 //	private void computeFrontierAndExistentials() {
@@ -75,14 +71,12 @@ public class ExRule {
 		
 //		this.existentials = new HashSet<>();
 //		this.frontier = new HashSet<>();
-		this.var_bound = body_vars.size();
 		this.vartype = new HashMap<>();
 		
 		for(Variable v : head_vars) {
 			if(body_vars.contains(v)) this.vartype.put(v, TermType.FRONTIER);
 			else {
 				this.vartype.put(v, TermType.EXISTENTIAL);
-				this.var_bound++;
 			}
 		}
 	}
