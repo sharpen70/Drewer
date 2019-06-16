@@ -4,12 +4,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
@@ -17,10 +18,19 @@ public class Unifier {
 	private Partition partition;
 	private Set<Atom> B;
 	private Set<Atom> H;
+	private Rule br;
+	private Rule hr;
 	
-	public Unifier(Set<Atom> pB, Set<Atom> H, Partition partition) {
+	private Set<Atom> stickyAtoms;
+	private boolean valid;
+	private boolean analyzed = false;
+	
+	public Unifier(Set<Atom> B, Set<Atom> H, Rule br, Rule hr, Partition partition) {
 		this.B = B;
 		this.H = H;
+		this.br = br;
+		this.hr = hr;
+		
 		this.partition = partition;
 	}
 	
@@ -55,55 +65,67 @@ public class Unifier {
 		
 		Partition newP = this.partition.join(u.partition);
 		
-		return new Unifier(newpB, newH, newP);
+		return new Unifier(newpB, newH, this.br, this.hr, newP);
+	}
+	
+	public boolean isPartitionValid() {
+		if(!this.analyzed) analyze();
+		return this.valid;
 	}
 	
 	public boolean isPieceUnifier() {
-		if(sticky == null) this.computeSticky();
-		return this.sticky.isEmpty();
+		if(!this.analyzed) analyze();
+		return this.stickyAtoms.isEmpty();
 	}
 	
 	public Set<Atom> getStickyAtoms() {
-		if(this.sticky == null) this.computeSticky();
-		
-		Set<Atom> re = new HashSet<>();
-		
-		for(List<Atom> atoms : this.sticky.values()) 
-			re.addAll(atoms);
-		
-		return re;
+		if(!this.analyzed) analyze();
+		return this.stickyAtoms;
 	}
 	
-	private void computeSticky() {
-		this.sticky = new HashMap<>();
+	private void analyze() {
+		this.stickyAtoms = new HashSet<>();
+		
 		List<Atom> minus = new LinkedList<>();
 		
-		for(Atom a : this.B) {
-			if(!this.pB.contains(a)) minus.add(a);
+		for(Atom a : br.getBody()) {
+			if(!this.B.contains(a)) minus.add(a);
 		}
 		
-		Set<Variable> pBvar = new HashSet<>();
-		for(Atom a : pB) pBvar.addAll(a.getVariable());
-		
-		for(Atom a : minus) {
-			for(Variable v : pBvar) {
-				if(a.getVariable().contains(v)) {
-					List<Atom> sticky_atoms = this.sticky.get(v);
-					if(sticky_atoms == null) {
-						sticky_atoms = new LinkedList<>();
-						sticky_atoms.add(a);
-						this.sticky.put(v, sticky_atoms);
+		for(Set<Object> c : this.partition.categories) {
+			boolean constant = false;
+			boolean existential = false;
+			boolean frontier = false;
+			
+			Set<Atom> separatingAtoms = new HashSet<>();
+			
+			for(Object o : c) {
+				if(o instanceof Constant) {
+					if(constant == true) { this.valid = false; return; }
+					constant = true;
+				}
+				else {
+					int value = (int)o;
+					
+					if(value > this.partition.getOffset()) {
+						if(hr.isExistentialVar(value - this.partition.getOffset())) 
+							if(existential || frontier) { this.valid = false; return; }
+							else existential = true;
+						else
+							if(existential) { this.valid = false; return; }
+							else frontier = true;
 					}
-					else sticky_atoms.add(a);
+					else {
+						for(Atom a : minus) {
+							for(Variable v : a.getVariables()) {
+								if(v.getValue() == value) separatingAtoms.add(a);
+							}
+						}
+					}
 				}
 			}
-		}
-		
-		for(Entry<Set<Term>, boolean[]> category : this.partition.categories.entrySet()) {
-			if(category.getValue()[1]) {
-				for(Term t : this.sticky.keySet()) 
-					if(!category.getKey().contains(t)) this.sticky.remove(t);
-			}
+			
+			if(existential) stickyAtoms.addAll(separatingAtoms);
 		}
 	}
 }

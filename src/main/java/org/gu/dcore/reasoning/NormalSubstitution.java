@@ -8,7 +8,7 @@ import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
-import org.gu.dcore.model.ExRule;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
@@ -50,7 +50,7 @@ public class NormalSubstitution implements Substitution {
 		return new AtomSet(atoms);
 	}
 	
-	public ExRule getImageOf(ExRule rule) {
+	public Rule getImageOf(Rule rule) {
 		AtomSet head = rule.getHead();
 		AtomSet body = rule.getBody();
 		

@@ -1,7 +1,7 @@
 package org.gu.dcore.factories;
 
 import org.gu.dcore.model.AtomSet;
-import org.gu.dcore.model.ExRule;
+import org.gu.dcore.model.Rule;
 
 public class RuleFactory {
 	private static RuleFactory factory = null;
@@ -18,7 +18,7 @@ public class RuleFactory {
 		return factory;
 	}
 	
-	public ExRule createRule(AtomSet head, AtomSet body, int var_offset) {
-		return new ExRule(head, body, ruleIndex++, var_offset);
+	public Rule createRule(AtomSet head, AtomSet body, int var_offset) {
+		return new Rule(head, body, ruleIndex++, var_offset);
 	}
 }

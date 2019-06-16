@@ -2,7 +2,7 @@ package org.gu.dcore.reasoning;
 
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
-import org.gu.dcore.model.ExRule;
+import org.gu.dcore.model.Rule;
 
 public class SubstitutionWithFreshVar implements Substitution {
 	private int varbound;
@@ -24,7 +24,7 @@ public class SubstitutionWithFreshVar implements Substitution {
 	}
 	
 	@Override
-	public ExRule getImageOf(ExRule rule) {
+	public Rule getImageOf(Rule rule) {
 		// TODO Auto-generated method stub
 		return null;
 	}

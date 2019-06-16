@@ -9,15 +9,15 @@ import java.util.List;
  * @author sharpen
  * @version 1.0, April 2018
  */
-public class Program implements Iterable<ExRule> {
-	private List<ExRule> rules;
+public class Program implements Iterable<Rule> {
+	private List<Rule> rules;
 	
-	public Program(List<ExRule> rules) {
+	public Program(List<Rule> rules) {
 		this.rules = rules;
 	}
 
 	@Override
-	public Iterator<ExRule> iterator() {
+	public Iterator<Rule> iterator() {
 		return this.rules.iterator();
 	}
 	
@@ -25,14 +25,14 @@ public class Program implements Iterable<ExRule> {
 		return this.rules.size();
 	}
 	
-	public ExRule getRule(int i) {
+	public Rule getRule(int i) {
 		return this.rules.get(i);
 	}
 	
 	@Override
 	public String toString() {
 		String s = "";
-		for(ExRule r : rules) {
+		for(Rule r : rules) {
 			s += r.toString();
 			s += "\n";
 		}

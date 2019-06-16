@@ -10,15 +10,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.gu.dcore.model.Atom;
-import org.gu.dcore.model.AtomSet;
-import org.gu.dcore.model.Constant;
-import org.gu.dcore.model.ExRule;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
-import org.gu.dcore.model.Variable;
 
 public class Unify {
 	
-	public static List<Unifier> getSinglePieceUnifier(ExRule br, ExRule hr) {
+	public static List<Unifier> getSinglePieceUnifier(Rule br, Rule hr) {
 	//	List<Unifier> preUnifiers = new LinkedList<>();
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
@@ -27,19 +24,19 @@ public class Unify {
 			for(Atom b : hr.getHead()) {
 				if(a.getPredicate().equals(b.getPredicate())) {
 					Partition partition = new Partition(br.getMaxVar());
-					boolean valid = true;
 					
 					for(int i = 0; i < a.getPredicate().getArity(); i++) {
 						Term at = a.getTerm(i);
 						Term bt = b.getTerm(i);
 						partition.add(at, bt);
-					}
+					}					
+
+					Set<Atom> B = new HashSet<>(); B.add(a);
+					Set<Atom> H = new HashSet<>(); H.add(b);
 					
-					if(valid) {
-						Set<Atom> B = new HashSet<>(); B.add(a);
-						Set<Atom> H = new HashSet<>(); H.add(b);
-						
-						Unifier u = new Unifier(B, H, partition);
+					Unifier u = new Unifier(B, H, br, hr, partition);
+					
+					if(u.isPartitionValid()) {
 						if(u.isPieceUnifier()) singlePieceUnifiers.add(u);
 						else {
 							List<Unifier> unifiers = preUnifiers.get(a);
@@ -98,54 +95,4 @@ public class Unify {
 		
 		return result;
 	}
-	
-	public static Set<Atom> getStickyAtoms(Unifier u, ExRule br, ExRule hr) {
-		Partition p = u.getPartition();
-		Set<Atom> stickyAtoms = new HashSet<>();
-		
-		List<Atom> minus = new LinkedList<>();
-		
-		for(Atom a : br.getBody()) {
-			if(!u.getB().contains(a)) minus.add(a);
-		}
-		
-		for(Set<Object> c : p.categories) {
-			boolean constant = false;
-			boolean existential = false;
-			boolean frontier = false;
-			
-			Set<Atom> separatingAtoms = new HashSet<>();
-			
-			for(Object o : c) {
-				if(o instanceof Constant) {
-					if(constant == true) return null;
-					constant = true;
-				}
-				else {
-					Variable v = (Variable)o;
-					if(v.getValue() > p.getOffset()) {
-						if(hr.isExistentialVar(v)) 
-							if(existential || frontier) return null;
-							else existential = true;
-						else
-							if(existential) return null;
-							else frontier = true;
-					}
-					else {
-						for(Atom a : minus) {
-							if(a.getVariables().contains(v)) {
-								separatingAtoms.add(a);
-							}
-						}
-					}
-				}
-			}
-			
-			if(existential) stickyAtoms.addAll(separatingAtoms);
-		}
-		
-		return stickyAtoms;
-	}
-	
-	
 } 

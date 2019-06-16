@@ -39,12 +39,16 @@ public class Partition {
 	/*
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule
+	 * 		   eV: whether h is an existential variable
 	 */
-	public void add(Term b, Term h) {		
+	public void add(Object b, Object h) {		
 		boolean b_in = false;
 		boolean h_in = false;
 		
 		Set<Object> first = null;
+		
+		if(b instanceof Variable) b = ((Variable) b).getValue();
+		if(h instanceof Variable) h = ((Variable) h).getValue() + this.var_offset;
 		
 		for(Set<Object> category : this.categories) {
 			boolean this_round = false;			
@@ -75,9 +79,13 @@ public class Partition {
 			}
 		}
 		
-		if(b_in && !h_in) addTerm(first, h, true);
-		if(!b_in && h_in) addTerm(first, b, false);
-		if(!b_in && !h_in) this.addCategory(b, h);
+		if(b_in && !h_in) first.add(h); 
+		if(!b_in && h_in) first.add(b);
+		if(!b_in && !h_in) {
+			Set<Object> category = new HashSet<>();			
+			category.add(b); category.add(h);			
+			this.categories.add(category);
+		}
 	}
 	
 	public Partition join(Partition p) {
@@ -139,22 +147,5 @@ public class Partition {
 			}
 		}
 		return this.substitution;
-	}
-	
-	private void addCategory(Term b, Term h) {
-		Set<Object> category = new HashSet<>();
-		
-		addTerm(category, b, false);
-		addTerm(category, h, true);
-		
-		this.categories.add(category);
-	}
-	
-	private void addTerm(Set<Object> c, Term t, boolean withOffset) {
-		if(t instanceof Constant) c.add(t);
-		else {
-			int value = ((Variable)t).getValue();
-			c.add(value + this.var_offset);
-		}
 	}
 }

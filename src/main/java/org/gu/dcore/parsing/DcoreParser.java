@@ -23,7 +23,7 @@ import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
-import org.gu.dcore.model.ExRule;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Term;
@@ -76,7 +76,7 @@ public class DcoreParser {
 		public Program visitProgram(ProgramContext ctx) {
 			ExRuleVisitor exRuleVisitor = new ExRuleVisitor();
 			
-			List<ExRule> exrules = ctx.exrule()
+			List<Rule> exrules = ctx.exrule()
 					.stream()
 					.map(exrule -> exrule.accept(exRuleVisitor))
 					.collect(Collectors.toList());
@@ -85,9 +85,9 @@ public class DcoreParser {
 		}
 	}
 	
-	private class ExRuleVisitor extends EDLGBaseVisitor<ExRule> {
+	private class ExRuleVisitor extends EDLGBaseVisitor<Rule> {
 		@Override
-		public ExRule visitExrule(ExruleContext ctx) {
+		public Rule visitExrule(ExruleContext ctx) {
 			AtomSetVisitor atomSetVisitor = new AtomSetVisitor();
 			
 			vMap.clear();

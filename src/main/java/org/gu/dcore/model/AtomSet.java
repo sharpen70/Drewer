@@ -42,7 +42,7 @@ public class AtomSet implements Iterable<Atom> {
 		Set<Variable> vars = new HashSet<>();
 		
 		for(Atom a : this.atoms) {
-			vars.addAll(a.getVariable());
+			vars.addAll(a.getVariables());
 		}
 		
 		return vars;
