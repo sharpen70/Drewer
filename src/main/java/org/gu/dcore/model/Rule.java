@@ -8,8 +8,8 @@ import java.util.Set;
 import org.gu.dcore.reasoning.TermType;
 
 public class Rule {
-	private AtomSet head;
-	private AtomSet body;
+	protected AtomSet head;
+	protected AtomSet body;
 	
 	private int ruleIndex;
 	
@@ -23,6 +23,13 @@ public class Rule {
 		this.body = body;
 		this.ruleIndex = index;
 		this.max_var = max_var;
+	}
+	
+	public Rule(Rule r) {
+		this.head = r.head;
+		this.body = r.body;
+		this.ruleIndex = r.ruleIndex;
+		this.max_var = r.max_var;
 	}
 	
 	public AtomSet getHead() {

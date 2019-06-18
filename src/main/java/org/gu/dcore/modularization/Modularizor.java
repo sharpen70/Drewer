@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.gu.dcore.grd.IndexedByBodyPredRuleSet;
+import org.gu.dcore.grd.PredPosition;
+import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Modularizor {
@@ -33,16 +36,37 @@ public class Modularizor {
 	}
 	
 	private List<Rule> existentialForwardChaining(Rule r) {
-		Set<Variable> existentials = r.getExistentials();
+		List<PredPosition> predPositions = getExistentialPositions(r);
 		
-		for(Variable v : existentials) {
-			existentialForwardChaining(r, v);
+		for(PredPosition predPosition : predPositions) {
+			existentialForwardMarking(r, predPosition);
 		}
 		
 		return null;
 	}
 	
-	private List<Rule> existentialForwardChaining(Rule r, Variable v) {
+	private List<Rule> existentialForwardMarking(Rule r, PredPosition predPosition) {
+		
 		return null;
+	}
+	
+	private List<PredPosition> getExistentialPositions(Rule r) {
+		List<PredPosition> predPositions = new LinkedList<>();
+		
+		for(Atom a : r.getHead()) {
+			List<Integer> indice = new LinkedList<>();
+			
+			for(int i = 0; i < a.getTerms().size(); i++) {
+				Term t = a.getTerm(i);
+				if(t instanceof Variable) {
+					int value = ((Variable) t).getValue();
+					if(r.isExistentialVar(value)) indice.add(i);
+				}
+			}
+			
+			if(!indice.isEmpty()) predPositions.add(new PredPosition(a.getPredicate(), indice));
+		}
+		
+		return predPositions;
 	}
 }

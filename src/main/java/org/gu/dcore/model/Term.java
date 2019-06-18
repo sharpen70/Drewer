@@ -5,5 +5,7 @@ package org.gu.dcore.model;
  * @author sharpen
  * @version 1.0, April 2018
  */
-public interface Term {		
+public interface Term {
+	public boolean isVariable();
+	public boolean isConstant();
 }

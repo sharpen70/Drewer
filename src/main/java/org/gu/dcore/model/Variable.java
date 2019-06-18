@@ -27,4 +27,12 @@ public class Variable implements Term {
 		Variable _obj = (Variable) obj;
 		return this.value == _obj.value;
 	}
+	@Override
+	public boolean isConstant() {
+		return false;
+	}
+	@Override
+	public boolean isVariable() {
+		return true;
+	}
 }

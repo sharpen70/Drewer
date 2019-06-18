@@ -27,4 +27,12 @@ public class Constant implements Term {
 	public String toString() {
 		return this.name;
 	}
+	@Override
+	public boolean isConstant() {
+		return true;
+	}
+	@Override
+	public boolean isVariable() {
+		return false;
+	}
 }
