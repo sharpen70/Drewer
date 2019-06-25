@@ -13,6 +13,10 @@ import org.gu.dcore.model.Rule;
 public class IndexedByBodyPredRuleSet {
 	private Map<Predicate, List<Rule>> ruleMap;
 	
+	public IndexedByBodyPredRuleSet() {
+		this.ruleMap = new HashMap<>();
+	}
+	
 	public IndexedByBodyPredRuleSet(List<Rule> onto) {
 		this.ruleMap = new HashMap<>();
 		

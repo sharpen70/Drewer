@@ -1,6 +1,6 @@
 package org.gu.dcore.modularization;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -13,48 +13,70 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Modularizor {
-	private List<Rule> er;
-	private IndexedByBodyPredRuleSet onto;
+	private List<MarkedRule> onto;
+	private IndexedByBodyPredRuleSet indexedRuleSet;
 	
 	public Modularizor(List<Rule> onto) {
-		this.onto = new IndexedByBodyPredRuleSet(onto);
-		er = new ArrayList<>();
+		this.indexedRuleSet = new IndexedByBodyPredRuleSet();
+		this.onto = new LinkedList<>();
 		
 		for(Rule r: onto) {
-			if(!r.getExistentials().isEmpty()) er.add(r);
+			MarkedRule mr = new MarkedRule(r);
+			this.onto.add(mr);
+			this.indexedRuleSet.add(mr);
 		}
 	}
 	
-	public List<Rule> modularize(List<Rule> onto) {
+	public List<Rule> modularize() {
 		List<Rule> modularizedRules = new LinkedList<>();
 		
-		for(Rule r : this.er) {
-			modularizedRules.addAll(this.existentialForwardChaining(r));
-		}
+		this.markRules();
 		
 		return modularizedRules;
 	}
 	
-	private List<Rule> existentialForwardChaining(Rule r) {
+	public void markRules() {
+		for(Rule r : this.onto) {
+			this.existentialForwardChaining(r);
+		}
+	}
+	
+	public List<MarkedRule> getMarkedRules() {
+		return this.onto;
+	}
+	
+	private void existentialForwardChaining(Rule r) {
 		List<PredPosition> predPositions = getExistentialPositions(r);
 		
 		for(PredPosition predPosition : predPositions) {
-			existentialForwardMarking(r, predPosition);
+			List<Rule> rs = this.indexedRuleSet.get(predPosition.getPredicate());
+			if(rs != null) {
+				for(Rule r1 : rs) {
+					existentialForwardMarking(r1, predPosition, r);
+				}
+			}
 		}
-		
-		return null;
 	}
 	
-	private List<Rule> existentialForwardMarking(Rule r, PredPosition predPosition) {
+	private void existentialForwardMarking(Rule r1, PredPosition predPosition, Rule r) {
+		MarkedRule mr = (MarkedRule)r1;
+		List<PredPosition> predPositions = mr.mark(r, predPosition);
 		
-		return null;
+		for(PredPosition pp : predPositions) {
+			List<Rule> rs = this.indexedRuleSet.get(pp.getPredicate());
+			if(rs != null) {
+				for(Rule _r : rs) {
+					existentialForwardMarking(_r, predPosition, r);
+				}
+			}
+		}
 	}
 	
 	private List<PredPosition> getExistentialPositions(Rule r) {
 		List<PredPosition> predPositions = new LinkedList<>();
 		
 		for(Atom a : r.getHead()) {
-			List<Integer> indice = new LinkedList<>();
+			Set<Integer> indice = new HashSet<>();
 			
 			for(int i = 0; i < a.getTerms().size(); i++) {
 				Term t = a.getTerm(i);

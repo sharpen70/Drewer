@@ -1,6 +1,5 @@
 package org.gu.dcore.modularization;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -71,9 +70,14 @@ public class MarkedRule extends Rule {
 			for(int ti = 0; ti < lt.size(); ti++) {
 				Term t = lt.get(ti);
 				if(markedv.contains(t)) {
-					if(!markedPositions.get(a).contains(ti)) through = false;
+					Set<Integer> indice = markedPositions.get(a);
+					if(indice == null || !indice.contains(ti)) {
+						through = false; break;
+					}
 				}
 			}
+			
+			if(!through) break;
 		}
 		
 		if(through) {		
@@ -87,12 +91,44 @@ public class MarkedRule extends Rule {
 					if(markedv.contains(terms.get(ai))) hid.add(ai);
 				}
 				
-				_fhead.add(new PredPosition(a.getPredicate(), hid));
+				if(hid.isEmpty()) continue;
+				
+				Set<Integer> mhid = markedPositions.get(a);
+				if(mhid == null) {
+					mhid = new HashSet<>();
+					markedPositions.put(a, mhid);
+				}
+				if(mhid.addAll(hid)) {
+					_fhead.add(new PredPosition(a.getPredicate(), hid));
+				}
 			}
 			
 			fhead.addAll(_fhead);
 		}
 		
 		return fhead;
+	}
+	
+	public void printMarked() {
+		for(Entry<Rule, Map<Atom, Set<Integer>>> entry: this.markedMap.entrySet()) {
+			System.out.print("(" + entry.getKey().getRuleIndex() + ") ");
+			 Map<Atom, Set<Integer>> mm = entry.getValue();
+			 
+			for(Atom a : this.head) {
+				Set<Integer> indice = mm.get(a);
+				if(indice != null) {
+					System.out.print(a.getPredicate().getName() + indice + " ");
+				}
+			}
+			
+			System.out.print(": ");
+			
+			for(Atom a : this.body) {
+				Set<Integer> indice = mm.get(a);
+				if(indice != null) {
+					System.out.print(a.getPredicate().getName() + indice + " ");
+				}
+			}
+		}
 	}
 }

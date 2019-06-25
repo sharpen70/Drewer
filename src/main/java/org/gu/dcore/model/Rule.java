@@ -65,6 +65,10 @@ public class Rule {
 		}
 	}
 	
+	public int getRuleIndex() {
+		return this.ruleIndex;
+	}
+	
 	public Set<Variable> getExistentials() {
 		if(this.existentials == null) computeFrontierAndExistentials();
 		return this.existentials;

@@ -29,6 +29,10 @@ public class Program implements Iterable<Rule> {
 		return this.rules.get(i);
 	}
 	
+	public List<Rule> getRuleSet() {
+		return this.rules;
+	}
+	
 	@Override
 	public String toString() {
 		String s = "";
