@@ -66,7 +66,7 @@ public class Modularizor {
 			List<Rule> rs = this.indexedRuleSet.get(pp.getPredicate());
 			if(rs != null) {
 				for(Rule _r : rs) {
-					existentialForwardMarking(_r, predPosition, r);
+					existentialForwardMarking(_r, pp, r);
 				}
 			}
 		}

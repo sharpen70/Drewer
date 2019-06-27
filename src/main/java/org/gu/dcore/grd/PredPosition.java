@@ -20,4 +20,9 @@ public class PredPosition {
 	public Set<Integer> getIndice() {
 		return this.indice;
 	}
+	
+	@Override
+	public String toString() {
+		return "" + this.predicate + this.indice;
+	}
 }

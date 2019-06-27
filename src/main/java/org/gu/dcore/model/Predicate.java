@@ -31,10 +31,15 @@ public class Predicate {
 	public int getArity() {
 		return this.arity;
 	}
-	/**
-	 * @return the name
-	 */
+	
 	public String getName() {
-		return name;
+		return this.name;
 	}
+	
+	@Override
+	public String toString() {
+		return this.name;
+	}
+	
+	
 }

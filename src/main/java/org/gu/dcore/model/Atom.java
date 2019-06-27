@@ -62,7 +62,7 @@ public class Atom {
 	
 	@Override
 	public String toString() {
-		String out = p.getName();
+		String out = p.toString();
 		out = out + "(";
 		
 		for(int i = 0; i < terms.size(); i++) {

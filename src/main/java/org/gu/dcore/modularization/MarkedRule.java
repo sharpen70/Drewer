@@ -5,13 +5,15 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.gu.dcore.grd.PredPosition;
 import org.gu.dcore.model.Atom;
+import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 
 public class MarkedRule extends Rule {
 	private Map<Rule, Map<Atom, Set<Integer>>> markedMap;
@@ -109,7 +111,51 @@ public class MarkedRule extends Rule {
 		return fhead;
 	}
 	
+	public List<BlockRule> getBlockRules() {
+		List<Block> blocks = new LinkedList<>();
+		Map<Variable, Block> blockMap = new HashMap<>();
+		
+		for(Entry<Rule, Map<Atom, Set<Integer>>> entry : this.markedMap.entrySet()) {
+			Rule source = entry.getKey();
+			Map<Atom, Set<Integer>> markedPositions = entry.getValue();
+			
+			for(Atom a : this.body) {
+				Set<Integer> indice = markedPositions.get(a);
+				
+				if(indice == null) blocks.add(new Block(new AtomSet(a), null));
+				else {
+					
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/*
+	 * @param r the source rule leading to the blockRule
+	 */
+	public BlockRule getBlockRule(Rule r) {
+		Map<Atom, Set<Integer>> markedPosition = this.markedMap.get(r);
+		
+		BlockRule br = new BlockRule(this);
+		
+		
+		AtomSet blockAtoms = new AtomSet();
+		
+		for(Atom a : this.body) {
+			Set<Integer> indice = markedPosition.get(a);
+			
+			if(indice == null) br.add(new Block(new AtomSet(a), null));
+			else {
+				
+			}
+		}
+	}
+	
 	public void printMarked() {
+		System.out.println("r" + this.getRuleIndex() + " ");
+		
 		for(Entry<Rule, Map<Atom, Set<Integer>>> entry: this.markedMap.entrySet()) {
 			System.out.print("(" + entry.getKey().getRuleIndex() + ") ");
 			 Map<Atom, Set<Integer>> mm = entry.getValue();
@@ -129,6 +175,8 @@ public class MarkedRule extends Rule {
 					System.out.print(a.getPredicate().getName() + indice + " ");
 				}
 			}
+			
+			System.out.print("\n");
 		}
 	}
 }

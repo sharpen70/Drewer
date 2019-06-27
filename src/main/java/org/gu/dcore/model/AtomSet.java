@@ -8,6 +8,10 @@ import java.util.Set;
 public class AtomSet implements Iterable<Atom> {
 	private ArrayList<Atom> atoms;
 	
+	public AtomSet() {
+		atoms = new ArrayList<>();
+	}
+	
 	public AtomSet(ArrayList<Atom> _atoms) {
 		this.atoms = _atoms;
 	}
