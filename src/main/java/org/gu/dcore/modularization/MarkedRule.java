@@ -17,10 +17,12 @@ import org.gu.dcore.model.Variable;
 
 public class MarkedRule extends Rule {
 	private Map<Rule, Map<Atom, Set<Integer>>> markedMap;
+	private Set<Variable> markedVar;
 	
 	public MarkedRule(Rule r) {
 		super(r);
 		markedMap = new HashMap<>();
+		markedVar = new HashSet<>();
 	}
 	
 	public List<PredPosition> mark(Rule r, PredPosition predPosition) {	
@@ -138,18 +140,31 @@ public class MarkedRule extends Rule {
 	public BlockRule getBlockRule(Rule r) {
 		Map<Atom, Set<Integer>> markedPosition = this.markedMap.get(r);
 		
-		BlockRule br = new BlockRule(this);
-		
+		Map<Variable, Block> blockmap = new HashMap<>();
+		List<Block> atomicBlocks = new LinkedList<>();
 		
 		AtomSet blockAtoms = new AtomSet();
 		
 		for(Atom a : this.body) {
 			Set<Integer> indice = markedPosition.get(a);
 			
-			if(indice == null) br.add(new Block(new AtomSet(a), null));
+			if(indice == null) atomicBlocks.add(new Block(new AtomSet(a), null));
 			else {
-				
+				Block merge = null;
+				for(Integer i : indice) {
+					Variable v = a.getTerm(i);
+				}
 			}
+		}
+	}
+	
+	private class VarIndex {
+		public Variable v;
+		public int index;
+		
+		public VarIndex(Variable v, int i) {
+			this.v = v;
+			this.index = i;
 		}
 	}
 	

@@ -2,10 +2,12 @@ package org.gu.dcore.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gu.dcore.reasoning.TermType;
+import org.gu.dcore.grd.PredPosition;
 
 public class Rule {
 	protected AtomSet head;
@@ -67,6 +69,22 @@ public class Rule {
 	
 	public int getRuleIndex() {
 		return this.ruleIndex;
+	}
+	
+	public List<PredPosition> getPositions(Variable v) {
+		List<PredPosition> pp = new LinkedList<>();
+		
+		for(Atom a : this.body) {
+			Set<Integer> indice = new HashSet<>();
+			
+			for(int i = 0; i < a.getPredicate().getArity(); i++) {
+				if(a.getTerm(i).equals(v)) indice.add(i);
+			}
+			
+			if(!indice.isEmpty()) pp.add(new PredPosition(a.getPredicate(), indice));
+		}
+		
+		return pp;
 	}
 	
 	public Set<Variable> getExistentials() {
