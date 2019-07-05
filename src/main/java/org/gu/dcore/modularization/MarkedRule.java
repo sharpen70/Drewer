@@ -124,10 +124,10 @@ public class MarkedRule extends Rule {
 			for(Atom a : this.body) {
 				Set<Integer> indice = markedPositions.get(a);
 				
-				if(indice == null) blocks.add(new Block(new AtomSet(a), null));
-				else {
-					
-				}
+//				if(indice == null) blocks.add(new Block(new AtomSet(a), null));
+//				else {
+//					
+//				}
 			}
 		}
 		
@@ -137,26 +137,26 @@ public class MarkedRule extends Rule {
 	/*
 	 * @param r the source rule leading to the blockRule
 	 */
-	public BlockRule getBlockRule(Rule r) {
-		Map<Atom, Set<Integer>> markedPosition = this.markedMap.get(r);
-		
-		Map<Variable, Block> blockmap = new HashMap<>();
-		List<Block> atomicBlocks = new LinkedList<>();
-		
-		AtomSet blockAtoms = new AtomSet();
-		
-		for(Atom a : this.body) {
-			Set<Integer> indice = markedPosition.get(a);
-			
-			if(indice == null) atomicBlocks.add(new Block(new AtomSet(a), null));
-			else {
-				Block merge = null;
-				for(Integer i : indice) {
-					Variable v = a.getTerm(i);
-				}
-			}
-		}
-	}
+//	public BlockRule getBlockRule(Rule r) {
+//		Map<Atom, Set<Integer>> markedPosition = this.markedMap.get(r);
+//		
+//		Map<Variable, Block> blockmap = new HashMap<>();
+//		List<Block> atomicBlocks = new LinkedList<>();
+//		
+//		AtomSet blockAtoms = new AtomSet();
+//		
+//		for(Atom a : this.body) {
+//			Set<Integer> indice = markedPosition.get(a);
+//			
+//			if(indice == null) atomicBlocks.add(new Block(new AtomSet(a), null));
+//			else {
+//				Block merge = null;
+//				for(Integer i : indice) {
+////					Variable v = a.getTerm(i);
+//				}
+//			}
+//		}
+//	}
 	
 	private class VarIndex {
 		public Variable v;
