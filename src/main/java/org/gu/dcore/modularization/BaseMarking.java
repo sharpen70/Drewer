@@ -1,5 +1,6 @@
 package org.gu.dcore.modularization;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -53,16 +54,10 @@ public class BaseMarking implements Marking {
 		}
 	}
 	
-	@Override
-	public Block getBlocks(Rule r) {
-		for(Entry<Rule, RuleBasedMark> entry : this.marking.entrySet()) {
-			RuleBasedMark m = entry.getValue(); 
-		}
-	}
-	
-	public List<Block> getBlocks(RuleBasedMark rbm) {
+	@Override	
+	public List<Block> getBlocks(Rule r) {
 		List<Block> blocks = new LinkedList<>();
-		Map<Rule, Map<Atom, Set<Integer>>> marked = rbm.marked;
+		Map<Rule, Map<Atom, Set<Integer>>> marked = this.marking.get(r).marked;
 		
 		for(Entry<Rule, Map<Atom, Set<Integer>>> entry : marked.entrySet()) {
 			Rule source = entry.getKey();

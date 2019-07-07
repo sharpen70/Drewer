@@ -24,4 +24,12 @@ public class Block {
 		this.bricks = bricks;
 		this.source = source;
 	}
+	
+	public boolean overlap(Block b) {
+		for(Atom a : b.bricks) {
+			if(this.bricks.contains(a)) return true;
+		}
+		
+		return false;
+	}
 }
