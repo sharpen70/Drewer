@@ -1,6 +1,5 @@
 package org.gu.dcore.modularization;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,6 +35,8 @@ public class BaseMarking implements Marking {
 	public void mark(Rule source, PredPosition pp) {
 		List<Rule> affected = this.onto.get(pp.getPredicate());
 		
+		if(affected == null) return;
+		
 		for(Rule r : affected) {
 			mark(r, source, pp);
 		}
@@ -57,20 +58,26 @@ public class BaseMarking implements Marking {
 	@Override	
 	public List<Block> getBlocks(Rule r) {
 		List<Block> blocks = new LinkedList<>();
-		Map<Rule, Map<Atom, Set<Integer>>> marked = this.marking.get(r).marked;
 		
-		for(Entry<Rule, Map<Atom, Set<Integer>>> entry : marked.entrySet()) {
-			Rule source = entry.getKey();
-			Map<Atom, Set<Integer>> markedPosition = entry.getValue();
+		RuleBasedMark rbm = this.marking.get(r);
+		
+		if(rbm != null) {
+			Map<Rule, Map<Atom, Set<Integer>>> marked = rbm.marked;
 			
-			blocks.add(new Block(markedPosition.keySet(), source));
+			for(Entry<Rule, Map<Atom, Set<Integer>>> entry : marked.entrySet()) {
+				Rule source = entry.getKey();
+				Map<Atom, Set<Integer>> markedPosition = entry.getValue();
+				
+				blocks.add(new Block(markedPosition.keySet(), source));
+			}
 		}
-		
 		return blocks;
 	}
 	
+	@Override
 	public void printMarked() {
 		for(Entry<Rule, RuleBasedMark> entry : this.marking.entrySet()) {
+			System.out.println(entry.getKey());
 			entry.getValue().printMarked();
 		}
 	}
@@ -122,7 +129,7 @@ public class BaseMarking implements Marking {
 		
 		public void printMarked() {
 			for(Entry<Rule, Map<Atom, Set<Integer>>> entry: this.marked.entrySet()) {
-				System.out.print("(" + entry.getKey().getRuleIndex() + ") ");
+				System.out.print("    (" + entry.getKey().getRuleIndex() + ") ");
 				 Map<Atom, Set<Integer>> mm = entry.getValue();
 				 
 				for(Atom a : rule.getHead()) {

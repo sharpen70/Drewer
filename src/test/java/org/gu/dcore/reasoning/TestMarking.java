@@ -1,6 +1,7 @@
 package org.gu.dcore.reasoning;
 
 import org.gu.dcore.model.Program;
+import org.gu.dcore.modularization.BaseMarking;
 import org.gu.dcore.modularization.MarkedRule;
 import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.parsing.DcoreParser;
@@ -44,23 +45,23 @@ public class TestMarking extends TestCase {
 //    	Assert.assertTrue(true);
 //	}
 	
-//	public void test2() {
-//		DcoreParser parser = new DcoreParser();
-//    	
-//    	Program P = parser.parse("B(X, Y), C(X,Y) :- A(X).\n"
-//    			+ "E(Y,Z) :- C(X,Y), D(X).\n"
-//    			+ "E(X,Z) :- B(X,Y), E(Y,Z).\n"
-//    			+ "D(X) :- F(X).\n" 
-//    			+ "C(Y,Z) :- E(Y,Z).");
-//    	
-//    	Modularizor m = new Modularizor(P.getRuleSet());
-//    	
-//    	m.markRules();
-//    	
-//    	for(MarkedRule r : m.getMarkedRules()) r.printMarked();
-//    	
-//    	Assert.assertTrue(true);
-//	}
+	public void test2() {
+		DcoreParser parser = new DcoreParser();
+    	
+    	Program P = parser.parse("B(X, Y), C(X,Y) :- A(X).\n"
+    			+ "E(Y,Z) :- C(X,Y), D(X).\n"
+    			+ "E(X,Z) :- B(X,Y), E(Y,Z).\n"
+    			+ "D(X) :- F(X).\n" 
+    			+ "C(Y,Z) :- E(Y,Z).");
+    	
+    	Modularizor m = new Modularizor(P.getRuleSet());
+    	
+    	m.modularize();
+    	
+    	m.getMarking().printMarked();
+    	
+    	Assert.assertTrue(true);
+	}
 	
 	public void test3() {
 		DcoreParser parser = new DcoreParser();
@@ -72,9 +73,9 @@ public class TestMarking extends TestCase {
     	
     	Modularizor m = new Modularizor(P.getRuleSet());
     	
-    	m.markRules();
+    	m.modularize();
     	
-    	for(MarkedRule r : m.getMarkedRules()) r.printMarked();
+    	m.getMarking().printMarked();
     	
     	Assert.assertTrue(true);
 	}

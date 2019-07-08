@@ -158,16 +158,6 @@ public class MarkedRule extends Rule {
 //		}
 //	}
 	
-	private class VarIndex {
-		public Variable v;
-		public int index;
-		
-		public VarIndex(Variable v, int i) {
-			this.v = v;
-			this.index = i;
-		}
-	}
-	
 	public void printMarked() {
 		System.out.println("r" + this.getRuleIndex() + " ");
 		

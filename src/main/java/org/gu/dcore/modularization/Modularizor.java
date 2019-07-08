@@ -13,38 +13,27 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Modularizor {
-	private List<MarkedRule> onto;
+	private List<Rule> onto;
 	private IndexedByBodyPredRuleSet indexedRuleSet;
 	private Marking marking;
 	
 	public Modularizor(List<Rule> onto) {
-		this.indexedRuleSet = new IndexedByBodyPredRuleSet();
-		this.onto = new LinkedList<>();
-		
-		for(Rule r: onto) {
-			MarkedRule mr = new MarkedRule(r);
-			this.onto.add(mr);
-			this.indexedRuleSet.add(mr);
-		}
+		this.onto = onto;
 		
 		this.marking = new BaseMarking(onto);
 	}
 	
-	public List<Rule> modularize() {
-		List<Rule> modularizedRules = new LinkedList<>();
-		
-//		this.markRules();
-		
-		return modularizedRules;
+	public void modularize() {
+		for(Rule r : onto) {
+			this.marking.mark(r);
+		}
 	}
 	
 	public List<BlockRule> getBlockRules(Rule r) {
 		List<BlockRule> blockRules = new LinkedList<>();
 		List<Block> blocks = this.marking.getBlocks(r);
 		
-		for(Block block : blocks) {
-			blockRules.add(new BlockRule(r, block));
-		}
+		blockRules.add(new BlockRule(r));
 		
 		for(int i = 0; i < blockRules.size(); i++) {
 			for(int j = i + 1; j < blocks.size(); j++) {
@@ -53,7 +42,11 @@ public class Modularizor {
 			}
 		}
 		
-		return null;
+		return blockRules;
+	}
+	
+	public Marking getMarking() {
+		return this.marking;
 	}
 //	public void markRules() {
 //		for(Rule r : this.onto) {

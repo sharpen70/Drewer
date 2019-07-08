@@ -74,7 +74,7 @@ public class Rule {
 	public List<PredPosition> getPositions(Variable v) {
 		List<PredPosition> pp = new LinkedList<>();
 		
-		for(Atom a : this.body) {
+		for(Atom a : this.head) {
 			Set<Integer> indice = new HashSet<>();
 			
 			for(int i = 0; i < a.getPredicate().getArity(); i++) {

@@ -32,4 +32,23 @@ public class Block {
 		
 		return false;
 	}
+	
+	public boolean contains(Atom a) {
+		return this.bricks.contains(a);
+	}
+	
+	@Override
+	public String toString() {
+		String s = "{";
+		
+		boolean first = true;
+		
+		for(Atom a : bricks) {
+			if(!first) { first = false; s += ", "; }
+			s += a.toString();
+		}
+		s += "}";
+		
+		return s;
+	}
 }
