@@ -1,20 +1,12 @@
 package org.gu.dcore.modularization;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.gu.dcore.grd.IndexedByBodyPredRuleSet;
-import org.gu.dcore.grd.PredPosition;
-import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.model.Term;
-import org.gu.dcore.model.Variable;
 
 public class Modularizor {
 	private List<Rule> onto;
-	private IndexedByBodyPredRuleSet indexedRuleSet;
 	private Marking marking;
 	
 	public Modularizor(List<Rule> onto) {
@@ -36,7 +28,7 @@ public class Modularizor {
 		blockRules.add(new BlockRule(r));
 		
 		for(int i = 0; i < blockRules.size(); i++) {
-			for(int j = i + 1; j < blocks.size(); j++) {
+			for(int j = i; j < blocks.size(); j++) {
 				BlockRule nbr = blockRules.get(i).add(blocks.get(j));
 				if(nbr != null) blockRules.add(nbr);
 			}

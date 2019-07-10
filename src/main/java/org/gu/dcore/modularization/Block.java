@@ -44,10 +44,11 @@ public class Block {
 		boolean first = true;
 		
 		for(Atom a : bricks) {
-			if(!first) { first = false; s += ", "; }
+			if(!first) s += ", ";
+			 first = false; 
 			s += a.toString();
 		}
-		s += "}";
+		s += "}" + this.source.getRuleIndex();
 		
 		return s;
 	}

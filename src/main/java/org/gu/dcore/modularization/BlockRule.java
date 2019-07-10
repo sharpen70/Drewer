@@ -20,9 +20,13 @@ public class BlockRule extends Rule {
 		for(Atom a : this.body) this.mbody.add(a);
 	}
 	
-	public BlockRule(Rule r, List<Block> blocks) {
+	public BlockRule(BlockRule r) {
 		super(r);
-		this.blocks = blocks;
+		this.blocks = new ArrayList<>();
+		this.mbody = new LinkedList<>();
+		
+		this.blocks.addAll(r.blocks);
+		this.mbody.addAll(r.mbody);
 	}
 	
 	public void addBlock(Block block) {
@@ -41,10 +45,7 @@ public class BlockRule extends Rule {
 			if(b.overlap(block)) return null;
 		}
 		
-		List<Block> nb = new ArrayList<>();
-		nb.addAll(this.blocks);
-		
-		BlockRule br = new BlockRule(this, nb);
+		BlockRule br = new BlockRule(this);
 		br.addBlock(block);
 		
 		return br;
@@ -59,15 +60,16 @@ public class BlockRule extends Rule {
 		boolean first = true;
 		
 		for(Block b : this.blocks) {
-			if(!first) {
-				first = false;
+			if(!first) 
 				s += ", ";
-			}
+			first = false;
 			s += b.toString();
 		}
 		
+		first = this.blocks.isEmpty();
 		for(Atom a : this.mbody) {
-			s += ",";
+			if(!first) s += ", ";
+			first = false;
 			s += a.toString();
 		}
 		s += ".";
