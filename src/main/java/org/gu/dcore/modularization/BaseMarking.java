@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.gu.dcore.grd.IndexedBlockRuleSet;
 import org.gu.dcore.grd.IndexedByBodyPredRuleSet;
 import org.gu.dcore.grd.PredPosition;
 import org.gu.dcore.model.Atom;
@@ -18,6 +19,7 @@ import org.gu.dcore.model.Variable;
 public class BaseMarking implements Marking {
 	private Map<Rule, RuleBasedMark> marking; 
 	private IndexedByBodyPredRuleSet onto;
+	private IndexedBlockRuleSet brs;
 	
 	public BaseMarking(List<Rule> ruleset) {
 		this.marking = new HashMap<>();
@@ -53,6 +55,10 @@ public class BaseMarking implements Marking {
 		for(PredPosition npp : rbm.add(source, pp)) {
 			mark(source, npp);
 		}
+	}
+	
+	public void markQueryRule(Rule qr) {
+		
 	}
 	
 	@Override	

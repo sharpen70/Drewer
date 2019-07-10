@@ -1,20 +1,29 @@
 package org.gu.dcore.modularization;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.gu.dcore.model.Atom;
-import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Rule;
 
 public class Block {
-	private Rule source;
+	private List<Rule> sources;
 	
+	private List<Block> nestedBlock;	
 	private Set<Atom> bricks;
 	
 	public Block() {
 		
 	}
 	
+	public Block(List<Block> blocks) {
+		this.sources = new LinkedList<>();
+		for(Block b : blocks) {
+			this.sources.addAll(b.sources);
+		}
+		this.nestedBlock = blocks;
+	}
 //	public Block(AtomSet bricks, Rule source) {
 //		this.bricks = bricks;
 //		this.source = source;
@@ -22,7 +31,8 @@ public class Block {
 	
 	public Block(Set<Atom> bricks, Rule source) {
 		this.bricks = bricks;
-		this.source = source;
+		this.sources = new LinkedList<>();
+		this.sources.add(source);
 	}
 	
 	public boolean overlap(Block b) {
@@ -48,7 +58,7 @@ public class Block {
 			 first = false; 
 			s += a.toString();
 		}
-		s += "}" + this.source.getRuleIndex();
+		s += "}";
 		
 		return s;
 	}
