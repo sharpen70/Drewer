@@ -91,10 +91,12 @@ public class BaseMarking implements Marking {
 	private class RuleBasedMark {
 		private Rule rule;
 		private Map<Rule, Map<Atom, Set<Integer>>> marked;
-	
+		private Map<Rule, List<PredPosition>> passed;
+		
 		public RuleBasedMark(Rule rule) {
 			this.rule = rule;
 			this.marked = new HashMap<>();
+			this.passed = new HashMap<>();
 		}
 		
 		public List<PredPosition> add(Rule source, PredPosition pp) {
@@ -129,6 +131,14 @@ public class BaseMarking implements Marking {
 			for(Variable v : newMarked) {
 				pass.addAll(this.rule.getPositions(v));
 			}
+			
+			List<PredPosition> passed_s = this.passed.get(source);
+			if(passed_s == null) {
+				passed_s = new LinkedList<>();
+				this.passed.put(source, passed_s);
+			}
+			
+			passed_s.addAll(pass);
 			
 			return pass;
 		}

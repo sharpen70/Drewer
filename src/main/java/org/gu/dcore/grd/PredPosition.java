@@ -25,4 +25,14 @@ public class PredPosition {
 	public String toString() {
 		return "" + this.predicate + this.indice;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof PredPosition)) return false;
+		PredPosition _obj = (PredPosition)obj;
+		
+		if(this.predicate.equals(_obj.predicate)) 
+			return this.indice.equals(_obj.indice);
+		else return false;
+	}
 }
