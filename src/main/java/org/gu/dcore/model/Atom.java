@@ -51,13 +51,21 @@ public class Atom {
 	}
 	
 	public Set<Variable> getVariables() {
-		Set<Variable> vars = new HashSet<>();
+		if(this.vars == null) vars();
+		return this.vars;
+	}
+	
+	public boolean contains(Variable v) {
+		if(this.vars == null) vars();
+		return this.vars.contains(v);
+	}
+	
+	private void vars() {
+		this.vars = new HashSet<>();
 		
 		for(Term t : this.terms) {
 			if(t instanceof Variable) vars.add((Variable) t);
 		}
-		
-		return vars;
 	}
 	
 	@Override

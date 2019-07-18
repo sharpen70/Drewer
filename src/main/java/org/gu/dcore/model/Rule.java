@@ -71,7 +71,7 @@ public class Rule {
 		return this.ruleIndex;
 	}
 	
-	public List<PredPosition> getPositions(Variable v) {
+	public List<PredPosition> getHeadPositions(Variable v) {
 		List<PredPosition> pp = new LinkedList<>();
 		
 		for(Atom a : this.head) {

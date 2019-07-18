@@ -11,13 +11,17 @@ import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.modularization.BlockRule;
+import org.gu.dcore.modularization.Modularizor;
 
 public class ModularizedRewriting {
 	List<Rule> ruleset;
 	List<BlockRule> blockRuleset;
+	Modularizor modularizor;
 	
 	public ModularizedRewriting(List<Rule> onto) {
 		this.ruleset = onto;
+		this.modularizor = new Modularizor(onto);
+		this.modularizor.
 	}
 	
 	public List<Rule> rewrite(ConjunctiveQuery q) {		

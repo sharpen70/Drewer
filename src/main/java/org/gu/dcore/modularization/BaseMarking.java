@@ -19,16 +19,17 @@ import org.gu.dcore.model.Variable;
 public class BaseMarking implements Marking {
 	private Map<Rule, RuleBasedMark> marking; 
 	private IndexedByBodyPredRuleSet onto;
-	private IndexedBlockRuleSet brs;
+	private IndexedBlockRuleSet ihs;
 	
 	public BaseMarking(List<Rule> ruleset) {
 		this.marking = new HashMap<>();
 		this.onto = new IndexedByBodyPredRuleSet(ruleset);
+		this.ihs = new IndexedBlockRuleSet(ruleset);
 	}
 	
 	public void mark(Rule source) {
 		for(Variable v : source.getExistentials()) {
-			for(PredPosition pp : source.getPositions(v)) {
+			for(PredPosition pp : source.getHeadPositions(v)) {
 				mark(source, pp);
 			}
 		}
@@ -40,11 +41,11 @@ public class BaseMarking implements Marking {
 		if(affected == null) return;
 		
 		for(Rule r : affected) {
-			mark(r, source, pp);
+			mark(r, source, pp, true);
 		}
 	}
 	
-	public void mark(Rule r, Rule source, PredPosition pp) {
+	public void mark(Rule r, Rule source, PredPosition pp, boolean recursive) {
 		RuleBasedMark rbm = this.marking.get(r);
 		
 		if(rbm == null) {
@@ -52,13 +53,27 @@ public class BaseMarking implements Marking {
 			this.marking.put(r, rbm);
 		}
 		
-		for(PredPosition npp : rbm.add(source, pp)) {
-			mark(source, npp);
+		if(recursive) {
+			for(PredPosition npp : rbm.add(source, pp)) {
+				mark(source, npp);
+			}
 		}
+		else rbm.add(source, pp);
 	}
 	
 	public void markQueryRule(Rule qr) {
-		
+		for(Atom a : qr.getBody()) {
+			List<Rule> rs = this.ihs.getRulesByHead(a.getPredicate());
+			for(Rule r : rs) {	
+				RuleBasedMark rbm = this.marking.get(r);
+				for(Entry<Rule, Set<Variable>> entry : rbm.markedHeadVars.entrySet()) {
+					for(Variable v : entry.getValue()) {
+						for(PredPosition pp : r.getHeadPositions(v)) 
+							mark(qr, entry.getKey(), pp, false);
+					}
+				}
+			}
+		}
 	}
 	
 	@Override	
@@ -91,21 +106,28 @@ public class BaseMarking implements Marking {
 	private class RuleBasedMark {
 		private Rule rule;
 		private Map<Rule, Map<Atom, Set<Integer>>> marked;
-		private Map<Rule, List<PredPosition>> passed;
+		private Map<Rule, Set<Variable>> markedHeadVars;
 		
 		public RuleBasedMark(Rule rule) {
 			this.rule = rule;
 			this.marked = new HashMap<>();
-			this.passed = new HashMap<>();
+			this.markedHeadVars = new HashMap<>();
 		}
 		
 		public List<PredPosition> add(Rule source, PredPosition pp) {
 			Map<Atom, Set<Integer>> m = this.marked.get(source);
+			Set<Variable> mhv = this.markedHeadVars.get(source);
+			
 			Set<Variable> newMarked = new HashSet<>();
 			
 			if(m == null) {
 				m = new HashMap<>();
 				this.marked.put(source, m);
+			}
+			
+			if(mhv == null) {
+				mhv = new HashSet<>();
+				this.markedHeadVars.put(source, mhv);
 			}
 			
 			for(Atom a : this.rule.getBody()) {
@@ -128,17 +150,13 @@ public class BaseMarking implements Marking {
 			
 			List<PredPosition> pass = new LinkedList<>();
 			
-			for(Variable v : newMarked) {
-				pass.addAll(this.rule.getPositions(v));
+			for(Atom a : this.rule.getHead()) {
+				for(Variable v : newMarked) {
+					if(a.contains(v)) {
+						if(mhv.add(v)) pass.addAll(this.rule.getHeadPositions(v));
+					}
+				}
 			}
-			
-			List<PredPosition> passed_s = this.passed.get(source);
-			if(passed_s == null) {
-				passed_s = new LinkedList<>();
-				this.passed.put(source, passed_s);
-			}
-			
-			passed_s.addAll(pass);
 			
 			return pass;
 		}
