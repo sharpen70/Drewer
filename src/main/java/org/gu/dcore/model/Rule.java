@@ -93,6 +93,18 @@ public class Rule {
 	}
 	
 	@Override
+	public int hashCode() {
+		return this.ruleIndex;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Rule)) return false;
+		Rule _obj = (Rule)obj;
+		return _obj.ruleIndex == this.ruleIndex;
+	}
+	
+	@Override
 	public String toString() {
 		String s = "[" + this.ruleIndex + "] "; 
 		s += head.toString();

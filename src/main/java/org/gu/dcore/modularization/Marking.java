@@ -12,4 +12,6 @@ public interface Marking {
 	public List<Block> getBlocks(Rule r);
 	
 	public void printMarked();
+	
+	public RuleBasedMark markQueryRule(Rule qr);
 }

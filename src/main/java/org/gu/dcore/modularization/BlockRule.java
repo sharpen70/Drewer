@@ -19,7 +19,6 @@ public class BlockRule extends Rule {
 		
 		for(Atom a : this.body) this.mbody.add(a);
 	}
-	
 	public BlockRule(BlockRule r) {
 		super(r);
 		this.blocks = new ArrayList<>();
@@ -28,7 +27,6 @@ public class BlockRule extends Rule {
 		this.blocks.addAll(r.blocks);
 		this.mbody.addAll(r.mbody);
 	}
-	
 	public void addBlock(Block block) {
 		this.blocks.add(block);
 		
@@ -39,7 +37,6 @@ public class BlockRule extends Rule {
 			if(block.contains(a)) it.remove();
 		}
 	}
-	
 	public BlockRule add(Block block) {
 		for(Block b : this.blocks) {
 			if(b.overlap(block)) return null;
@@ -50,7 +47,15 @@ public class BlockRule extends Rule {
 		
 		return br;
 	}
-	
+	public List<Block> getBlocks() {
+		return this.blocks;
+	}
+	public List<Atom> getNormalAtoms() {
+		return this.mbody;
+	}
+	public boolean isNormalRule() {
+		return this.blocks.isEmpty();
+	}
 	@Override
 	public String toString() {
 		String s = "[" + this.getRuleIndex() + "] "; 

@@ -22,4 +22,10 @@ public class MoveSetMarking implements Marking {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public RuleBasedMark markQueryRule(Rule qr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

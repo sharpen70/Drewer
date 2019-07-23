@@ -13,10 +13,6 @@ public class Block {
 	private List<Block> nestedBlock;	
 	private Set<Atom> bricks;
 	
-	public Block() {
-		
-	}
-	
 	public Block(List<Block> blocks) {
 		this.sources = new LinkedList<>();
 		for(Block b : blocks) {
