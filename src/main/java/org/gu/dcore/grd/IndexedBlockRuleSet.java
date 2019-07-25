@@ -8,6 +8,7 @@ import java.util.Map;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
 
 public class IndexedBlockRuleSet {
@@ -44,6 +45,9 @@ public class IndexedBlockRuleSet {
 	}
 	
 	public List<BlockRule> getBlockRule(Block b) {
+		List<BlockRule> br = new LinkedList<>();
+		
+		for()
 		return this.blockRuleMap.get(pred);
 	}
 }

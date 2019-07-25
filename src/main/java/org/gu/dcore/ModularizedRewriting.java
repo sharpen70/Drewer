@@ -93,7 +93,11 @@ public class ModularizedRewriting {
 		
 		List<Rule> result = new LinkedList<>();
 		
+		while()
+		
 		this.blockMap.put(b, result);
 		return result;
 	}
+	
+	
 }
