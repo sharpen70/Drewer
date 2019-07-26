@@ -1,6 +1,7 @@
 package org.gu.dcore.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -31,6 +32,10 @@ public class AtomSet implements Iterable<Atom> {
 	
 	public boolean contains(Atom a) {
 		return this.atoms.contains(a);
+	}
+	
+	public boolean containsAll(Collection<Atom> atoms) {
+		return this.atoms.containsAll(atoms);
 	}
 	
 	public int size() {

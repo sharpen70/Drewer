@@ -43,6 +43,10 @@ public class Block {
 		return this.bricks.contains(a);
 	}
 	
+	public List<Rule> getSources() {
+		return this.sources;
+	}
+	
 	@Override
 	public String toString() {
 		String s = "{";
