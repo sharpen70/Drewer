@@ -39,6 +39,7 @@ public class BlockRule extends Rule {
 	
 	public void addBlock(Block block) {
 		this.blocks.add(block);
+		this.sourceRules.addAll(block.getPassSources());
 		
 		Iterator<Atom> it = this.mbody.iterator();
 		

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.gu.dcore.grd.IndexedBlockRuleSet;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.modularization.Block;;
 
 public class Modularizor {
 	private List<Rule> onto;
