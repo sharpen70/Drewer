@@ -15,14 +15,18 @@ public class Block {
 	private List<Block> nestedBlock;	
 	private Set<Atom> bricks;
 	
-	public Block(List<Block> blocks) {
+	public Block(Block ... blocks) {
+		this.nestedBlock = new LinkedList<>();
 		this.sources = new LinkedList<>();
+		this.pass_sources = new LinkedList<>();
 		this.bricks = new HashSet<>();
+		
 		for(Block b : blocks) {
+			this.nestedBlock.add(b);
 			this.sources.addAll(b.sources);
+			this.pass_sources.addAll(b.pass_sources);
 			this.bricks.addAll(b.bricks);
 		}
-		this.nestedBlock = blocks;
 	}
 	
 	public Block(Set<Atom> bricks, Rule source, boolean pass) {
@@ -39,11 +43,6 @@ public class Block {
 		}
 		
 		return false;
-	}
-	
-	public boolean merge(Block b) {
-		if(!overlap(b)) return false;
-		
 	}
 	
 	public boolean contains(Atom a) {

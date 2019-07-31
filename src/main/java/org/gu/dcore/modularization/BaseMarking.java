@@ -1,21 +1,18 @@
 package org.gu.dcore.modularization;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.gu.dcore.grd.IndexedBlockRuleSet;
 import org.gu.dcore.grd.IndexedByBodyPredRuleSet;
 import org.gu.dcore.grd.IndexedByHeadPredRuleSet;
 import org.gu.dcore.grd.PredPosition;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class BaseMarking implements Marking {
@@ -83,15 +80,22 @@ public class BaseMarking implements Marking {
 	public List<Block> getBlocks(Rule r) {		
 		RuleBasedMark rbm = this.marking.get(r);
 		
-		List<Block> blocks = new ArrayList<>();
+		List<Block> blocks = new LinkedList<>();
 		
 		for(Block b : rbm.getBaseBlocks()) {
-			boolean merged = false;
-			for(int i = 0; i < blocks.size(); i++) {
-				Block mb = blocks.get(i);
-				merged = mb.merge(b);
+			Block merge = null;
+			Iterator<Block> it = blocks.iterator();
+			while(it.hasNext()) {
+				Block mb = it.next();
+				if(mb.overlap(b)) {
+					if(merge == null) merge = new Block(mb, b);
+					else {
+						merge = new Block(merge, mb);
+						it.remove();
+					}
+				}				
 			}
-			if(!merged) blocks.add(b);
+			if(merge == null) blocks.add(b);
 		}
 		
 		return blocks;
