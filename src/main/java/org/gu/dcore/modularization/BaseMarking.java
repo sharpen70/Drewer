@@ -76,9 +76,14 @@ public class BaseMarking implements Marking {
 		return rbm;
 	}
 	
-	@Override	
-	public List<Block> getBlocks(Rule r) {		
+	public BlockRule getBlockRule(Rule r) {
+		List<Rule> passSources = new LinkedList<>();
 		RuleBasedMark rbm = this.marking.get(r);
+		
+		for(Entry<Rule, Set<Variable>> entry : 
+			rbm.markedHeadVars.entrySet()) {
+			if(!entry.getValue().isEmpty()) passSources.add(entry.getKey());
+		}
 		
 		List<Block> blocks = new LinkedList<>();
 		
@@ -98,7 +103,7 @@ public class BaseMarking implements Marking {
 			if(merge == null) blocks.add(b);
 		}
 		
-		return blocks;
+		return new BlockRule(r, blocks, passSources);
 	}
 	
 	@Override

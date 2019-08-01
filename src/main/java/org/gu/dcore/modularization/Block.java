@@ -12,17 +12,14 @@ public class Block {
 	private List<Rule> sources;
 	private List<Rule> pass_sources;
 	
-	private List<Block> nestedBlock;	
 	private Set<Atom> bricks;
 	
 	public Block(Block ... blocks) {
-		this.nestedBlock = new LinkedList<>();
 		this.sources = new LinkedList<>();
 		this.pass_sources = new LinkedList<>();
 		this.bricks = new HashSet<>();
 		
 		for(Block b : blocks) {
-			this.nestedBlock.add(b);
 			this.sources.addAll(b.sources);
 			this.pass_sources.addAll(b.pass_sources);
 			this.bricks.addAll(b.bricks);
@@ -43,6 +40,10 @@ public class Block {
 		}
 		
 		return false;
+	}
+	
+	public Set<Atom> getBricks() {
+		return this.bricks;
 	}
 	
 	public boolean contains(Atom a) {

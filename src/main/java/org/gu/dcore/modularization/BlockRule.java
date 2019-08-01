@@ -16,50 +16,57 @@ public class BlockRule extends Rule {
 	
 	private Set<Rule> sourceRules;
 	
-	public BlockRule(Rule r) {
+	public BlockRule(Rule r, List<Block> blocks, List<Rule> sources) {
 		super(r);
-		this.blocks = new ArrayList<>();
+		this.blocks = blocks;
 		this.mbody = new LinkedList<>();
 		this.sourceRules = new HashSet<>();
 		
-		for(Atom a : this.body) this.mbody.add(a);
+		for(Atom a : this.body) {
+			for(Block b : blocks) 
+				if(b.contains(a)) this.mbody.add(a);
+		}
+		this.sourceRules.addAll(sources);
 		if(!r.getExistentials().isEmpty()) this.sourceRules.add(r);
 	}
 	
-	public BlockRule(BlockRule r) {
-		super(r);
-		this.blocks = new ArrayList<>();
-		this.mbody = new LinkedList<>();
-		this.sourceRules = new HashSet<>();
-		
-		this.blocks.addAll(r.blocks);
-		this.mbody.addAll(r.mbody);
-		this.sourceRules.addAll(r.sourceRules);
+	public Set<Rule> getSourceRules() {
+		return this.sourceRules;
 	}
-	
-	public void addBlock(Block block) {
-		this.blocks.add(block);
-		this.sourceRules.addAll(block.getPassSources());
-		
-		Iterator<Atom> it = this.mbody.iterator();
-		
-		while(it.hasNext()) {
-			Atom a = it.next();
-			if(block.contains(a)) it.remove();
-		}
-	}
-	
-	public BlockRule add(Block block) {
-		for(Block b : this.blocks) {
-			if(b.overlap(block)) return null;
-		}
-		
-		BlockRule br = new BlockRule(this);
-		br.addBlock(block);
-		
-		return br;
-	}
-	
+//	public BlockRule(BlockRule r) {
+//		super(r);
+//		this.blocks = new ArrayList<>();
+//		this.mbody = new LinkedList<>();
+//		this.sourceRules = new HashSet<>();
+//		
+//		this.blocks.addAll(r.blocks);
+//		this.mbody.addAll(r.mbody);
+//		this.sourceRules.addAll(r.sourceRules);
+//	}
+//	
+//	public void addBlock(Block block) {
+//		this.blocks.add(block);
+//		this.sourceRules.addAll(block.getPassSources());
+//		
+//		Iterator<Atom> it = this.mbody.iterator();
+//		
+//		while(it.hasNext()) {
+//			Atom a = it.next();
+//			if(block.contains(a)) it.remove();
+//		}
+//	}
+//	
+//	public BlockRule add(Block block) {
+//		for(Block b : this.blocks) {
+//			if(b.overlap(block)) return null;
+//		}
+//		
+//		BlockRule br = new BlockRule(this);
+//		br.addBlock(block);
+//		
+//		return br;
+//	}
+//	
 	public List<Block> getBlocks() {
 		return this.blocks;
 	}

@@ -9,7 +9,7 @@ public interface Marking {
 	
 	public void mark(Rule source);
 	
-	public List<Block> getBlocks(Rule r);
+	public BlockRule getBlockRule(Rule rule);
 	
 	public void printMarked();
 	
