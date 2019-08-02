@@ -57,7 +57,7 @@ public class IndexedBlockRuleSet {
 		return this.normalRuleMap.get(pred);
 	}
 	
-	public Set<BlockRule> getBlockRules(Block b, Predicate pred, Set<Rule> sources) {
+	public Set<BlockRule> getBlockRules(Block b) {
 		Set<BlockRule> br = new HashSet<>();
 		
 		for(Rule source : b.getSources()) {

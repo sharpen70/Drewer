@@ -76,9 +76,8 @@ public class BaseMarking implements Marking {
 		return rbm;
 	}
 	
-	public BlockRule getBlockRule(Rule r) {
+	public BlockRule getBlockRule(Rule r, RuleBasedMark rbm) {
 		List<Rule> passSources = new LinkedList<>();
-		RuleBasedMark rbm = this.marking.get(r);
 		
 		for(Entry<Rule, Set<Variable>> entry : 
 			rbm.markedHeadVars.entrySet()) {
@@ -104,6 +103,11 @@ public class BaseMarking implements Marking {
 		}
 		
 		return new BlockRule(r, blocks, passSources);
+	}
+	
+	public BlockRule getBlockRule(Rule r) {
+		RuleBasedMark rbm = this.marking.get(r);
+		return getBlockRule(r, rbm);
 	}
 	
 	@Override

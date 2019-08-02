@@ -7,7 +7,7 @@ import org.gu.dcore.model.Rule;
 
 public class Modularizor {
 	private List<Rule> onto;
-	private Marking marking;
+	private BaseMarking marking;
 	private IndexedBlockRuleSet ibs;
 	
 	public Modularizor(List<Rule> onto) {
@@ -45,7 +45,7 @@ public class Modularizor {
 //		return blockRules;
 //	}
 	
-	public Marking getMarking() {
+	public BaseMarking getMarking() {
 		return this.marking;
 	}
 }

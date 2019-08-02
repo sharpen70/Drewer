@@ -17,9 +17,9 @@ import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.modularization.BaseMarking;
 import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
-import org.gu.dcore.modularization.Marking;
 import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
 
@@ -44,46 +44,48 @@ public class ModularizedRewriting {
 		Atom Qhead = AtomFactory.instance().createAtom(Q, q.getAnsVar());
 		Rule Qr = RuleFactory.instance().createRule(new AtomSet(Qhead), new AtomSet(q.getBody()));
 		
-		Marking marking = this.modularizor.getMarking();
+		BaseMarking marking = this.modularizor.getMarking();
 		RuleBasedMark rbm = marking.markQueryRule(Qr);
 		
-		List<Block> blocks = rbm.getBlocks();
-		List<BlockRule> brs = this.modularizor.getBlockRules(Qr, blocks);
+		BlockRule brs = marking.getBlockRule(Qr, rbm);
 		IndexedBlockRuleSet ibr = this.modularizor.getIndexedBlockOnto();
 	
 		
 		return null;
 	}
 	
-	private List<Rule> backwardChaining(List<BlockRule> qr, List<BlockRule> rs) {
+	private List<Rule> backwardChaining(BlockRule qr, List<BlockRule> rs) {
 		List<Rule> result = new LinkedList<>();
 		IndexedBlockRuleSet ibr = this.modularizor.getIndexedBlockOnto();
 		
 		Queue<BlockRule> rqueue = new LinkedList<>();
 		
-		rqueue.addAll(qr);
+		rqueue.add(qr);
 		
 		while(!rqueue.isEmpty()) {
 			BlockRule br = rqueue.poll();
 			
-			for(Block b : br.getBlocks()) {
-				for(BlockRule r : ibr.getBlockRule(b)) {
-					
-				}
-			}
-			
+		
 			for(Atom a : br.getNormalAtoms()) {
-				for(BlockRule r : ibr.getNormalRule(a.getPredicate())) {
+				for(BlockRule r : ibr.getNormalRules(a.getPredicate())) {
 					if(this.selected.add(r)) {
 						result.add(r);
 						rqueue.add(r);
 					}
 				}
 			}
+			
+			if(br.getBlocks().isEmpty()) result.add(br);
+			else 
+				for(Block b : br.getBlocks()) {
+					for(BlockRule r : ibr.getBlockRules(b)) {
+						
+					}
+				}
 		}
 		
 		
-		return null;
+		return result;
 	}
 	
 	private List<Rule> rewriteBlock(Block b) {
@@ -93,7 +95,7 @@ public class ModularizedRewriting {
 		
 		List<Rule> result = new LinkedList<>();
 		
-		while()
+		
 		
 		this.blockMap.put(b, result);
 		return result;

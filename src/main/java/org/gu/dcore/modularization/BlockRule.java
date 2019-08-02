@@ -33,40 +33,7 @@ public class BlockRule extends Rule {
 	public Set<Rule> getSourceRules() {
 		return this.sourceRules;
 	}
-//	public BlockRule(BlockRule r) {
-//		super(r);
-//		this.blocks = new ArrayList<>();
-//		this.mbody = new LinkedList<>();
-//		this.sourceRules = new HashSet<>();
-//		
-//		this.blocks.addAll(r.blocks);
-//		this.mbody.addAll(r.mbody);
-//		this.sourceRules.addAll(r.sourceRules);
-//	}
-//	
-//	public void addBlock(Block block) {
-//		this.blocks.add(block);
-//		this.sourceRules.addAll(block.getPassSources());
-//		
-//		Iterator<Atom> it = this.mbody.iterator();
-//		
-//		while(it.hasNext()) {
-//			Atom a = it.next();
-//			if(block.contains(a)) it.remove();
-//		}
-//	}
-//	
-//	public BlockRule add(Block block) {
-//		for(Block b : this.blocks) {
-//			if(b.overlap(block)) return null;
-//		}
-//		
-//		BlockRule br = new BlockRule(this);
-//		br.addBlock(block);
-//		
-//		return br;
-//	}
-//	
+
 	public List<Block> getBlocks() {
 		return this.blocks;
 	}
