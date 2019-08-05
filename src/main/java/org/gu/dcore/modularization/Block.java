@@ -7,6 +7,8 @@ import java.util.Set;
 
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 
 public class Block {
 	private List<Rule> sources;
@@ -42,6 +44,13 @@ public class Block {
 		return false;
 	}
 	
+	public boolean related(Block b) {
+		for(Rule r : b.sources) {
+			if(this.sources.contains(r)) return true;
+		}
+		return false;
+	}
+	
 	public Set<Atom> getBricks() {
 		return this.bricks;
 	}
@@ -56,6 +65,18 @@ public class Block {
 	
 	public List<Rule> getPassSources() {
 		return this.pass_sources;
+	}
+	
+	public Set<Term> getVariables() {
+		Set<Term> vars = new HashSet<>();
+		for(Atom a : bricks) {
+			for(Term t : a.getTerms()) {
+				if(t instanceof Variable) {
+					vars.add(t);
+				}
+			}
+		}
+		return vars;
 	}
 	
 	@Override

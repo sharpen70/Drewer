@@ -9,6 +9,7 @@ public class PredicateFactory {
 	private static PredicateFactory factory = null;
 	private Map<String, Predicate> pMap = null;
 	private long id = 0;
+	private long block_id = 0;
 	
 	private PredicateFactory() {
 		pMap = new HashMap<>();
@@ -29,5 +30,9 @@ public class PredicateFactory {
 		}
 		
 		return p;
+	}
+	
+	public Predicate createBlockPredicate(int arity) {
+		return new Predicate("BLOCK_" + this.block_id++, this.id++, arity);
 	}
 }

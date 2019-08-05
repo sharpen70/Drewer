@@ -2,12 +2,11 @@ package org.gu.dcore.grd;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.gu.dcore.model.Atom;
+import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.modularization.Block;
@@ -15,6 +14,7 @@ import org.gu.dcore.modularization.BlockRule;
 
 public class IndexedBlockRuleSet {
 	Map<Predicate, Set<BlockRule>> normalRuleMap;
+	Map<Predicate, Set<BlockRule>> blockRuleMap1;
 	Map<Rule, Map<Predicate, Set<BlockRule>>> blockRuleMap;
 	
 	public IndexedBlockRuleSet() {
@@ -55,6 +55,18 @@ public class IndexedBlockRuleSet {
 	
 	public Set<BlockRule> getNormalRules(Predicate pred) {
 		return this.normalRuleMap.get(pred);
+	}
+	
+	public Set<BlockRule> getRules(AtomSet body) {
+		Set<BlockRule> br = new HashSet<>();
+		
+		for(Atom a : body) {
+			Set<BlockRule> rs = this.blockRuleMap1.get(a.getPredicate());
+			if(rs != null)
+				br.addAll(rs);
+		}
+		
+		return br;
 	}
 	
 	public Set<BlockRule> getBlockRules(Block b) {

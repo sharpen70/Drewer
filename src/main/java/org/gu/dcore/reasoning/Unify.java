@@ -10,10 +10,58 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.gu.dcore.model.Atom;
+import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 
 public class Unify {
+	
+	public static List<Unifier> getSinglePieceUnifier(AtomSet block, Rule br, Rule hr) {
+		List<Unifier> singlePieceUnifiers = new LinkedList<>();
+		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
+		
+		for(Atom a : br.getBody()) {
+			for(Atom b : hr.getHead()) {
+				if(a.getPredicate().equals(b.getPredicate())) {
+					Partition partition = new Partition(br.getMaxVar());
+					
+					for(int i = 0; i < a.getPredicate().getArity(); i++) {
+						Term at = a.getTerm(i);
+						Term bt = b.getTerm(i);
+						partition.add(at, bt);
+					}					
+
+					Set<Atom> B = new HashSet<>(); B.add(a);
+					Set<Atom> H = new HashSet<>(); H.add(b);
+					
+					Unifier u = new Unifier(B, H, br, hr, partition);
+					
+					if(u.isPartitionValid()) {
+						if(u.isPieceUnifier()) singlePieceUnifiers.add(u);
+						else {
+							List<Unifier> unifiers = preUnifiers.get(a);
+							if(unifiers == null) {
+								unifiers = new LinkedList<>();
+								unifiers.add(u);
+								preUnifiers.put(a, unifiers);
+							}
+							else unifiers.add(u);
+						}
+					}
+				}
+			}
+		}
+		
+		for(Entry<Atom, List<Unifier>> entry : preUnifiers.entrySet()) {
+			Iterator<Unifier> it = entry.getValue().iterator();
+			while(it.hasNext()) {
+				singlePieceUnifiers.addAll(extend(it.next(), preUnifiers));
+				it.remove();
+			}
+		}
+		
+		return singlePieceUnifiers;	
+	}
 	
 	public static List<Unifier> getSinglePieceUnifier(Rule br, Rule hr) {
 	//	List<Unifier> preUnifiers = new LinkedList<>();

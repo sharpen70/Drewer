@@ -92,6 +92,10 @@ public class Rule {
 		return this.existentials;
 	}
 	
+	public boolean isExRule() {
+		return !this.getExistentials().isEmpty();
+	}
+	
 	@Override
 	public int hashCode() {
 		return this.ruleIndex;
