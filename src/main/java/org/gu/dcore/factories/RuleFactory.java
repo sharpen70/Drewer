@@ -31,4 +31,17 @@ public class RuleFactory {
 		
 		return new Rule(head, body, ruleIndex++, maxVar);
 	}
+	
+	public Rule createRule(AtomSet head, AtomSet... bodies) {
+		int maxVar = -1;
+		
+		AtomSet body = new AtomSet();
+		
+		for(AtomSet b : bodies) body.addAll(b);
+		
+		for(Variable v : head.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
+		for(Variable v : body.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
+		
+		return new Rule(head, body, ruleIndex++, maxVar);
+	}
 }

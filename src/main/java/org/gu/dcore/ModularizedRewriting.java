@@ -1,5 +1,6 @@
 package org.gu.dcore;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,7 +9,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.antlr.v4.runtime.misc.Triple;
 import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
@@ -99,20 +99,33 @@ public class ModularizedRewriting {
 		
 		result_head.add(init_head);
 		
-		Queue<Triple<Atom, AtomSet, AtomSet>> queue = new LinkedList<>();
-		queue.add(new Triple<>(init_head, new AtomSet(b.getBricks()), new AtomSet()));
+		Queue<Tuple4<Atom, AtomSet, AtomSet, Set<Rule>>> queue = new LinkedList<>();
+		AtomSet na = new AtomSet(b.getBricks());
+		queue.add(new Tuple4<>(init_head, na, new AtomSet(), b.getSources()));
+		
+		List<AtomSet> rewrited = new LinkedList<>();
+		rewrited.add(na);
 		
 		while(!queue.isEmpty()) {
-			Triple<Atom, AtomSet, AtomSet> t = queue.poll();
+			Tuple4<Atom, AtomSet, AtomSet, Set<Rule>> t = queue.poll();	
+			
 			Set<BlockRule> rs = this.ibr.getRules(t.b);
 			for(BlockRule hr : rs) {
 				List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.b, br, hr);
 				
 				if(!unifiers.isEmpty()) {
+					Set<Rule> current_sources = new HashSet<>(t.d);
+					AtomSet current_target = new AtomSet();
+					
 					List<List<Atom>> tails = new LinkedList<>();
+					
 					for(Block hb : hr.getBlocks()) {
-						if(!b.related(hb)) {
+						if(!source_related(t.d, hb.getSources())) {
 							tails.add(rewriteBlock(hr, hb, result, normalRuleQueue));
+						}
+						else {
+							current_sources.addAll(hb.getSources());
+							current_target.addAll(hb.getBricks());
 						}
 					}
 					for(Atom a : hr.getNormalAtoms()) {
@@ -124,25 +137,46 @@ public class ModularizedRewriting {
 						}
 					}
 					List<AtomSet> ct = combine(tails);
+					if(ct.isEmpty()) ct.add(new AtomSet());
 					for(AtomSet c : ct) c.addAll(hr.getNormalAtoms());
 					
-					if(ct.isEmpty()) ct.add(new AtomSet());
+					if(!hr.isExRule() && this.selected.add(hr)) result.add(hr);
 					
-					if(hr.isExRule()) {
-						
+					for(Unifier u : unifiers) {
+						AtomSet rewriting = rewrite(t.b, current_target, u);
+						boolean subsumed = false;
+						for(AtomSet rw : rewrited) {
+							if(isMoreGeneral(rw, rewriting)) {
+								subsumed = true; break;
+							}
+						}
+						if(!subsumed) {
+							rewrited.add(rewriting);
+							
+							for(AtomSet c : ct) {
+								if(hr.isExRule()) {								
+									Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(rw_head), rewriting, c);
+								}
+								if(!current_target.isEmpty()) {
+									queue.add(new Tuple4(rw_head, rewriting, c, current_sources));
+								}
+							}
+						}
 					}
-					else {
-						              
-					}
+					
 				}
 			}
 
 		}
 
-		
-		
-		
 		return result_head;
+	}
+	
+	public boolean source_related(Set<Rule> s1, Collection<Rule> s2) {
+		for(Rule r : s2) {
+			if(s1.contains(r)) return true;
+		}
+		return false;
 	}
 	
 	private List<AtomSet> combine(List<List<Atom>> atomlists) {
@@ -167,6 +201,20 @@ public class ModularizedRewriting {
 		}
 		
 		return as;
+	}
+	
+	private final class Tuple4<T1, T2, T3, T4> {
+		public T1 a;
+		public T2 b;
+		public T3 c;
+		public T4 d;
+		
+		Tuple4(T1 a, T2 b, T3 c, T4 d) {
+			this.a = a;
+			this.b = b;
+			this.c = c;
+			this.d = d;
+		}
 	}
 	
 }

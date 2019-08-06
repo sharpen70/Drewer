@@ -22,14 +22,6 @@ public class AtomSet implements Iterable<Atom> {
 		this.atoms = _atoms;
 	}
 	
-	public void add(Atom a) {
-		this.atoms.add(a);
-	}
-	
-	public void addAll(Collection<Atom> as) {
-		for(Atom a : as) add(a);
-	}
-	
 	public AtomSet(Collection<Atom> atoms) {
 		this.atoms = new ArrayList<>();
 		for(Atom a : atoms) atoms.add(a);
@@ -38,6 +30,22 @@ public class AtomSet implements Iterable<Atom> {
 	public AtomSet(Atom atom) {
 		this.atoms = new ArrayList<>();
 		this.atoms.add(atom);
+	}
+	
+	public void add(Atom a) {
+		this.atoms.add(a);
+	}
+	
+	public void addAll(AtomSet as) {
+		addAll(as.atoms);
+	}
+	
+	public void addAll(Collection<Atom> as) {
+		for(Atom a : as) add(a);
+	}
+	
+	public boolean isEmpty() {
+		return this.atoms.isEmpty();
 	}
 	
 	public ArrayList<Atom> getAtoms() {

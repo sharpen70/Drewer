@@ -11,14 +11,14 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Block {
-	private List<Rule> sources;
-	private List<Rule> pass_sources;
+	private Set<Rule> sources;
+	private Set<Rule> pass_sources;
 	
 	private Set<Atom> bricks;
 	
 	public Block(Block ... blocks) {
-		this.sources = new LinkedList<>();
-		this.pass_sources = new LinkedList<>();
+		this.sources = new HashSet<>();
+		this.pass_sources = new HashSet<>();
 		this.bricks = new HashSet<>();
 		
 		for(Block b : blocks) {
@@ -30,9 +30,9 @@ public class Block {
 	
 	public Block(Set<Atom> bricks, Rule source, boolean pass) {
 		this.bricks = bricks;
-		this.sources = new LinkedList<>();
+		this.sources = new HashSet<>();
 		this.sources.add(source);
-		this.pass_sources = new LinkedList<>();
+		this.pass_sources = new HashSet<>();
 		if(pass) this.pass_sources.add(source);
 	}
 	
@@ -44,12 +44,7 @@ public class Block {
 		return false;
 	}
 	
-	public boolean related(Block b) {
-		for(Rule r : b.sources) {
-			if(this.sources.contains(r)) return true;
-		}
-		return false;
-	}
+
 	
 	public Set<Atom> getBricks() {
 		return this.bricks;
@@ -59,11 +54,11 @@ public class Block {
 		return this.bricks.contains(a);
 	}
 	
-	public List<Rule> getSources() {
+	public Set<Rule> getSources() {
 		return this.sources;
 	}
 	
-	public List<Rule> getPassSources() {
+	public Set<Rule> getPassSources() {
 		return this.pass_sources;
 	}
 	
