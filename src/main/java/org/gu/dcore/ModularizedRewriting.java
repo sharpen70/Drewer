@@ -1,5 +1,6 @@
 package org.gu.dcore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 import org.gu.dcore.modularization.BaseMarking;
 import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
@@ -83,25 +85,31 @@ public class ModularizedRewriting {
 				for(Block b : br.getBlocks()) {
 
 				}
-		}
-		
+		}	
 		
 		return result;
 	}
 	
 	private List<Atom> rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<Rule> normalRuleQueue) {
 		Set<Term> variables = b.getVariables();
+		ArrayList<Term> atom_t = new ArrayList<>(variables);
+		String init_position = "";
+		for(int i = 0; i < atom_t.size(); i++) init_position += i;
+		Set<String> reserved_positions = new HashSet<>();
+		reserved_positions.add(init_position);
+		
 		Predicate init_predicate = PredicateFactory.instance().createBlockPredicate(variables.size());
 		Atom init_head = AtomFactory.instance().createAtom(init_predicate, variables);
 		Rule init_rule = RuleFactory.instance().createRule(new AtomSet(init_head), new AtomSet(b.getBricks()));
 		
 		List<Atom> result_head = new LinkedList<>();
 		
+		
 		result_head.add(init_head);
 		
-		Queue<Tuple4<Atom, AtomSet, AtomSet, Set<Rule>>> queue = new LinkedList<>();
+		Queue<Tuple4<ArrayList<Term>, AtomSet, AtomSet, Set<Rule>>> queue = new LinkedList<>();
 		AtomSet na = new AtomSet(b.getBricks());
-		queue.add(new Tuple4<>(init_head, na, new AtomSet(), b.getSources()));
+		queue.add(new Tuple4<>(atom_t, na, new AtomSet(), b.getSources()));
 		
 		List<AtomSet> rewrited = new LinkedList<>();
 		rewrited.add(na);
@@ -151,14 +159,16 @@ public class ModularizedRewriting {
 							}
 						}
 						if(!subsumed) {
+							Set<Term> eliminated = u.getImageOf(hr.getExistentials());
 							rewrited.add(rewriting);
 							
 							for(AtomSet c : ct) {
+								AtomSet uc = u.getImageOf(c);
 								if(hr.isExRule()) {								
-									Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(rw_head), rewriting, c);
+									Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(rw_head), rewriting, uc);
 								}
 								if(!current_target.isEmpty()) {
-									queue.add(new Tuple4(rw_head, rewriting, c, current_sources));
+									queue.add(new Tuple4<>(rw_head, rewriting, uc, current_sources));
 								}
 							}
 						}

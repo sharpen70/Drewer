@@ -1,10 +1,8 @@
 package org.gu.dcore.reasoning;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.gu.dcore.model.Atom;
@@ -52,6 +50,10 @@ public class Unifier {
 	
 	public AtomSet getImageOf(AtomSet atomset) {
 		return null;
+	}
+	
+	public Set<Term> getImageOf(Set<Variable> vars) {
+		return this.partition.getSubstitution().getImageOf(vars);
 	}
 	
 	public Unifier extend(Unifier u) {

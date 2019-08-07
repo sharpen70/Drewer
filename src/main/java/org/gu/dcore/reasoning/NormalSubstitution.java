@@ -2,7 +2,9 @@ package org.gu.dcore.reasoning;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.RuleFactory;
@@ -58,5 +60,14 @@ public class NormalSubstitution implements Substitution {
 		AtomSet substituted_body = this.getImageOf(body);
 		
 		return RuleFactory.instance().createRule(substituted_head, substituted_body, rule.getMaxVar());
+	}
+	
+	public Set<Term> getImageOf(Set<Variable> vars) {
+		Set<Term> image = new HashSet<>();
+		for(Variable v : vars) {
+			Term t = this.sMap.get(v);
+			if(t != null) image.add(t);
+		}		
+		return image;
 	}
 }

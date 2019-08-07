@@ -1,8 +1,6 @@
 package org.gu.dcore.modularization;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.gu.dcore.model.Atom;
@@ -11,12 +9,15 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Block {
+	private String block_name = "";
 	private Set<Rule> sources;
 	private Set<Rule> pass_sources;
 	
 	private Set<Atom> bricks;
 	
 	public Block(Block ... blocks) {
+		if(blocks.length > 0)
+			this.block_name = blocks[0].block_name;
 		this.sources = new HashSet<>();
 		this.pass_sources = new HashSet<>();
 		this.bricks = new HashSet<>();
@@ -28,12 +29,17 @@ public class Block {
 		}
 	}
 	
-	public Block(Set<Atom> bricks, Rule source, boolean pass) {
+	public Block(String b_name, Set<Atom> bricks, Rule source, boolean pass) {
+		this.block_name = b_name;
 		this.bricks = bricks;
 		this.sources = new HashSet<>();
 		this.sources.add(source);
 		this.pass_sources = new HashSet<>();
 		if(pass) this.pass_sources.add(source);
+	}
+	
+	public String getBlockName() {
+		return this.block_name;
 	}
 	
 	public boolean overlap(Block b) {
@@ -43,8 +49,6 @@ public class Block {
 		
 		return false;
 	}
-	
-
 	
 	public Set<Atom> getBricks() {
 		return this.bricks;

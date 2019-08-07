@@ -40,6 +40,4 @@ public class Predicate {
 	public String toString() {
 		return this.name;
 	}
-	
-	
 }

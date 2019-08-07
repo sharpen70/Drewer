@@ -73,13 +73,17 @@ public class RuleBasedMark {
 	}
 	
 	public List<Block> getBaseBlocks() {
+		int b_id = 0;
+		
 		List<Block> blocks = new LinkedList<>();
 		
 		for(Entry<Rule, Map<Atom, Set<Integer>>> entry : this.marked.entrySet()) {
 			Rule source = entry.getKey();
 			Map<Atom, Set<Integer>> markedPosition = entry.getValue();
 			
-			blocks.add(new Block(markedPosition.keySet(), source, 
+			String b_name = "BLK:" + this.rule.getRuleIndex() + ":" + b_id++;
+			
+			blocks.add(new Block(b_name, markedPosition.keySet(), source, 
 					!this.markedHeadVars.get(source).isEmpty()));
 		}
 		
