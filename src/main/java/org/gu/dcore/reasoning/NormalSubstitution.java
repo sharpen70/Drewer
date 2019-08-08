@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
@@ -21,8 +23,31 @@ public class NormalSubstitution implements Substitution {
 		this.sMap = new HashMap<>();
 	}
 	
-	public void add(Variable v, Term t) {
+	public NormalSubstitution(NormalSubstitution sub) {
+		this.sMap = new HashMap<>(sub.sMap);
+	}
+	
+	public boolean add(Variable v, Term t) {
+		Term st = this.sMap.get(v);
+		if(st != null && !st.equals(t)) return false;
+		
 		this.sMap.put(v, t);
+		return true;
+	}
+	
+	public NormalSubstitution add(NormalSubstitution sub) {
+		NormalSubstitution re = new NormalSubstitution(this);
+		for(Entry<Variable, Term> entry : sub.sMap.entrySet()) {
+			if(!re.add(entry.getKey(), entry.getValue())) return null;
+		}
+		return re;
+	}
+	
+	public Term getImageOf(Term t) {
+		if(t instanceof Constant) return t;
+		Term _t = this.sMap.get(t);
+		if(_t == null) return t;
+		else return _t;
 	}
 	
 	public Atom getImageOf(Atom a) {

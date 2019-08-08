@@ -13,14 +13,15 @@ import java.util.Set;
 import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
+import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.grd.IndexedBlockRuleSet;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
+import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
-import org.gu.dcore.model.Variable;
 import org.gu.dcore.modularization.BaseMarking;
 import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
@@ -28,17 +29,21 @@ import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
+import org.guiiis.dwfe.core.graal.Utils;
+
+import fr.lirmm.graphik.graal.api.core.InMemoryAtomSet;
+import fr.lirmm.graphik.graal.api.homomorphism.HomomorphismException;
+import fr.lirmm.graphik.graal.core.atomset.AtomSetUtils;
+import fr.lirmm.graphik.graal.homomorphism.PureHomomorphism;
 
 public class ModularizedRewriting {
-	List<Rule> ruleset;
-	List<BlockRule> blockRuleset;
-	Modularizor modularizor;
-	IndexedBlockRuleSet ibr;
-	Set<Rule> selected;
-	Map<Block, List<Rule>> blockMap;
+	private Modularizor modularizor;
+	private IndexedBlockRuleSet ibr;
+	private Set<Rule> selected;
+	
+	private final Constant blank = TermFactory.instance().createConstant("BLANK");
 	
 	public ModularizedRewriting(List<Rule> onto) {
-		this.ruleset = onto;
 		this.modularizor = new Modularizor(onto);
 		this.modularizor.modularize();
 		this.ibr = this.modularizor.getIndexedBlockOnto();
@@ -54,58 +59,29 @@ public class ModularizedRewriting {
 		BaseMarking marking = this.modularizor.getMarking();
 		RuleBasedMark rbm = marking.markQueryRule(Qr);
 		
-		BlockRule brs = marking.getBlockRule(Qr, rbm);
+		BlockRule bQr = marking.getBlockRule(Qr, rbm);
 	
-		
-		return null;
-	}
-	
-	private List<Rule> backwardChaining(BlockRule qr, List<BlockRule> rs) {
 		List<Rule> result = new LinkedList<>();
-		IndexedBlockRuleSet ibr = this.modularizor.getIndexedBlockOnto();
+		Queue<Rule> normalRuleQueue = new LinkedList<>();
 		
-		Queue<BlockRule> rqueue = new LinkedList<>();
+		AtomSet body = new AtomSet();
 		
-		rqueue.add(qr);
-		
-		while(!rqueue.isEmpty()) {
-			BlockRule br = rqueue.poll();		
-		
-			for(Atom a : br.getNormalAtoms()) {
-				for(BlockRule r : ibr.getNormalRules(a.getPredicate())) {
-					if(this.selected.add(r)) {
-						result.add(r);
-						rqueue.add(r);
-					}
-				}
-			}
-			
-			if(br.getBlocks().isEmpty()) result.add(br);
-			else 
-				for(Block b : br.getBlocks()) {
-
-				}
-		}	
+		for(Block b : bQr.getBlocks()) {
+			body.add(rewriteBlock(bQr, b, result, normalRuleQueue));
+		}
+		body.addAll(bQr.getNormalAtoms());
+		result.add(RuleFactory.instance().createRule(bQr.getHead(), body));
 		
 		return result;
 	}
 	
-	private List<Atom> rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<Rule> normalRuleQueue) {
+	private Atom rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<Rule> normalRuleQueue) {
 		Set<Term> variables = b.getVariables();
-		ArrayList<Term> atom_t = new ArrayList<>(variables);
-		String init_position = "";
-		for(int i = 0; i < atom_t.size(); i++) init_position += i;
-		Set<String> reserved_positions = new HashSet<>();
-		reserved_positions.add(init_position);
+		ArrayList<Term> atom_t = new ArrayList<>(variables);;
 		
-		Predicate init_predicate = PredicateFactory.instance().createBlockPredicate(variables.size());
-		Atom init_head = AtomFactory.instance().createAtom(init_predicate, variables);
-		Rule init_rule = RuleFactory.instance().createRule(new AtomSet(init_head), new AtomSet(b.getBricks()));
-		
-		List<Atom> result_head = new LinkedList<>();
-		
-		
-		result_head.add(init_head);
+		Predicate blockPred = PredicateFactory.instance().createPredicate(b.getBlockName(), atom_t.size());
+		Atom init_head = AtomFactory.instance().createAtom(blockPred, variables);
+		Rule init_rule = RuleFactory.instance().createRule(new AtomSet(init_head), new AtomSet(b.getBricks()));		
 		
 		Queue<Tuple4<ArrayList<Term>, AtomSet, AtomSet, Set<Rule>>> queue = new LinkedList<>();
 		AtomSet na = new AtomSet(b.getBricks());
@@ -115,7 +91,7 @@ public class ModularizedRewriting {
 		rewrited.add(na);
 		
 		while(!queue.isEmpty()) {
-			Tuple4<Atom, AtomSet, AtomSet, Set<Rule>> t = queue.poll();	
+			Tuple4<ArrayList<Term>, AtomSet, AtomSet, Set<Rule>> t = queue.poll();	
 			
 			Set<BlockRule> rs = this.ibr.getRules(t.b);
 			for(BlockRule hr : rs) {
@@ -125,7 +101,7 @@ public class ModularizedRewriting {
 					Set<Rule> current_sources = new HashSet<>(t.d);
 					AtomSet current_target = new AtomSet();
 					
-					List<List<Atom>> tails = new LinkedList<>();
+					AtomSet tails = new AtomSet();
 					
 					for(Block hb : hr.getBlocks()) {
 						if(!source_related(t.d, hb.getSources())) {
@@ -144,9 +120,7 @@ public class ModularizedRewriting {
 							}
 						}
 					}
-					List<AtomSet> ct = combine(tails);
-					if(ct.isEmpty()) ct.add(new AtomSet());
-					for(AtomSet c : ct) c.addAll(hr.getNormalAtoms());
+					tails.addAll(hr.getNormalAtoms());
 					
 					if(!hr.isExRule() && this.selected.add(hr)) result.add(hr);
 					
@@ -162,15 +136,22 @@ public class ModularizedRewriting {
 							Set<Term> eliminated = u.getImageOf(hr.getExistentials());
 							rewrited.add(rewriting);
 							
-							for(AtomSet c : ct) {
-								AtomSet uc = u.getImageOf(c);
-								if(hr.isExRule()) {								
-									Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(rw_head), rewriting, uc);
-								}
-								if(!current_target.isEmpty()) {
-									queue.add(new Tuple4<>(rw_head, rewriting, uc, current_sources));
-								}
+							ArrayList<Term> rw_t = new ArrayList<>();
+							for(int i = 0; i < t.a.size(); i++) {
+								Term _t = t.a.get(i);
+								if(eliminated.contains(_t)) rw_t.set(i, blank);
+								else rw_t.set(i, u.getImageOf(_t));
 							}
+
+							AtomSet uc = u.getImageOf(tails);
+							if(hr.isExRule()) {
+								Atom newhead =  AtomFactory.instance().createAtom(blockPred, rw_t);
+								Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(newhead), rewriting, uc);
+							}
+							if(!current_target.isEmpty()) {
+								queue.add(new Tuple4<>(rw_t, rewriting, uc, current_sources));
+							}
+							
 						}
 					}
 					
@@ -179,7 +160,7 @@ public class ModularizedRewriting {
 
 		}
 
-		return result_head;
+		return init_head;
 	}
 	
 	public boolean source_related(Set<Rule> s1, Collection<Rule> s2) {
@@ -189,28 +170,43 @@ public class ModularizedRewriting {
 		return false;
 	}
 	
-	private List<AtomSet> combine(List<List<Atom>> atomlists) {
-		LinkedList<AtomSet> as = new LinkedList<>();
-		
-		Iterator<List<Atom>> it = atomlists.iterator();
-		
-		if(!it.hasNext()) return as;
-		
-		for(Atom a : it.next()) {
-			as.add(new AtomSet(a));
-		}
-		
-		while(it.hasNext()) {
-			List<Atom> list = it.next();
-			AtomSet s = as.poll();
-			for(Atom a : list) {
-				AtomSet ns = new AtomSet(s);
-				ns.add(a);
-				as.add(ns);
+//	private List<AtomSet> combine(List<List<Atom>> atomlists) {
+//		LinkedList<AtomSet> as = new LinkedList<>();
+//		
+//		Iterator<List<Atom>> it = atomlists.iterator();
+//		
+//		if(!it.hasNext()) return as;
+//		
+//		for(Atom a : it.next()) {
+//			as.add(new AtomSet(a));
+//		}
+//		
+//		while(it.hasNext()) {
+//			List<Atom> list = it.next();
+//			AtomSet s = as.poll();
+//			for(Atom a : list) {
+//				AtomSet ns = new AtomSet(s);
+//				ns.add(a);
+//				as.add(ns);
+//			}
+//		}
+//		
+//		return as;
+//	}
+	
+	private boolean isMoreGeneral(AtomSet f, AtomSet h) {
+		boolean moreGen = false;
+		if (AtomSetUtils.contains(f, h)) {
+			moreGen = true;
+		} else {
+			try {
+				InMemoryAtomSet fCopy = Utils.getSafeCopy(f);
+				moreGen = PureHomomorphism.instance().exist(h, fCopy, compilation);
+			} catch (HomomorphismException e) {
 			}
 		}
-		
-		return as;
+
+		return moreGen;
 	}
 	
 	private final class Tuple4<T1, T2, T3, T4> {

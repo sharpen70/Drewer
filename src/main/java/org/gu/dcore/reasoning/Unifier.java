@@ -44,6 +44,10 @@ public class Unifier {
 		return this.H;
 	}
 	
+	public Term getImageOf(Term t) {
+		return this.partition.getSubstitution().getImageOf(t);
+	}
+	
 	public Atom getImageOf(Atom a) {
 		return null;
 	}
