@@ -3,10 +3,8 @@ package org.gu.dcore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -15,6 +13,8 @@ import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.grd.IndexedBlockRuleSet;
+import org.gu.dcore.homomorphism.HomoUtils;
+import org.gu.dcore.homomorphism.Homomorphism;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
@@ -29,12 +29,6 @@ import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
-import org.guiiis.dwfe.core.graal.Utils;
-
-import fr.lirmm.graphik.graal.api.core.InMemoryAtomSet;
-import fr.lirmm.graphik.graal.api.homomorphism.HomomorphismException;
-import fr.lirmm.graphik.graal.core.atomset.AtomSetUtils;
-import fr.lirmm.graphik.graal.homomorphism.PureHomomorphism;
 
 public class ModularizedRewriting {
 	private Modularizor modularizor;
@@ -80,8 +74,7 @@ public class ModularizedRewriting {
 		ArrayList<Term> atom_t = new ArrayList<>(variables);;
 		
 		Predicate blockPred = PredicateFactory.instance().createPredicate(b.getBlockName(), atom_t.size());
-		Atom init_head = AtomFactory.instance().createAtom(blockPred, variables);
-		Rule init_rule = RuleFactory.instance().createRule(new AtomSet(init_head), new AtomSet(b.getBricks()));		
+		Atom init_head = AtomFactory.instance().createAtom(blockPred, variables);	
 		
 		Queue<Tuple4<ArrayList<Term>, AtomSet, AtomSet, Set<Rule>>> queue = new LinkedList<>();
 		AtomSet na = new AtomSet(b.getBricks());
@@ -144,9 +137,11 @@ public class ModularizedRewriting {
 							}
 
 							AtomSet uc = u.getImageOf(tails);
+							uc.addAll(t.c);
 							if(hr.isExRule()) {
 								Atom newhead =  AtomFactory.instance().createAtom(blockPred, rw_t);
 								Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(newhead), rewriting, uc);
+								result.add(rw_rule);
 							}
 							if(!current_target.isEmpty()) {
 								queue.add(new Tuple4<>(rw_t, rewriting, uc, current_sources));
@@ -194,19 +189,28 @@ public class ModularizedRewriting {
 //		return as;
 //	}
 	
+	/*
+	 * f the set of atoms being replaced
+	 * b the set of atoms to replace
+	 * u the unifier for replacing
+	 */
+	private AtomSet rewrite(AtomSet f, AtomSet b, Unifier u) {
+		AtomSet uf = u.getImageOf(f);
+		AtomSet ub = u.getImageOf(b);
+		
+		AtomSet up = u.getImageOfPiece();
+		
+		uf = HomoUtils.minus(uf, up);
+		uf = HomoUtils.simple_union(uf, ub);
+		
+		return uf;
+	}
+	
 	private boolean isMoreGeneral(AtomSet f, AtomSet h) {
-		boolean moreGen = false;
-		if (AtomSetUtils.contains(f, h)) {
-			moreGen = true;
-		} else {
-			try {
-				InMemoryAtomSet fCopy = Utils.getSafeCopy(f);
-				moreGen = PureHomomorphism.instance().exist(h, fCopy, compilation);
-			} catch (HomomorphismException e) {
-			}
-		}
-
-		return moreGen;
+		if (HomoUtils.contains(f, h)) 
+			return true;
+		else 
+			return new Homomorphism(f, h).exist();		
 	}
 	
 	private final class Tuple4<T1, T2, T3, T4> {

@@ -52,8 +52,16 @@ public class Unifier {
 		return null;
 	}
 	
+	public AtomSet getImageOfPiece() {
+		AtomSet up = new AtomSet();
+		for(Atom a : this.B) {
+			up.add(this.partition.getSubstitution().getImageOf(a));
+		}
+		return up;
+	}
+	
 	public AtomSet getImageOf(AtomSet atomset) {
-		return null;
+		return this.partition.getSubstitution().getImageOf(atomset);
 	}
 	
 	public Set<Term> getImageOf(Set<Variable> vars) {

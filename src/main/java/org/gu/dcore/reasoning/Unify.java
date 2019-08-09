@@ -63,8 +63,45 @@ public class Unify {
 		return singlePieceUnifiers;	
 	}
 	
+	public static List<Unifier> getAggregatedPieceUnifier(AtomSet block, Rule br, Rule hr) {
+		List<Unifier> singlePieceUnifiers = getSinglePieceUnifier(block, br, hr);
+		
+		LinkedList<Unifier> unifAggregated = new LinkedList<Unifier>();
+		
+		if (!singlePieceUnifiers.isEmpty()) {
+			LinkedList<Unifier> restOfUnifToAggregate = new LinkedList<>(singlePieceUnifiers);
+			
+			while(!restOfUnifToAggregate.isEmpty()) {
+				Unifier u = restOfUnifToAggregate.poll();
+				
+				for(Unifier _u : aggregate(u, restOfUnifToAggregate)) {
+					unifAggregated.add(_u);
+				}
+			}
+		}
+		
+		return unifAggregated;			
+	}
+	
+	private static LinkedList<Unifier> aggregate(Unifier u,
+			LinkedList<Unifier> l) {
+		LinkedList<Unifier> lu = new LinkedList<>(l);
+		// if there is no more unifier to aggregate
+		if (lu.isEmpty()) {
+			LinkedList<Unifier> res = new LinkedList<>();
+			res.add(u);
+			return res;
+		} else { 
+			Unifier first = lu.poll(); 
+			LinkedList<Unifier> res = aggregate(u, lu);
+			if (u.isCompatible(first)) {
+				res.addAll(aggregate(u.aggregate(first), lu));
+			}
+			return res;
+		}
+	}
+	
 	public static List<Unifier> getSinglePieceUnifier(Rule br, Rule hr) {
-	//	List<Unifier> preUnifiers = new LinkedList<>();
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
 		

@@ -1,7 +1,6 @@
 package org.gu.dcore.homomorphism;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
@@ -9,7 +8,6 @@ import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 import org.gu.dcore.reasoning.NormalSubstitution;
-import org.gu.dcore.reasoning.Substitution;
 
 public class Homomorphism {
 	private AtomSet source;
@@ -70,7 +68,7 @@ public class Homomorphism {
 		return level > 0;
 	}
 	
-	private Substitution homo(Atom source, Atom target) {
+	private NormalSubstitution homo(Atom source, Atom target) {
 		if(!source.getPredicate().equals(target.getPredicate())) return null;
 		
 		NormalSubstitution sub = new NormalSubstitution();
@@ -92,11 +90,11 @@ public class Homomorphism {
 	
 	private boolean getSubsitutionsForSourceAtoms() {
 		for(int i = 0; i < source.size(); i++) {
-			ArrayList<Substitution> subs = new ArrayList<>();
+			ArrayList<NormalSubstitution> subs = new ArrayList<>();
 			for(int j = 0; j < target.size(); j++) {
 				Atom sa = source.getAtom(i);
 				Atom sb = target.getAtom(j);
-				Substitution sub = homo(sa, sb);
+				NormalSubstitution sub = homo(sa, sb);
 				if(sub != null) subs.add(sub);
 			}
 			if(subs.isEmpty()) return false;
