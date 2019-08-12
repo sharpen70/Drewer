@@ -97,8 +97,10 @@ public class Partition {
 			Set<Object> pc = it.next();
 			
 			Set<Object> hit = null;			
-
-			for(Set<Object> tc : re.categories) {
+			
+			Iterator<Set<Object>> rit = re.categories.iterator();
+			while(rit.hasNext()) {
+				Set<Object> tc = rit.next();
 				for(Object t : pc) {
 					if(tc.contains(t)) {
 						if(hit == null) {
@@ -106,8 +108,8 @@ public class Partition {
 							tc.addAll(pc);
 						}
 						else {
-							hit.addAll(pc);
-							it.remove();
+							hit.addAll(tc);
+							rit.remove();
 						}
 					}
 				}
