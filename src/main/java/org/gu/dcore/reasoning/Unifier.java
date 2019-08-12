@@ -98,6 +98,8 @@ public class Unifier {
 	}
 	
 	private void analyze() {
+		this.analyzed = true;
+		this.valid = true;
 		this.stickyAtoms = new HashSet<>();
 		
 		List<Atom> minus = new LinkedList<>();

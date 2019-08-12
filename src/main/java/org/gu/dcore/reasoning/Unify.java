@@ -20,7 +20,7 @@ public class Unify {
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
 		
-		for(Atom a : br.getBody()) {
+		for(Atom a : block) {
 			for(Atom b : hr.getHead()) {
 				if(a.getPredicate().equals(b.getPredicate())) {
 					Partition partition = new Partition(br.getMaxVar());

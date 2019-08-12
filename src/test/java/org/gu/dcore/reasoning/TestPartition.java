@@ -41,7 +41,7 @@ public class TestPartition extends TestCase {
     	
     	System.out.println(P);
     	
-    	List<Unifier> us = Unify.getSinglePieceUnifier(P.getRule(1), P.getRule(0));
+    	List<Unifier> us = Unify.getSinglePieceUnifier(P.getRule(0), P.getRule(1));
     	
     	System.out.println("Unifier Num : " + us.size());
     	

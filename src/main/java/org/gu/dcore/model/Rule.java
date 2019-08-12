@@ -55,12 +55,13 @@ public class Rule {
 		Set<Term> head_terms = this.head.getTerms();
 		
 		this.existentials = new HashSet<>();
+		this.frontier_terms = new HashSet<>();
 		this.exVar = new HashSet<>();
 		
 		for(Term t : head_terms) {
 			if(t instanceof Variable) {
 				Variable v = (Variable)t;
-				if(body_vars.contains(v)) this.exVar.add(v.getValue());
+				if(!body_vars.contains(v)) this.exVar.add(v.getValue());
 				else this.frontier_terms.add(t);
 			}
 			else {
