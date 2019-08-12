@@ -83,6 +83,16 @@ public class AtomSet implements Iterable<Atom> {
 		return vars;
 	}
 	
+	public Set<Term> getTerms() {
+		Set<Term> terms = new HashSet<>();
+		
+		for(Atom a : this.atoms) {
+			terms.addAll(a.getTerms());
+		}
+		
+		return terms;
+	}
+	
 	@Override
 	public String toString() {
 		String s = "";

@@ -1,10 +1,8 @@
 package org.gu.dcore.model;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.gu.dcore.grd.PredPosition;
@@ -16,7 +14,8 @@ public class Rule {
 	private int ruleIndex;
 	
 	private Set<Variable> existentials;
-	private Map<Integer, Boolean> headVarType = null; 
+	private Set<Integer> exVar = null;
+	private Set<Term> frontier_terms = null;
 	
 	private int max_var;
 	
@@ -47,22 +46,25 @@ public class Rule {
 	}
 	
 	public boolean isExistentialVar(int v) {
-		if(this.headVarType == null) this.computeFrontierAndExistentials();
-		return this.headVarType.get(v);
+		if(this.exVar == null) this.computeFrontierAndExistentials();
+		return this.exVar.contains(v);
 	}
 	
 	private void computeFrontierAndExistentials() {
 		Set<Variable> body_vars = this.body.getVariables();
-		Set<Variable> head_vars = this.head.getVariables();
+		Set<Term> head_terms = this.head.getTerms();
 		
 		this.existentials = new HashSet<>();
-		this.headVarType = new HashMap<>();
+		this.exVar = new HashSet<>();
 		
-		for(Variable v : head_vars) {
-			if(body_vars.contains(v)) this.headVarType.put(v.getValue(), false);
+		for(Term t : head_terms) {
+			if(t instanceof Variable) {
+				Variable v = (Variable)t;
+				if(body_vars.contains(v)) this.exVar.add(v.getValue());
+				else this.frontier_terms.add(t);
+			}
 			else {
-				this.headVarType.put(v.getValue(), true);
-				this.existentials.add(v);
+				this.frontier_terms.add(t);
 			}
 		}
 	}
@@ -90,6 +92,10 @@ public class Rule {
 	public Set<Variable> getExistentials() {
 		if(this.existentials == null) computeFrontierAndExistentials();
 		return this.existentials;
+	}
+	
+	public Set<Term> getFrontierTerm() {
+		return this.frontier_terms;
 	}
 	
 	public boolean isExRule() {

@@ -2,9 +2,12 @@ package org.gu.dcore;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -36,11 +39,17 @@ public class ModularizedRewriting {
 	private Set<Rule> selected;
 	
 	private final Constant blank = TermFactory.instance().createConstant("BLANK");
+	private final String pstring = "EXR";
+	
+	private Map<BlockRule, BlockRule> selected_exrule;
 	
 	public ModularizedRewriting(List<Rule> onto) {
 		this.modularizor = new Modularizor(onto);
 		this.modularizor.modularize();
 		this.ibr = this.modularizor.getIndexedBlockOnto();
+		
+		this.selected = new HashSet<>();
+		this.selected_exrule = new HashMap<>();
 	}
 	
 	public List<Rule> rewrite(ConjunctiveQuery q) {
@@ -120,11 +129,20 @@ public class ModularizedRewriting {
 					for(Unifier u : unifiers) {
 						AtomSet rewriting = rewrite(t.b, current_target, u);
 						boolean subsumed = false;
-						for(AtomSet rw : rewrited) {
-							if(isMoreGeneral(rw, rewriting)) {
+						
+						//Remove redundant rewritings
+						Iterator<AtomSet> it = rewrited.iterator();
+						while(it.hasNext()) {
+							AtomSet rew = it.next();
+							
+							if(isMoreGeneral(rew, rewriting)) {
 								subsumed = true; break;
 							}
+							if(isMoreGeneral(rewriting, rew)) {
+								it.remove();
+							}
 						}
+						
 						if(!subsumed) {
 							Set<Term> eliminated = u.getImageOf(hr.getExistentials());
 							rewrited.add(rewriting);
@@ -145,8 +163,11 @@ public class ModularizedRewriting {
 							}
 							if(!current_target.isEmpty()) {
 								queue.add(new Tuple4<>(rw_t, rewriting, uc, current_sources));
-							}
-							
+							}							
+						}
+						else {
+							Predicate newP = PredicateFactory.instance().createPredicate(pstring, hr.getFrontierTerm().size());
+							Atom ex_newhead = AtomFactory.instance().createAtom(newP, hr.getFrontierTerm());						
 						}
 					}
 					
