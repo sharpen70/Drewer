@@ -2,12 +2,10 @@ package org.gu.dcore;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -39,9 +37,6 @@ public class ModularizedRewriting {
 	private Set<Rule> selected;
 	
 	private final Constant blank = TermFactory.instance().createConstant("BLANK");
-	private final String pstring = "EXR";
-	
-	private Map<BlockRule, BlockRule> selected_exrule;
 	
 	public ModularizedRewriting(List<Rule> onto) {
 		this.modularizor = new Modularizor(onto);
@@ -49,7 +44,6 @@ public class ModularizedRewriting {
 		this.ibr = this.modularizor.getIndexedBlockOnto();
 		
 		this.selected = new HashSet<>();
-		this.selected_exrule = new HashMap<>();
 	}
 	
 	public List<Rule> rewrite(ConjunctiveQuery q) {
@@ -65,20 +59,23 @@ public class ModularizedRewriting {
 		BlockRule bQr = marking.getBlockRule(Qr, rbm);
 	
 		List<Rule> result = new LinkedList<>();
-		Queue<Rule> normalRuleQueue = new LinkedList<>();
+		Queue<BlockRule> rewQueue = new LinkedList<>();
+		rewQueue.add(bQr);
 		
-		AtomSet body = new AtomSet();
-		
-		for(Block b : bQr.getBlocks()) {
-			body.add(rewriteBlock(bQr, b, result, normalRuleQueue));
+		while(!rewQueue.isEmpty()) {
+			BlockRule r = rewQueue.poll();
+			AtomSet body = new AtomSet();
+			
+			for(Block b : r.getBlocks()) {
+				body.add(rewriteBlock(r, b, result, rewQueue));
+			}
+			body.addAll(r.getNormalAtoms());
+			result.add(RuleFactory.instance().createRule(r.getHead(), body));
 		}
-		body.addAll(bQr.getNormalAtoms());
-		result.add(RuleFactory.instance().createRule(bQr.getHead(), body));
-		
 		return result;
 	}
 	
-	private Atom rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<Rule> normalRuleQueue) {
+	private Atom rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<BlockRule> normalRuleQueue) {
 		Set<Term> variables = b.getVariables();
 		ArrayList<Term> atom_t = new ArrayList<>(variables);;
 		
@@ -173,12 +170,7 @@ public class ModularizedRewriting {
 						}
 						if(!current_target.isEmpty()) {
 							queue.add(new Tuple5<>(rw_t, p.b, rewriting, uc, current_sources));
-						}							
-						
-//						else {
-//							Predicate newP = PredicateFactory.instance().createPredicate(pstring, hr.getFrontierTerm().size());
-//							Atom ex_newhead = AtomFactory.instance().createAtom(newP, hr.getFrontierTerm());						
-//						}
+						}	
 					}	
 				}
 			}

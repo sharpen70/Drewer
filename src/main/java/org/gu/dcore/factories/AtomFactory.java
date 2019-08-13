@@ -31,4 +31,8 @@ public class AtomFactory {
 	public Atom createAtom(Predicate p, ArrayList<Term> terms) {
 		return new Atom(p, terms);
 	}
+	
+	public Atom getBottom() {
+		return null;
+	}
 }

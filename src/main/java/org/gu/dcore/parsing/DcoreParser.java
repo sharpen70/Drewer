@@ -18,6 +18,7 @@ import org.gu.dcore.antlr4.EDLGParser.AtomsetContext;
 import org.gu.dcore.antlr4.EDLGParser.ExruleContext;
 import org.gu.dcore.antlr4.EDLGParser.ProgramContext;
 import org.gu.dcore.antlr4.EDLGParser.TermsContext;
+import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
@@ -120,6 +121,8 @@ public class DcoreParser {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
 			String iri = ctx.predicate().getText();
+			
+			if(iri == "!") return AtomFactory.instance().getBottom();
 			
 			int arity = 0;
 			
