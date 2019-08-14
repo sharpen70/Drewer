@@ -2,8 +2,11 @@ package org.gu.dcore;
 
 import java.util.List;
 
+import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
+import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
 
@@ -39,18 +42,20 @@ public class TestModularRewriting extends TestCase
 	{
     	DcoreParser parser = new DcoreParser();
     	
-    	Program P = parser.parse("Q(X) :- A(X), B(X, Y).\n"
-    			+ "B(X, Y), A(X) :- C(Y).");
+    	Program P = parser.parse("B(X, Y), A(X) :- C(Y).");
+    	
+    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- A(X), B(X,Y).");
     	
     	System.out.println(P);
+    	System.out.println(query);
     	
     	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
     	
-    	List<Unifier> us = Unify.getSinglePieceUnifier(P.getRule(0), P.getRule(1));
+    	List<Rule> datalog = mr.rewrite(query);
     	
-    	System.out.println("Unifier Num : " + us.size());
-    	
-    	Assert.assertTrue(us.size() == 1);
+    	for(Rule r : datalog) {
+    		System.out.println(r);
+    	}
     	
 	    assertTrue( true );
 	}

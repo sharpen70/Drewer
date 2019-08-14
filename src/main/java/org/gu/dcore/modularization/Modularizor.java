@@ -12,7 +12,7 @@ public class Modularizor {
 	
 	public Modularizor(List<Rule> onto) {
 		this.onto = onto;
-		
+		this.ibs = new IndexedBlockRuleSet();
 		this.marking = new BaseMarking(onto);
 	}
 	

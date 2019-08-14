@@ -3,9 +3,13 @@ grammar EDLG;
 /*
  * Parser Rules
  */
-program     : exrule* EOF ;
+program     : prule* EOF ;
+
+prule       : exrule | constraint ;
 
 exrule      : atomset ':-' atomset '.' ;
+
+constraint  : '!' ':-' atomset '.' ;
 
 atomset     : atom | atom ',' atomset ;
 
@@ -15,11 +19,11 @@ terms       : term | term ',' terms ;
 
 term        : DESCRIPTION ;
 
-predicate   : DESCRIPTION ;
+predicate   : '<' DESCRIPTION '>' | DESCRIPTION;
 
 /*
  * Lexer Rules
  */
-DESCRIPTION : [!?a-zA-Z][a-zA-Z0-9_]* ;
+DESCRIPTION : [?a-zA-Z][a-zA-Z0-9_]* ;
 
 WS          : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines.

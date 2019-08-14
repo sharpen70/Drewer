@@ -1,5 +1,6 @@
 package org.gu.dcore.reasoning;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,12 +12,14 @@ import java.util.Set;
 
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 
 public class Unify {
 	
-	public static List<Unifier> getSinglePieceUnifier(AtomSet block, Rule br, Rule hr) {
+	public static List<Unifier> getSinglePieceUnifier(AtomSet block, Rule br, Rule hr, Set<Variable> ansVar) {
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
 		
@@ -33,8 +36,18 @@ public class Unify {
 
 					Set<Atom> B = new HashSet<>(); B.add(a);
 					Set<Atom> H = new HashSet<>(); H.add(b);
+					 
+					AtomSet body = new AtomSet(br.getBody());
 					
-					Unifier u = new Unifier(B, H, br, hr, partition);
+					if(ansVar != null && !ansVar.isEmpty()) {
+						Predicate ansP = new Predicate("ANS", -1, ansVar.size());
+						ArrayList<Term> ans_t = new ArrayList<>();
+						ans_t.addAll(ansVar);
+						Atom ansAtom = new Atom(ansP, ans_t);
+						body.add(ansAtom);
+					}
+					
+					Unifier u = new Unifier(B, H, body, hr, partition);
 					
 					if(u.isPartitionValid()) {
 						if(u.isPieceUnifier()) singlePieceUnifiers.add(u);
@@ -119,7 +132,7 @@ public class Unify {
 					Set<Atom> B = new HashSet<>(); B.add(a);
 					Set<Atom> H = new HashSet<>(); H.add(b);
 					
-					Unifier u = new Unifier(B, H, br, hr, partition);
+					Unifier u = new Unifier(B, H, br.getBody(), hr, partition);
 					
 					if(u.isPartitionValid()) {
 						if(u.isPieceUnifier()) singlePieceUnifiers.add(u);

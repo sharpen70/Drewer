@@ -16,17 +16,17 @@ public class Unifier {
 	private Partition partition;
 	private Set<Atom> B;
 	private Set<Atom> H;
-	private Rule br;
+	private AtomSet body;
 	private Rule hr;
 	
 	private Set<Atom> stickyAtoms;
 	private boolean valid;
 	private boolean analyzed = false;
 	
-	public Unifier(Set<Atom> B, Set<Atom> H, Rule br, Rule hr, Partition partition) {
+	public Unifier(Set<Atom> B, Set<Atom> H, AtomSet body, Rule hr, Partition partition) {
 		this.B = B;
 		this.H = H;
-		this.br = br;
+		this.body = body;
 		this.hr = hr;
 		
 		this.partition = partition;
@@ -79,7 +79,7 @@ public class Unifier {
 		
 		Partition newP = this.partition.join(u.partition);
 		
-		return new Unifier(newpB, newH, this.br, this.hr, newP);
+		return new Unifier(newpB, newH, this.body, this.hr, newP);
 	}
 	
 	public boolean isPartitionValid() {
@@ -104,7 +104,7 @@ public class Unifier {
 		
 		List<Atom> minus = new LinkedList<>();
 		
-		for(Atom a : br.getBody()) {
+		for(Atom a : this.body) {
 			if(!this.B.contains(a)) minus.add(a);
 		}
 		

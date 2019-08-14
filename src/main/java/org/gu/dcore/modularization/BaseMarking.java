@@ -64,6 +64,8 @@ public class BaseMarking implements Marking {
 			List<Rule> rs = this.ihs.get(a.getPredicate());
 			for(Rule r : rs) {	
 				RuleBasedMark rrbm = this.marking.get(r);
+				if(rrbm == null) continue;
+				
 				for(Entry<Rule, Set<Variable>> entry : rrbm.markedHeadVars.entrySet()) {
 					for(Variable v : entry.getValue()) {
 						for(PredPosition pp : r.getHeadPositions(v)) 
@@ -78,14 +80,15 @@ public class BaseMarking implements Marking {
 	
 	public BlockRule getBlockRule(Rule r, RuleBasedMark rbm) {
 		List<Rule> passSources = new LinkedList<>();
+		List<Block> blocks = new LinkedList<>();
+		
+		if(rbm == null) return new BlockRule(r, blocks, passSources);
 		
 		for(Entry<Rule, Set<Variable>> entry : 
 			rbm.markedHeadVars.entrySet()) {
 			if(!entry.getValue().isEmpty()) passSources.add(entry.getKey());
 		}
-		
-		List<Block> blocks = new LinkedList<>();
-		
+			
 		for(Block b : rbm.getBaseBlocks()) {
 			Block merge = null;
 			Iterator<Block> it = blocks.iterator();

@@ -23,6 +23,7 @@ import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 import org.gu.dcore.modularization.BaseMarking;
 import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
@@ -51,7 +52,7 @@ public class ModularizedRewriting {
 		
 		Predicate Q = PredicateFactory.instance().createPredicate("Q", q.getAnsVar().size());
 		Atom Qhead = AtomFactory.instance().createAtom(Q, q.getAnsVar());
-		Rule Qr = RuleFactory.instance().createRule(new AtomSet(Qhead), new AtomSet(q.getBody()));
+		Rule Qr = RuleFactory.instance().createRule(new AtomSet(Qhead), q.getBody());
 		
 		BaseMarking marking = this.modularizor.getMarking();
 		RuleBasedMark rbm = marking.markQueryRule(Qr);
@@ -67,7 +68,7 @@ public class ModularizedRewriting {
 			AtomSet body = new AtomSet();
 			
 			for(Block b : r.getBlocks()) {
-				body.add(rewriteBlock(r, b, result, rewQueue));
+				body.add(rewriteBlock(r, b, result, rewQueue, true));
 			}
 			body.addAll(r.getNormalAtoms());
 			result.add(RuleFactory.instance().createRule(r.getHead(), body));
@@ -75,7 +76,7 @@ public class ModularizedRewriting {
 		return result;
 	}
 	
-	private Atom rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<BlockRule> normalRuleQueue) {
+	private Atom rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<BlockRule> normalRuleQueue, boolean queryRule) {
 		Set<Term> variables = b.getVariables();
 		ArrayList<Term> atom_t = new ArrayList<>(variables);;
 		
@@ -94,7 +95,8 @@ public class ModularizedRewriting {
 			
 			Set<BlockRule> rs = this.ibr.getRules(t.b);
 			for(BlockRule hr : rs) {
-				List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.b, br, hr);
+				Set<Variable> ansVar = queryRule ? br.getHead().getVariables() : null;
+				List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.b, br, hr, ansVar);
 				List<Pair<Unifier, AtomSet>> available_unifiers = new LinkedList<>();
 				
 				for(Unifier u : unifiers) {
@@ -128,7 +130,7 @@ public class ModularizedRewriting {
 					
 					for(Block hb : hr.getBlocks()) {
 						if(!source_related(t.e, hb.getSources())) {
-							tails.add(rewriteBlock(hr, hb, result, normalRuleQueue));
+							tails.add(rewriteBlock(hr, hb, result, normalRuleQueue, false));
 						}
 						else {
 							current_sources.addAll(hb.getSources());

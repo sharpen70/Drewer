@@ -1,23 +1,42 @@
 package org.gu.dcore.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ConjunctiveQuery {
 	Set<Term> ansVar;
-	ArrayList<Atom> querybody;
+	AtomSet querybody;
 	
-	public ConjunctiveQuery() {
+	public ConjunctiveQuery(List<Term> ansVar, AtomSet body) {
 		this.ansVar = new HashSet<>();
-		this.querybody = new ArrayList<>();
+		this.ansVar.addAll(ansVar);
+		this.querybody = body;
 	}
 	
 	public Set<Term> getAnsVar() {
 		return this.ansVar;
 	}
 	
-	public ArrayList<Atom> getBody() {
+	public AtomSet getBody() {
 		return this.querybody;
+	}
+	
+	@Override
+	public String toString() {
+		String s = "?(";
+		
+		boolean first = true;
+		
+		for(Term t : ansVar) {
+			if(!first) s += ",";
+			s += t;
+			first = false;
+		}
+		
+		s += ") :- ";
+		s += this.querybody + ".";
+		
+		return s;
 	}
 }
