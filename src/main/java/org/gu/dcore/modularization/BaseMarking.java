@@ -27,6 +27,14 @@ public class BaseMarking implements Marking {
 	}
 	
 	public void mark(Rule source) {
+		RuleBasedMark rbm = this.marking.get(source);
+		
+		if(!source.getExistentials().isEmpty() && rbm == null) {
+			rbm = new RuleBasedMark(source);
+			this.marking.put(source, rbm);
+			rbm.markedHeadVars.put(source, source.getExistentials());
+		}
+		
 		for(Variable v : source.getExistentials()) {
 			for(PredPosition pp : source.getHeadPositions(v)) {
 				mark(source, pp);
@@ -79,15 +87,9 @@ public class BaseMarking implements Marking {
 	}
 	
 	public BlockRule getBlockRule(Rule r, RuleBasedMark rbm) {
-		List<Rule> passSources = new LinkedList<>();
 		List<Block> blocks = new LinkedList<>();
 		
-		if(rbm == null) return new BlockRule(r, blocks, passSources);
-		
-		for(Entry<Rule, Set<Variable>> entry : 
-			rbm.markedHeadVars.entrySet()) {
-			if(!entry.getValue().isEmpty()) passSources.add(entry.getKey());
-		}
+		if(rbm == null) return new BlockRule(r, blocks);
 			
 		for(Block b : rbm.getBaseBlocks()) {
 			Block merge = null;
@@ -105,7 +107,7 @@ public class BaseMarking implements Marking {
 			if(merge == null) blocks.add(b);
 		}
 		
-		return new BlockRule(r, blocks, passSources);
+		return new BlockRule(r, blocks);
 	}
 	
 	public BlockRule getBlockRule(Rule r) {

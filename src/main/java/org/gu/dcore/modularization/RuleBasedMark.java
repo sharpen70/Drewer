@@ -82,9 +82,21 @@ public class RuleBasedMark {
 			Map<Atom, Set<Integer>> markedPosition = entry.getValue();
 			
 			String b_name = "BLK:" + this.rule.getRuleIndex() + ":" + b_id++;
+			Set<Atom> bricks = markedPosition.keySet();
+			boolean pass = false;
+			
+			for(Atom a : bricks) {
+				for(Variable v : a.getVariables()) 
+					if(this.rule.getFrontierTerm().contains(v)) {
+						pass = true;
+						break;
+					}
+				if(pass) break;
+			}
+			
 			
 			blocks.add(new Block(b_name, markedPosition.keySet(), source, 
-					!this.markedHeadVars.get(source).isEmpty()));
+					pass));
 		}
 		
 		return blocks;

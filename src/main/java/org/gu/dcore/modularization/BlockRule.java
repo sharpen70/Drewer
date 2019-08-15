@@ -12,21 +12,44 @@ import org.gu.dcore.model.Rule;
 
 public class BlockRule extends Rule {
 	private List<Block> blocks;
+	private List<Block> passblocks;
+	private List<Block> mblocks;
 	private List<Atom> mbody;
 	
 	private Set<Rule> sourceRules;
 	
-	public BlockRule(Rule r, List<Block> blocks, List<Rule> sources) {
+//	public BlockRule(Rule r, List<Block> blocks, List<Rule> sources) {
+//		super(r);
+//		this.blocks = blocks;
+//		this.mbody = new LinkedList<>();
+//		this.sourceRules = new HashSet<>();
+//		
+//		for(Atom a : this.body) {
+//			for(Block b : blocks) 
+//				if(b.contains(a)) this.mbody.add(a);
+//		}
+//		this.sourceRules.addAll(sources);
+//		if(!r.getExistentials().isEmpty()) this.sourceRules.add(r);
+//	}
+	
+	public BlockRule(Rule r, List<Block> blocks) {
 		super(r);
-		this.blocks = blocks;
-		this.mbody = new LinkedList<>();
+		this.passblocks = new LinkedList<>();
+		this.mblocks = new LinkedList<>();
+		this.mbody = new LinkedList<>(this.body.getAtoms());
 		this.sourceRules = new HashSet<>();
 		
-		for(Atom a : this.body) {
-			for(Block b : blocks) 
-				if(b.contains(a)) this.mbody.add(a);
+
+		
+		for(Block b : passblocks) {
+			this.sourceRules.addAll(b.getSources());
+			for(Atom a : b.getBricks()) this.mbody.remove(a);
 		}
-		this.sourceRules.addAll(sources);
+		
+		for(Block b : mblocks) {
+			for(Atom a : b.getBricks()) this.mbody.remove(a);
+		}
+		
 		if(!r.getExistentials().isEmpty()) this.sourceRules.add(r);
 	}
 	

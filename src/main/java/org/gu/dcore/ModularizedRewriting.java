@@ -76,7 +76,7 @@ public class ModularizedRewriting {
 		return result;
 	}
 	
-	private Atom rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<BlockRule> normalRuleQueue, boolean queryRule) {
+	private Atom rewriteBlock(BlockRule br, Block b, List<Rule> result, Queue<BlockRule> rewQueue, boolean queryRule) {
 		Set<Term> variables = b.getVariables();
 		ArrayList<Term> atom_t = new ArrayList<>(variables);;
 		
@@ -93,7 +93,7 @@ public class ModularizedRewriting {
 		while(!queue.isEmpty()) {
 			Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, Set<Rule>> t = queue.poll();	
 			
-			Set<BlockRule> rs = this.ibr.getRules(t.b);
+			Set<BlockRule> rs = this.ibr.getRules(t.c);
 			for(BlockRule hr : rs) {
 				Set<Variable> ansVar = queryRule ? br.getHead().getVariables() : null;
 				List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.b, br, hr, ansVar);
@@ -119,8 +119,7 @@ public class ModularizedRewriting {
 					if(!subsumed) {
 						available_unifiers.add(new Pair<>(u, rewriting));
 					}
-				}
-				
+				}	
 		
 				if(!available_unifiers.isEmpty()) {
 					Set<Rule> current_sources = new HashSet<>(t.e);
@@ -130,18 +129,24 @@ public class ModularizedRewriting {
 					
 					for(Block hb : hr.getBlocks()) {
 						if(!source_related(t.e, hb.getSources())) {
-							tails.add(rewriteBlock(hr, hb, result, normalRuleQueue, false));
+							tails.add(rewriteBlock(hr, hb, result, rewQueue, false));
 						}
 						else {
 							current_sources.addAll(hb.getSources());
 							current_target.addAll(hb.getBricks());
 						}
 					}
+					
+					if(current_target.isEmpty()) {
+						rewQueue.add(hr);
+						continue;
+					}
+					
 					for(Atom a : hr.getNormalAtoms()) {
 						for(BlockRule nr : this.ibr.getNormalRules(a.getPredicate())) {
 							if(this.selected.add(nr)) {
 								result.add(nr);
-								normalRuleQueue.add(nr);
+								rewQueue.add(nr);
 							}
 						}
 					}

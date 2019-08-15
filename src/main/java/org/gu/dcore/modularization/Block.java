@@ -11,20 +11,19 @@ import org.gu.dcore.model.Variable;
 public class Block {
 	private String block_name = "";
 	private Set<Rule> sources;
-	private Set<Rule> pass_sources;
 	
 	private Set<Atom> bricks;
+	
+	public boolean pass = false;
 	
 	public Block(Block ... blocks) {
 		if(blocks.length > 0)
 			this.block_name = blocks[0].block_name;
 		this.sources = new HashSet<>();
-		this.pass_sources = new HashSet<>();
 		this.bricks = new HashSet<>();
 		
 		for(Block b : blocks) {
 			this.sources.addAll(b.sources);
-			this.pass_sources.addAll(b.pass_sources);
 			this.bricks.addAll(b.bricks);
 		}
 	}
@@ -34,8 +33,8 @@ public class Block {
 		this.bricks = bricks;
 		this.sources = new HashSet<>();
 		this.sources.add(source);
-		this.pass_sources = new HashSet<>();
-		if(pass) this.pass_sources.add(source);
+		
+		this.pass = pass;
 	}
 	
 	public String getBlockName() {

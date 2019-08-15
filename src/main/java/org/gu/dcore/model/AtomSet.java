@@ -24,7 +24,7 @@ public class AtomSet implements Iterable<Atom> {
 	
 	public AtomSet(Collection<Atom> atoms) {
 		this.atoms = new ArrayList<>();
-		for(Atom a : atoms) atoms.add(a);
+		for(Atom a : atoms) this.atoms.add(a);
 	}
 	
 	public AtomSet(Atom atom) {

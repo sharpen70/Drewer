@@ -47,7 +47,7 @@ public class Rule {
 	
 	public boolean isExistentialVar(int v) {
 		if(this.exVar == null) this.computeFrontierAndExistentials();
-		return this.exVar.contains(v);
+		return this.exVar.contains(new Variable(v));
 	}
 	
 	private void computeFrontierAndExistentials() {
@@ -61,7 +61,7 @@ public class Rule {
 		for(Term t : head_terms) {
 			if(t instanceof Variable) {
 				Variable v = (Variable)t;
-				if(!body_vars.contains(v)) this.exVar.add(v.getValue());
+				if(!body_vars.contains(v)) this.existentials.add(v);
 				else this.frontier_terms.add(t);
 			}
 			else {
