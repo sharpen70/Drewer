@@ -25,6 +25,7 @@ public class Block {
 		for(Block b : blocks) {
 			this.sources.addAll(b.sources);
 			this.bricks.addAll(b.bricks);
+			this.pass = this.pass || b.pass;
 		}
 	}
 	
@@ -59,10 +60,6 @@ public class Block {
 	
 	public Set<Rule> getSources() {
 		return this.sources;
-	}
-	
-	public Set<Rule> getPassSources() {
-		return this.pass_sources;
 	}
 	
 	public Set<Term> getVariables() {
