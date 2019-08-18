@@ -44,29 +44,31 @@ public class Unifier {
 		return this.H;
 	}
 	
-	public Term getImageOf(Term t) {
-		return this.partition.getSubstitution().getImageOf(t);
+	public Term getImageOf(Term t, boolean withOffset) {
+		int offset = withOffset ? this.partition.getOffset() : 0;
+		return this.partition.getSubstitution().getImageOf(t, offset);
 	}
 	
-	public Atom getImageOf(Atom a) {
+	public Atom getImageOf(Atom a, boolean withOffset) {
 		return null;
 	}
 	
 	public AtomSet getImageOfPiece() {
 		AtomSet up = new AtomSet();
 		for(Atom a : this.B) {
-			up.add(this.partition.getSubstitution().getImageOf(a));
+			up.add(this.partition.getSubstitution().getImageOf(a, 0));
 		}
 		return up;
 	}
 	
-	public AtomSet getImageOf(AtomSet atomset) {
-		return this.partition.getSubstitution().getImageOf(atomset);
+	public AtomSet getImageOf(AtomSet atomset, boolean withOffset) {
+		int offset = withOffset ? this.partition.getOffset() : 0;
+		return this.partition.getSubstitution().getImageOf(atomset, offset);
 	}
 	
-	public Set<Term> getImageOf(Set<Variable> vars) {
-		return this.partition.getSubstitution().getImageOf(vars);
-	}
+//	public Set<Term> getImageOf(Set<Variable> vars) {
+//		return this.partition.getSubstitution().getImageOf(vars);
+//	}
 	
 	public Unifier extend(Unifier u) {
 		Set<Atom> newpB = new HashSet<>();
@@ -123,7 +125,7 @@ public class Unifier {
 				else {
 					int value = (int)o;
 					
-					if(value > this.partition.getOffset()) {
+					if(value >= this.partition.getOffset()) {
 						if(hr.isExistentialVar(value - this.partition.getOffset())) 
 							if(existential || frontier) { this.valid = false; return; }
 							else existential = true;
@@ -134,7 +136,10 @@ public class Unifier {
 					else {
 						for(Atom a : minus) {
 							for(Variable v : a.getVariables()) {
-								if(v.getValue() == value) separatingAtoms.add(a);
+								if(v.getValue() == value) {
+									separatingAtoms.add(a);
+									break;
+								}
 							}
 						}
 					}

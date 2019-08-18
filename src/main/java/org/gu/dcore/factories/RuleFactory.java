@@ -7,7 +7,7 @@ import org.gu.dcore.model.Variable;
 public class RuleFactory {
 	private static RuleFactory factory = null;
 	
-	private int ruleIndex = 0;
+	private int ruleIndex = 1;
 	
 	private RuleFactory() {
 		
@@ -20,16 +20,16 @@ public class RuleFactory {
 	}
 	
 	public Rule createRule(AtomSet head, AtomSet body, int maxVar) {
-		return new Rule(head, body, ruleIndex++, maxVar);
+		return new Rule(head, body, ruleIndex++, maxVar, false);
 	}
 	
-	public Rule createRule(AtomSet head, AtomSet body) {
+	public Rule createQueryRule(AtomSet head, AtomSet body) {
 		int maxVar = -1;
 		
 		for(Variable v : head.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
 		for(Variable v : body.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
 		
-		return new Rule(head, body, ruleIndex++, maxVar);
+		return new Rule(head, body, 0, maxVar, true);
 	}
 	
 	public Rule createRule(AtomSet head, AtomSet... bodies) {
@@ -42,6 +42,6 @@ public class RuleFactory {
 		for(Variable v : head.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
 		for(Variable v : body.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
 		
-		return new Rule(head, body, ruleIndex++, maxVar);
+		return new Rule(head, body, ruleIndex++, maxVar, false);
 	}
 }

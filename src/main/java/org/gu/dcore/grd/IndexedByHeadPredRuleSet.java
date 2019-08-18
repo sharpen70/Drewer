@@ -39,6 +39,8 @@ public class IndexedByHeadPredRuleSet {
 	}
 	
 	public List<Rule> get(Predicate p) {
-		return this.ruleMap.get(p);
+		List<Rule> re = this.ruleMap.get(p);
+		if(re == null) return new LinkedList<>();
+		return re;
 	}
 }

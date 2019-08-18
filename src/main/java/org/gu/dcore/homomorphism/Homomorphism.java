@@ -24,11 +24,12 @@ public class Homomorphism {
 		
 		this.level_size = source.size();
 		this.substitutionsPerLv = new ArrayList<>(this.level_size);
-		this.subsCurrentPath = new NormalSubstitution[this.level_size];
+		this.subsCurrentPath = new NormalSubstitution[this.level_size + 1];
 		this.directions = new int[this.level_size];
 		
 		for(int i = 0; i < this.level_size; i++) {
 			this.directions[i] = -1;
+			this.substitutionsPerLv.add(null);
 		}
 		
 		this.subsCurrentPath[0] = new NormalSubstitution();
@@ -81,7 +82,7 @@ public class Homomorphism {
 				if(!st.equals(tt)) return null;
 			}
 			else {
-				if(!sub.add((Variable)st, tt)) return null;
+				if(!sub.add(((Variable)st).getValue(), tt)) return null;
 			}
 		}
 		

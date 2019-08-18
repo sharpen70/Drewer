@@ -13,17 +13,19 @@ public class Rule {
 	
 	private int ruleIndex;
 	
-	private Set<Variable> existentials;
-	private Set<Integer> exVar = null;
+	private Set<Variable> existentials = null;
 	private Set<Term> frontier_terms = null;
 	
 	private int max_var;
 	
-	public Rule(AtomSet head, AtomSet body, int index, int max_var) {
+	boolean query;
+	
+	public Rule(AtomSet head, AtomSet body, int index, int max_var, boolean query) {
 		this.head = head;
 		this.body = body;
 		this.ruleIndex = index;
 		this.max_var = max_var;
+		this.query = query;
 	}
 	
 	public Rule(Rule r) {
@@ -31,6 +33,7 @@ public class Rule {
 		this.body = r.body;
 		this.ruleIndex = r.ruleIndex;
 		this.max_var = r.max_var;
+		this.query = r.query;
 	}
 	
 	public AtomSet getHead() {
@@ -46,8 +49,8 @@ public class Rule {
 	}
 	
 	public boolean isExistentialVar(int v) {
-		if(this.exVar == null) this.computeFrontierAndExistentials();
-		return this.exVar.contains(new Variable(v));
+		if(this.existentials == null) this.computeFrontierAndExistentials();
+		return this.existentials.contains(new Variable(v));
 	}
 	
 	private void computeFrontierAndExistentials() {
@@ -56,7 +59,6 @@ public class Rule {
 		
 		this.existentials = new HashSet<>();
 		this.frontier_terms = new HashSet<>();
-		this.exVar = new HashSet<>();
 		
 		for(Term t : head_terms) {
 			if(t instanceof Variable) {
@@ -96,11 +98,16 @@ public class Rule {
 	}
 	
 	public Set<Term> getFrontierTerm() {
+		if(this.frontier_terms == null) computeFrontierAndExistentials();
 		return this.frontier_terms;
 	}
 	
 	public boolean isExRule() {
 		return !this.getExistentials().isEmpty();
+	}
+	
+	public boolean isQueryRule() {
+		return this.query;
 	}
 	
 	@Override

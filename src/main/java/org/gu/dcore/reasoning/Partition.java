@@ -25,8 +25,7 @@ public class Partition {
 		Partition p = new Partition(this.var_offset);
 		
 		for(Set<Object> c : this.categories) {
-			Set<Object> nc = new HashSet<>();
-			nc.addAll(c);
+			Set<Object> nc = new HashSet<>(c);
 			p.categories.add(nc);
 		}
 		
@@ -111,6 +110,7 @@ public class Partition {
 							hit.addAll(tc);
 							rit.remove();
 						}
+						break;
 					}
 				}
 			}
@@ -131,20 +131,29 @@ public class Partition {
 			for(Set<Object> category : this.categories) {
 				Object mapto = null;
 				
-				Object last = null;
-				
+				Iterator<Object> it = category.iterator();
+				Object first = it.next();
+
 				for(Object t : category) {
-					last = t;
 					if(t instanceof Constant) {
 						mapto = t;
 						break;
 					}
 				}
 				
-				if(mapto == null) mapto = last;
+				if(mapto == null) mapto = first;
+				Term mapto_t;
+				if(mapto instanceof Constant) {
+					mapto_t = (Constant)mapto;
+				}
+				else {
+					Integer value = (Integer)mapto;
+					mapto_t = new Variable((value >= var_offset ? (value - var_offset) : value));
+				}
+							
 				
-				for(Object t : category) {
-//					if(!t.equals(mapto)) this.substitution.add((Variable)t, mapto);
+				for(Object o : category) {
+					if(!o.equals(mapto)) this.substitution.add((Integer)o, mapto_t);
 				}
 			}
 		}

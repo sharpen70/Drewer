@@ -5,7 +5,7 @@ grammar QUERY;
  */
 query       : ansVar ':-' atomset '.' EOF ;
 
-ansVar 	    : '?' '(' terms ')' ;
+ansVar 	    : '?' '(' terms ')' | '?()';
 
 atomset     : atom | atom ',' atomset ;
 

@@ -67,6 +67,19 @@ public class Atom {
 	}
 	
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Atom)) return false;
+		
+		Atom a = (Atom)obj;
+		
+		if(!this.p.equals(a.p)) return false;
+		
+		if(!this.terms.equals(a.terms)) return false;
+		
+		return true;
+	}
+	
+	@Override
 	public String toString() {
 		String out = p.toString();
 		out = out + "(";

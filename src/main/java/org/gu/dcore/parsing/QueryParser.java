@@ -59,7 +59,10 @@ public class QueryParser {
 	private class QueryVisitor extends QUERYBaseVisitor<ConjunctiveQuery> {
 		@Override
 		public ConjunctiveQuery visitQuery(QueryContext ctx) {
-			List<Term> terms = ctx.ansVar().terms().accept(new TermsVisitor());
+			List<Term> terms = new ArrayList<>();
+			if(ctx.ansVar().terms() != null) {
+				terms = ctx.ansVar().terms().accept(new TermsVisitor());
+			}
 			AtomSet body = ctx.atomset().accept(new AtomSetVisitor());
 			
 			ConjunctiveQuery query = new ConjunctiveQuery(terms, body);

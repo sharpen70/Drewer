@@ -7,10 +7,7 @@ import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
-import org.gu.dcore.reasoning.Unifier;
-import org.gu.dcore.reasoning.Unify;
 
-import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -59,4 +56,26 @@ public class TestModularRewriting extends TestCase
     	
 	    assertTrue( true );
 	}
+	
+//	public void testApp1()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("A(X, Y) :- B(X, Z), A(Z, T).");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- D(X), A(X,Y).");
+//    	
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//    	
+//	    assertTrue( true );
+//	}
 }

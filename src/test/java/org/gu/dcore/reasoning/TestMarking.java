@@ -2,7 +2,6 @@ package org.gu.dcore.reasoning;
 
 import org.gu.dcore.model.Program;
 import org.gu.dcore.modularization.BaseMarking;
-import org.gu.dcore.modularization.MarkedRule;
 import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.parsing.DcoreParser;
 

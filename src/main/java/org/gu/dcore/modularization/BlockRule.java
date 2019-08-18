@@ -34,19 +34,19 @@ public class BlockRule extends Rule {
 	
 	public BlockRule(Rule r, List<Block> blocks) {
 		super(r);
+		this.blocks = blocks;
 		this.passblocks = new LinkedList<>();
 		this.mblocks = new LinkedList<>();
 		this.mbody = new LinkedList<>(this.body.getAtoms());
-		this.sourceRules = new HashSet<>();
+		this.sourceRules = new HashSet<>();		
 		
-
-		
-		for(Block b : passblocks) {
-			this.sourceRules.addAll(b.getSources());
-			for(Atom a : b.getBricks()) this.mbody.remove(a);
-		}
-		
-		for(Block b : mblocks) {
+		for(Block b : blocks) {
+			if(b.pass) {
+				this.passblocks.add(b);
+				this.sourceRules.addAll(b.getSources());
+			}
+			else this.mblocks.add(b);
+			
 			for(Atom a : b.getBricks()) this.mbody.remove(a);
 		}
 		
@@ -59,6 +59,14 @@ public class BlockRule extends Rule {
 
 	public List<Block> getBlocks() {
 		return this.blocks;
+	}
+	
+	public List<Block> getPassBlocks() {
+		return this.passblocks;
+	}
+	
+	public List<Block> getMblocks() {
+		return this.mblocks;
 	}
 	
 	public List<Atom> getNormalAtoms() {

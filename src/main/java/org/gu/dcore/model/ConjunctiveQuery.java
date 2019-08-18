@@ -24,7 +24,7 @@ public class ConjunctiveQuery {
 	
 	@Override
 	public String toString() {
-		String s = "?(";
+		String s = "Q(";
 		
 		boolean first = true;
 		

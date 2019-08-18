@@ -69,8 +69,7 @@ public class BaseMarking implements Marking {
 		RuleBasedMark rbm = new RuleBasedMark(qr);
 		
 		for(Atom a : qr.getBody()) {
-			List<Rule> rs = this.ihs.get(a.getPredicate());
-			for(Rule r : rs) {	
+			for(Rule r : this.ihs.get(a.getPredicate())) {	
 				RuleBasedMark rrbm = this.marking.get(r);
 				if(rrbm == null) continue;
 				

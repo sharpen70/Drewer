@@ -6,9 +6,9 @@ import org.gu.dcore.model.Rule;
 
 public interface Substitution {
 	
-	public Atom getImageOf(Atom a);
-	
-	public AtomSet getImageOf(AtomSet atomset);
-	
-	public Rule getImageOf(Rule rule);
+//	public Atom getImageOf(Atom a);
+//	
+//	public AtomSet getImageOf(AtomSet atomset);
+//	
+//	public Rule getImageOf(Rule rule);
 }

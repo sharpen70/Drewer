@@ -9,21 +9,18 @@ public class SubstitutionWithFreshVar implements Substitution {
 	
 	public SubstitutionWithFreshVar(int varbound) {
 		
-	}
+	}	
 	
-	@Override
 	public Atom getImageOf(Atom a) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	@Override
+	}	
+
 	public AtomSet getImageOf(AtomSet atomset) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	@Override
 	public Rule getImageOf(Rule rule) {
 		// TODO Auto-generated method stub
 		return null;
