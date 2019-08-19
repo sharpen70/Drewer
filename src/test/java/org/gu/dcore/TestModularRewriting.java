@@ -35,36 +35,16 @@ public class TestModularRewriting extends TestCase
 	/**
 	 * Rigourous Test :-)
 	 */
-	public void testApp()
-	{
-    	DcoreParser parser = new DcoreParser();
-    	
-    	Program P = parser.parse("B(X, Y), A(X) :- C(Y).");
-    	
-    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- A(X), B(X,Y).");
-    	
-    	System.out.println(P);
-    	System.out.println(query);
-    	
-    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
-    	
-    	List<Rule> datalog = mr.rewrite(query);
-    	
-    	for(Rule r : datalog) {
-    		System.out.println(r);
-    	}
-    	
-	    assertTrue( true );
-	}
-	
-//	public void testApp1()
+//	public void testApp()
 //	{
 //    	DcoreParser parser = new DcoreParser();
 //    	
-//    	Program P = parser.parse("A(X, Y) :- B(X, Z), A(Z, T).");
+//    	Program P = parser.parse("B(X, Y), A(Y) :- C(X).\n" +
+//    	"D(X, Y), E(Y) :- A(X).");
 //    	
-//    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- D(X), A(X,Y).");
+//    	ConjunctiveQuery query = new QueryParser().parse("?() :- B(X,Y), D(Y,Z), E(Z).");
 //    	
+//    	System.out.println("============");
 //    	System.out.println(P);
 //    	System.out.println(query);
 //    	
@@ -72,10 +52,182 @@ public class TestModularRewriting extends TestCase
 //    	
 //    	List<Rule> datalog = mr.rewrite(query);
 //    	
+//    	System.out.println("\nRewritings:\n");
 //    	for(Rule r : datalog) {
 //    		System.out.println(r);
 //    	}
 //    	
 //	    assertTrue( true );
 //	}
+//	
+//	public void testApp1()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("D(X), A(X, Y) :- B(Y).");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//    	
+//	    assertTrue( true );
+//	}
+//	
+//	public void testApp2()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("D(X), A(X, Y) :- B1(Y).\n" +
+//    	"D(X), A(X,Y) :- B2(Y). \n"
+//    	+ "B(Z), C(Z, Y) :- B3(Y).");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y), B(Z), C(Z, Y).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//    	
+//	    assertTrue( true );
+//	}
+//	
+//	public void testApp3()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("A(X, Y) :- B(X, Z), A(Z, Y).\n");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//    	
+//	    assertTrue( true );
+//	}
+//	
+//	public void testApp4()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("P(X, Y) :- R(X, Z), R(Z, X).\n"
+//    			+ "R(Y, Z) :- P(X, Y).");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- P(X, Y), A(X).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//	    assertTrue( true );
+//	}
+//	
+//	public void testApp5()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("S(Y, Z) :- P(X,Y).\n"
+//    			+ "P(Y, X) :- S(X, Y).");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- P(X, Y), A(Y).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//	    assertTrue( true );
+//	}
+	
+//	public void testApp6()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("P(X, Y) :- T(X,Y).\n"
+//    			+ "A(X) :- S(X)."
+//    			+ "T(X,Y), S(Y) :- B(X).");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- P(X, Y), A(Y).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//	    assertTrue( true );
+//	}
+	
+	public void testApp7()
+	{
+    	DcoreParser parser = new DcoreParser();
+    	
+    	Program P = parser.parse("P(X, Y), A(Y) :- T(X).\n"
+    			+ "P(Y,X) :- B(X).");
+    	
+    	ConjunctiveQuery query = new QueryParser().parse("?() :- P(X, Y), A(Y).");
+    	
+    	System.out.println("============");
+    	System.out.println(P);
+    	System.out.println(query);
+    	
+    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+    	
+    	List<Rule> datalog = mr.rewrite(query);
+    	
+    	System.out.println("\nRewritings:\n");
+    	for(Rule r : datalog) {
+    		System.out.println(r);
+    	}
+	    assertTrue( true );
+	}
 }

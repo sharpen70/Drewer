@@ -16,23 +16,18 @@ public class Rule {
 	private Set<Variable> existentials = null;
 	private Set<Term> frontier_terms = null;
 	
-	private int max_var;
-	
 	boolean query;
 	
-	public Rule(AtomSet head, AtomSet body, int index, int max_var, boolean query) {
+	public Rule(AtomSet head, AtomSet body, int index) {
 		this.head = head;
 		this.body = body;
 		this.ruleIndex = index;
-		this.max_var = max_var;
-		this.query = query;
 	}
 	
 	public Rule(Rule r) {
 		this.head = r.head;
 		this.body = r.body;
 		this.ruleIndex = r.ruleIndex;
-		this.max_var = r.max_var;
 		this.query = r.query;
 	}
 	
@@ -42,10 +37,6 @@ public class Rule {
 	
 	public AtomSet getBody() {
 		return this.body;
-	}
-	
-	public int getMaxVar() {
-		return this.max_var;
 	}
 	
 	public boolean isExistentialVar(int v) {

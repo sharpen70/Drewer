@@ -35,7 +35,6 @@ import org.gu.dcore.reasoning.Unify;
 public class ModularizedRewriting {
 	private Modularizor modularizor;
 	private IndexedBlockRuleSet ibr;
-	private Set<Rule> selected;
 	
 	private final Constant blank = TermFactory.instance().createConstant("BLANK");
 	
@@ -44,15 +43,12 @@ public class ModularizedRewriting {
 		this.modularizor.modularize();
 		this.ibr = this.modularizor.getIndexedBlockOnto();
 		
-		this.selected = new HashSet<>();
 	}
 	
 	public List<Rule> rewrite(ConjunctiveQuery q) {
-		this.selected = new HashSet<>();
+		Set<BlockRule> selected = new HashSet<>();
 		
-		Predicate Q = PredicateFactory.instance().createPredicate("Q", q.getAnsVar().size());
-		Atom Qhead = AtomFactory.instance().createAtom(Q, q.getAnsVar());
-		Rule Qr = RuleFactory.instance().createQueryRule(new AtomSet(Qhead), q.getBody());
+		Rule Qr = RuleFactory.instance().createQueryRule(q);
 		
 		BaseMarking marking = this.modularizor.getMarking();
 		RuleBasedMark rbm = marking.markQueryRule(Qr);
@@ -67,7 +63,7 @@ public class ModularizedRewriting {
 			BlockRule r = rewQueue.poll();
 			
 			if(r.isNormalRule()) {
-				if(this.selected.add(r)) {
+				if(selected.add(r)) {
 					result.add(r);
 				}
 				else continue;
@@ -85,8 +81,9 @@ public class ModularizedRewriting {
 				}
 				body.add(a);
 			}
-
-			result.add(RuleFactory.instance().createRule(r.getHead(), body));
+			
+			if(!r.isNormalRule())
+				result.add(RuleFactory.instance().createRule(r.getHead(), body));
 		}
 		return result;
 	}
@@ -104,6 +101,8 @@ public class ModularizedRewriting {
 			Atom blockAtom = createBlockAtom(b);
 			AtomSet na = new AtomSet(b.getBricks());
 			
+			Set<BlockRule> accessed = new HashSet<>();
+			
 			Rule init_rule = RuleFactory.instance().createRule(new AtomSet(blockAtom), na);
 			result.add(init_rule);
 			
@@ -119,8 +118,7 @@ public class ModularizedRewriting {
 				
 				Set<BlockRule> rs = this.ibr.getRules(t.c);
 				for(BlockRule hr : rs) {
-					Set<Variable> ansVar = br.isQueryRule() ? br.getHead().getVariables() : null;
-					List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.c, br, hr, ansVar);
+					List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.c, t.b, hr);
 					List<Pair<Unifier, AtomSet>> available_unifiers = new LinkedList<>();
 						
 					for(Unifier u : unifiers) {
@@ -142,6 +140,7 @@ public class ModularizedRewriting {
 						
 						if(!subsumed) {
 							available_unifiers.add(new Pair<>(u, rewriting));
+							rewrited.add(rewriting);
 						}
 					}	
 			
@@ -174,11 +173,13 @@ public class ModularizedRewriting {
 						}
 						tails.addAll(hr.getNormalAtoms());		
 						
-						if(current_target.isEmpty() && hr.getExistentials().isEmpty()) {
-							Rule n_rule = RuleFactory.instance().
-									createRule(hr.getHead(), tails);
-							result.add(n_rule);
-							continue;
+						if(!hr.isExRule() ) {
+							if(accessed.add(hr)) {
+								Rule n_rule = RuleFactory.instance().
+										createRule(hr.getHead(), current_target, tails);
+								result.add(n_rule);
+							}
+							if(current_target.isEmpty()) continue;
 						}
 						
 						for(Pair<Unifier, AtomSet> p : available_unifiers) {
@@ -205,6 +206,7 @@ public class ModularizedRewriting {
 								Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(newhead), rewriting, uc);
 								result.add(rw_rule);
 							}
+								
 							if(!current_target.isEmpty()) {
 								queue.add(new Tuple5<>(rw_t, p.b, rewriting, uc, current_sources));
 							}	
@@ -221,30 +223,6 @@ public class ModularizedRewriting {
 		}
 		return false;
 	}
-	
-//	private List<AtomSet> combine(List<List<Atom>> atomlists) {
-//		LinkedList<AtomSet> as = new LinkedList<>();
-//		
-//		Iterator<List<Atom>> it = atomlists.iterator();
-//		
-//		if(!it.hasNext()) return as;
-//		
-//		for(Atom a : it.next()) {
-//			as.add(new AtomSet(a));
-//		}
-//		
-//		while(it.hasNext()) {
-//			List<Atom> list = it.next();
-//			AtomSet s = as.poll();
-//			for(Atom a : list) {
-//				AtomSet ns = new AtomSet(s);
-//				ns.add(a);
-//				as.add(ns);
-//			}
-//		}
-//		
-//		return as;
-//	}
 	
 	/*
 	 * f the set of atoms being replaced

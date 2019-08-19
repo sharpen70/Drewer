@@ -8,6 +8,8 @@ import java.util.Set;
 
 public class AtomSet implements Iterable<Atom> {
 	private ArrayList<Atom> atoms;
+	private Set<Variable> vars;
+	private Integer maxVarValue;
 	
 	public AtomSet() {
 		atoms = new ArrayList<>();
@@ -74,13 +76,26 @@ public class AtomSet implements Iterable<Atom> {
 	}
 	
 	public Set<Variable> getVariables() {
-		Set<Variable> vars = new HashSet<>();
+		if(this.vars != null) return this.vars;
+		
+		this.vars = new HashSet<>();
 		
 		for(Atom a : this.atoms) {
 			vars.addAll(a.getVariables());
 		}
 		
-		return vars;
+		return this.vars;
+	}
+	
+	public int getMaxVarValue() {
+		if(this.maxVarValue == null) {
+			this.maxVarValue = -1;
+			for(Variable v : this.getVariables()) {
+				if(v.getValue() > this.maxVarValue)
+					this.maxVarValue = v.getValue();
+			}
+		}
+		return this.maxVarValue;
 	}
 	
 	public Set<Term> getTerms() {

@@ -67,13 +67,29 @@ public class Atom {
 	}
 	
 	@Override
+	public int hashCode() {
+		int hash = 7;
+		
+		hash = 31 * hash + this.p.hashCode();
+		
+		for(Term t : this.terms) {
+			hash = 31 * hash + t.hashCode();
+		}
+		
+		return hash;
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof Atom)) return false;
 		
 		Atom a = (Atom)obj;
 		
 		if(!this.p.equals(a.p)) return false;
-		
+//		
+//		for(int i = 0; i < this.terms.size(); i++) {
+//			if(!this.terms.get(i).equals(a.terms.get(i))) return false;
+//		}
 		if(!this.terms.equals(a.terms)) return false;
 		
 		return true;

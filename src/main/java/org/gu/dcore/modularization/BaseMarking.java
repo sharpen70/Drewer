@@ -26,12 +26,13 @@ public class BaseMarking implements Marking {
 		this.ihs = new IndexedByHeadPredRuleSet(ruleset);
 	}
 	
-	public void mark(Rule source) {
-		RuleBasedMark rbm = this.marking.get(source);
-		
-		if(!source.getExistentials().isEmpty() && rbm == null) {
-			rbm = new RuleBasedMark(source);
-			this.marking.put(source, rbm);
+	public void mark(Rule source) {		
+		if(!source.getExistentials().isEmpty()) {
+			RuleBasedMark rbm = this.marking.get(source);
+			if(rbm == null) {
+				rbm = new RuleBasedMark(source);
+				this.marking.put(source, rbm);
+			}
 			rbm.markedHeadVars.put(source, source.getExistentials());
 		}
 		
@@ -96,9 +97,12 @@ public class BaseMarking implements Marking {
 			while(it.hasNext()) {
 				Block mb = it.next();
 				if(mb.overlap(b)) {
-					if(merge == null) merge = new Block(mb, b);
+					if(merge == null) {
+						merge = mb;
+						mb.merge(b);
+					}
 					else {
-						merge = new Block(merge, mb);
+						merge.merge(mb);;
 						it.remove();
 					}
 				}				

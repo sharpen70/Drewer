@@ -40,11 +40,10 @@ import org.gu.dcore.model.Variable;
  */
 public class DcoreParser {
 	private Map<String, Term> vMap;
-	private int max_var;
+	private int v = 0;
 	
 	public DcoreParser() {
 		vMap = new HashMap<>();
-		max_var = -1;
 	}
 	
 	/**
@@ -61,6 +60,9 @@ public class DcoreParser {
 	}
 	
 	public Program parse(CharStream charStream) {
+		PredicateFactory.reset();
+		TermFactory.reset();
+		
 		EDLGLexer lexer = new EDLGLexer(charStream);
 		
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -102,14 +104,14 @@ public class DcoreParser {
 			AtomSetVisitor atomSetVisitor = new AtomSetVisitor();
 			
 			vMap.clear();
-			max_var = -1;
+			v = 0;
 			
 			AtomSet head = ctx.atomset(0).accept(atomSetVisitor);
 			AtomSet body = ctx.atomset(1).accept(atomSetVisitor);
 			
 			if(head == null) return null;
 			
-			return RuleFactory.instance().createRule(head, body, max_var);
+			return RuleFactory.instance().createRule(head, body);
 		}
 	}
 	
@@ -152,11 +154,9 @@ public class DcoreParser {
 				if(Character.isUpperCase(ts.charAt(0))) {
 					t = vMap.get(ts);
 					if(t == null) {
-						t = TermFactory.instance().createVariable();
+						t = new Variable(v++);
 						vMap.put(ts, t);
 					}
-					int value = ((Variable)t).getValue();
-					if(value > max_var) max_var = value;
 				}
 				else 
 					t = TermFactory.instance().createConstant(ts);

@@ -32,21 +32,21 @@ public class TestPartition extends TestCase {
     /**
      * Rigourous Test :-)
      */
-    public void test1()
-    {
-    	DcoreParser parser = new DcoreParser();
-    	
-    	Program P = parser.parse("Q(X) :- A(X), B(X, Y).\n"
-    			+ "B(X, Y), A(X) :- C(Y).");
-    	
-    	System.out.println(P);
-    	
-    	List<Unifier> us = Unify.getSinglePieceUnifier(P.getRule(0), P.getRule(1));
-    	
-    	System.out.println("Unifier Num : " + us.size());
-    	
-    	Assert.assertTrue(us.size() == 1);
-    }
+//    public void test1()
+//    {
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("Q(X) :- A(X), B(X, Y).\n"
+//    			+ "B(X, Y), A(X) :- C(Y).");
+//    	
+//    	System.out.println(P);
+//    	
+//    	List<Unifier> us = Unify.getSinglePieceUnifier(P.getRule(0), P.getRule(1));
+//    	
+//    	System.out.println("Unifier Num : " + us.size());
+//    	
+//    	Assert.assertTrue(us.size() == 1);
+//    }
     
     
 }

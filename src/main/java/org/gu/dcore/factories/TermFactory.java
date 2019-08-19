@@ -8,6 +8,7 @@ import org.gu.dcore.model.Variable;
 
 public class TermFactory {
 	private static TermFactory factory = null;
+	
 	private Map<String, Constant> cMap = null;
 	private long id = 0;
 	
@@ -21,6 +22,10 @@ public class TermFactory {
 		if(factory == null) factory = new TermFactory();
 		
 		return factory;
+	}
+	
+	public static void reset() {
+		factory = new TermFactory();
 	}
 	
 	public Constant createConstant(String iri) {

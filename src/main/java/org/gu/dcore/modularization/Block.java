@@ -16,26 +16,32 @@ public class Block {
 	
 	public boolean pass = false;
 	
-	public Block(Block ... blocks) {
-		if(blocks.length > 0)
-			this.block_name = blocks[0].block_name;
-		this.sources = new HashSet<>();
-		this.bricks = new HashSet<>();
-		
-		for(Block b : blocks) {
-			this.sources.addAll(b.sources);
-			this.bricks.addAll(b.bricks);
-			this.pass = this.pass || b.pass;
-		}
-	}
+//	public Block(Block ... blocks) {
+//		if(blocks.length > 0)
+//			this.block_name = blocks[0].block_name;
+//		this.sources = new HashSet<>();
+//		this.bricks = new HashSet<>();
+//		
+//		for(Block b : blocks) {
+//			this.sources.addAll(b.sources);
+//			this.bricks.addAll(b.bricks);
+//			this.pass = this.pass || b.pass;
+//		}
+//	}
 	
 	public Block(String b_name, Set<Atom> bricks, Rule source, boolean pass) {
 		this.block_name = b_name;
-		this.bricks = bricks;
+		this.bricks = new HashSet<>(bricks);
 		this.sources = new HashSet<>();
 		this.sources.add(source);
 		
 		this.pass = pass;
+	}
+	
+	public void merge(Block b) {
+		this.sources.addAll(b.sources);
+		this.bricks.addAll(b.bricks);
+		this.pass = this.pass || b.pass;
 	}
 	
 	public String getBlockName() {

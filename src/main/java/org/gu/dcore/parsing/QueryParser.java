@@ -27,11 +27,10 @@ import org.gu.dcore.model.Variable;
 
 public class QueryParser {
 	private Map<String, Term> vMap;
-	private int max_var;
+	private int v = 0;
 	
 	public QueryParser() {
 		vMap = new HashMap<>();
-		max_var = -1;
 	}
 	
 	public ConjunctiveQuery parseFile(String programFile) throws IOException {		
@@ -50,6 +49,9 @@ public class QueryParser {
 		QUERYParser parser = new QUERYParser(tokens);
 		
 		QueryVisitor vistor = new QueryVisitor();
+		
+		vMap.clear();
+		v = 0;
 		
 		ConjunctiveQuery query = vistor.visit(parser.query());
 		
@@ -116,11 +118,9 @@ public class QueryParser {
 				if(Character.isUpperCase(ts.charAt(0))) {
 					t = vMap.get(ts);
 					if(t == null) {
-						t = TermFactory.instance().createVariable();
+						t = new Variable(v++);
 						vMap.put(ts, t);
 					}
-					int value = ((Variable)t).getValue();
-					if(value > max_var) max_var = value;
 				}
 				else 
 					t = TermFactory.instance().createConstant(ts);

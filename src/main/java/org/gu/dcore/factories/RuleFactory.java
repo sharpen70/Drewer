@@ -1,8 +1,13 @@
 package org.gu.dcore.factories;
 
+import java.util.ArrayList;
+
+import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.ConjunctiveQuery;
+import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.model.Variable;
+import org.gu.dcore.model.Term;
 
 public class RuleFactory {
 	private static RuleFactory factory = null;
@@ -19,29 +24,29 @@ public class RuleFactory {
 		return factory;
 	}
 	
-	public Rule createRule(AtomSet head, AtomSet body, int maxVar) {
-		return new Rule(head, body, ruleIndex++, maxVar, false);
+	public Rule createRule(AtomSet head, AtomSet body) {
+		return new Rule(head, body, ruleIndex++); 
 	}
 	
-	public Rule createQueryRule(AtomSet head, AtomSet body) {
-		int maxVar = -1;
-		
-		for(Variable v : head.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
-		for(Variable v : body.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
-		
-		return new Rule(head, body, 0, maxVar, true);
+	public Rule createQueryRule(ConjunctiveQuery q) {
+		Predicate Q = PredicateFactory.instance().createPredicate("Q", q.getAnsVar().size());
+		Atom Qhead = AtomFactory.instance().createAtom(Q, q.getAnsVar());
+		AtomSet body = new AtomSet(q.getBody());
+		if(!q.getAnsVar().isEmpty()) {
+			Predicate ansP = new Predicate("ANS", -1, q.getAnsVar().size());
+			ArrayList<Term> ans_t = new ArrayList<>();
+			ans_t.addAll(q.getAnsVar());
+			Atom ansAtom = new Atom(ansP, ans_t);
+			body.add(ansAtom);
+		}
+		return new Rule(new AtomSet(Qhead), body, 0);
 	}
 	
 	public Rule createRule(AtomSet head, AtomSet... bodies) {
-		int maxVar = -1;
-		
 		AtomSet body = new AtomSet();
 		
 		for(AtomSet b : bodies) body.addAll(b);
 		
-		for(Variable v : head.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
-		for(Variable v : body.getVariables()) if(maxVar < v.getValue()) maxVar = v.getValue();
-		
-		return new Rule(head, body, ruleIndex++, maxVar, false);
+		return new Rule(head, body, ruleIndex++);
 	}
 }

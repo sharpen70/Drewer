@@ -91,7 +91,7 @@ public class Unifier {
 	
 	public boolean isPieceUnifier() {
 		if(!this.analyzed) analyze();
-		return this.stickyAtoms.isEmpty();
+		return this.valid && this.stickyAtoms.isEmpty();
 	}
 	
 	public Set<Atom> getStickyAtoms() {
