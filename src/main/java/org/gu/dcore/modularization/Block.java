@@ -48,13 +48,27 @@ public class Block {
 		return this.block_name;
 	}
 	
+//	public boolean overlap(Block b) {
+//		for(Atom a : b.bricks) {
+//			if(this.bricks.contains(a)) return true;
+//		}
+//		
+//		return false;
+//	}
+	
 	public boolean overlap(Block b) {
+		boolean ol = false;
+		boolean allin = true;
+		
 		for(Atom a : b.bricks) {
-			if(this.bricks.contains(a)) return true;
+			if(this.bricks.contains(a)) ol = true;
+			else allin = false;
 		}
 		
-		return false;
+		if(ol && !allin) System.out.println("Got ya: " + this.toString() + " " + b.toString());
+		return ol;
 	}
+	
 	
 	public Set<Atom> getBricks() {
 		return this.bricks;

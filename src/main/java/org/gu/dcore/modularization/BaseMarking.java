@@ -15,7 +15,7 @@ import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Variable;
 
-public class BaseMarking implements Marking {
+public class BaseMarking {
 	private Map<Rule, RuleBasedMark> marking; 
 	private IndexedByBodyPredRuleSet onto;
 	private IndexedByHeadPredRuleSet ihs;
@@ -91,7 +91,7 @@ public class BaseMarking implements Marking {
 		
 		if(rbm == null) return new BlockRule(r, blocks);
 			
-		for(Block b : rbm.getBaseBlocks()) {
+		for(Block b : rbm.getConBlocks()) {
 			Block merge = null;
 			Iterator<Block> it = blocks.iterator();
 			while(it.hasNext()) {
@@ -118,7 +118,6 @@ public class BaseMarking implements Marking {
 		return getBlockRule(r, rbm);
 	}
 	
-	@Override
 	public void printMarked() {
 		for(Entry<Rule, RuleBasedMark> entry : this.marking.entrySet()) {
 			System.out.println(entry.getKey());

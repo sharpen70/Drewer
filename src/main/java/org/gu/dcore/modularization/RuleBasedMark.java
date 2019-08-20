@@ -72,6 +72,90 @@ public class RuleBasedMark {
 		return pass;
 	}
 	
+	/*
+	 * Get more accurate Blocks
+	 */
+	public List<Block> getConBlocks() {
+		int b_id = 0;
+		
+		List<Block> blocks = new LinkedList<>();
+		
+		for(Entry<Rule, Map<Atom, Set<Integer>>> entry : this.marked.entrySet()) {
+			Rule source = entry.getKey();
+			Map<Atom, Set<Integer>> markedPosition = entry.getValue();
+			
+			String b_name = "BLK_" + this.rule.getRuleIndex() + "_" + b_id++;
+			Set<Atom> bricks = markedPosition.keySet();
+			
+			Set<Variable> shared_vars = new HashSet<>();
+			Set<Variable> marked_vars = new HashSet<>();
+			
+			boolean validBlock = true;
+			boolean possibleBlock = true;
+			
+			for(Entry<Atom, Set<Integer>> mp : markedPosition.entrySet()) {
+				Atom atom = mp.getKey();
+				Set<Integer> positions = mp.getValue();
+				
+				if(shared_vars.isEmpty()) {
+					for(Integer i : positions) {
+						Term t = atom.getTerm(i);
+						if(t instanceof Variable) {	
+							shared_vars.add((Variable)t);
+							marked_vars.add((Variable)t);
+						}
+					}
+				}
+				else {
+					Set<Variable> t_shared_vars = new HashSet<>();
+					for(Integer i : positions) {
+						Term t = atom.getTerm(i);
+						if(t instanceof Variable) {
+							marked_vars.add((Variable)t);
+							if(shared_vars.contains(t))
+								t_shared_vars.add((Variable)t);
+						}
+					}
+					shared_vars = t_shared_vars;
+					if(shared_vars.isEmpty()) {
+						possibleBlock = false;
+						break;
+					}
+				}
+			}
+			
+			if(possibleBlock) {
+				for(Atom a : this.rule.getBody()) {
+					if(!markedPosition.keySet().contains(a)) {
+						for(Variable v : a.getVariables()) {
+							if(shared_vars.contains(v)) {
+								validBlock = false;
+								break;
+							}
+						}
+					}
+					if(!validBlock) break;
+				}
+			}
+			
+			if(validBlock) {
+				boolean pass = false;
+				
+				for(Variable v : marked_vars) {
+					if(this.rule.getFrontierTerm().contains(v)) {
+						pass = true;
+						break;
+					}
+				}
+				
+				blocks.add(new Block(b_name, bricks, source, 
+						pass));
+			}
+		}
+		
+		return blocks;
+	}
+	
 	public List<Block> getBaseBlocks() {
 		int b_id = 0;
 		
