@@ -107,8 +107,8 @@ public class TestLargeOntology extends TestCase
 	
 	public void testApp2() throws IOException
 	{
-//		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
-		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/O.dlp";
+		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
+//		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/O.dlp";
 		
     	DcoreParser parser = new DcoreParser();
     	
@@ -130,22 +130,22 @@ public class TestLargeOntology extends TestCase
 		
     	System.out.println(Qr);
     	
-		BaseMarking marking = modularizor.getMarking();
-		RuleBasedMark rbm = marking.markQueryRule(Qr);
-		
-		BlockRule bQr = marking.getBlockRule(Qr, rbm);
-		
-		System.out.println(bQr);
-//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
-//    	
-//    	long start = System.currentTimeMillis();
-//    	
-//    	List<Rule> datalog = mr.rewrite(query);
-//    	
-//    	long end = System.currentTimeMillis();
-//    	
-//    	System.out.println("\nRewritings:" + datalog.size() + "\n");
-//    	System.out.println("\nTime cost:" + (end - start) + "ms");
+//		BaseMarking marking = modularizor.getMarking();
+//		RuleBasedMark rbm = marking.markQueryRule(Qr);
+//		
+//		BlockRule bQr = marking.getBlockRule(Qr, rbm);
+//		
+//		System.out.println(bQr);
+    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+    	
+    	long start = System.currentTimeMillis();
+    	
+    	List<Rule> datalog = mr.rewrite(query);
+    	
+    	long end = System.currentTimeMillis();
+    	
+    	System.out.println("\nRewritings:" + datalog.size() + "\n");
+    	System.out.println("\nTime cost:" + (end - start) + "ms");
     	
 	    assertTrue( true );
 	}

@@ -76,6 +76,8 @@ public class ModularizedRewriting {
 				rewriteBlock(r, b, result, rewQueue);
 			}
 			for(Atom a : r.getNormalAtoms()) {
+				if(a.getPredicate().getName().equals("ANS")) continue;
+				
 				for(BlockRule nr : this.ibr.getNormalRules(a.getPredicate())) {
 					rewQueue.add(nr);
 				}

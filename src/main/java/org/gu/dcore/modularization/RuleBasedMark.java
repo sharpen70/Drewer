@@ -135,21 +135,23 @@ public class RuleBasedMark {
 						}
 					}
 					if(!validBlock) break;
-				}
-			}
+				}			
 			
-			if(validBlock) {
-				boolean pass = false;
-				
-				for(Variable v : marked_vars) {
-					if(this.rule.getFrontierTerm().contains(v)) {
-						pass = true;
-						break;
+				if(validBlock) {
+					boolean pass = false;
+					
+					for(Variable v : marked_vars) {
+						if(this.rule.getFrontierTerm().contains(v)) {
+							pass = true;
+							break;
+						}
 					}
+					
+					Block b = new Block(b_name, bricks, source, 
+							pass);
+					
+					blocks.add(b);
 				}
-				
-				blocks.add(new Block(b_name, bricks, source, 
-						pass));
 			}
 		}
 		
