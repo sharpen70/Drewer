@@ -1,6 +1,5 @@
 package org.gu.dcore;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -8,10 +7,7 @@ import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.modularization.BaseMarking;
-import org.gu.dcore.modularization.BlockRule;
 import org.gu.dcore.modularization.Modularizor;
-import org.gu.dcore.modularization.RuleBasedMark;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 
@@ -107,8 +103,8 @@ public class TestLargeOntology extends TestCase
 	
 	public void testApp2() throws IOException
 	{
-		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
-//		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/O.dlp";
+//		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
+		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/O.dlp";
 		
     	DcoreParser parser = new DcoreParser();
     	
@@ -121,21 +117,11 @@ public class TestLargeOntology extends TestCase
     			"<http://purl.obolibrary.org/obo/pr#CHEBI_23367>(Z).");
     	
     	System.out.println("============");
-  //  	System.out.println(P);
-    	
-    	Modularizor modularizor = new Modularizor(P.getRuleSet());
-    	modularizor.modularize();
     	
 		Rule Qr = RuleFactory.instance().createQueryRule(query);
 		
     	System.out.println(Qr);
     	
-//		BaseMarking marking = modularizor.getMarking();
-//		RuleBasedMark rbm = marking.markQueryRule(Qr);
-//		
-//		BlockRule bQr = marking.getBlockRule(Qr, rbm);
-//		
-//		System.out.println(bQr);
     	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
     	
     	long start = System.currentTimeMillis();

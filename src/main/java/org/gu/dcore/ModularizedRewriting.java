@@ -59,10 +59,12 @@ public class ModularizedRewriting {
 		Queue<BlockRule> rewQueue = new LinkedList<>();
 		rewQueue.add(bQr);
 		
+		boolean first = true;
+		
 		while(!rewQueue.isEmpty()) {
 			BlockRule r = rewQueue.poll();
 			
-			if(r.isNormalRule()) {
+			if(!first && r.isNormalRule()) {
 				if(selected.add(r)) {
 					result.add(r);
 				}
@@ -71,7 +73,7 @@ public class ModularizedRewriting {
 			
 			AtomSet body = new AtomSet();
 			
-			for(Block b : r.getBlocks()) {
+			for(Block b : r.getMblocks()) {
 				body.add(createBlockAtom(b));
 				rewriteBlock(r, b, result, rewQueue);
 			}
@@ -84,8 +86,10 @@ public class ModularizedRewriting {
 				body.add(a);
 			}
 			
-			if(!r.isNormalRule())
+			if(!r.isNormalRule() || first)
 				result.add(RuleFactory.instance().createRule(r.getHead(), body));
+			
+			first = false;
 		}
 		return result;
 	}
