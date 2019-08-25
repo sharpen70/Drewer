@@ -84,35 +84,31 @@ public class TestModularRewriting extends TestCase
 //	    assertTrue( true );
 //	}
 //	
-	public void testApp2()
-	{
-    	DcoreParser parser = new DcoreParser();
-    	
-    	Program P = parser.parse("D(Y), A(X, Y) :- B1(X).\n" +
-    	"D(Y), A(X, Y) :- B2(X). \n"
-    	+ "B(Y), C(X, Y) :- B3(X).\n"
-    	+ "E(Y), A(X,Y) :- B4(X).\n"
-    	+ "F(X) :- E(X).\n"
-    	+ "C(X, Y), G(Y) :- F(X).\n"
-    	+ "T(Y), A(X,Y) :- F(X).");
-    	
-    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- D(Y), A(X, Y), B(Z), C(X, Z).");
-    	
-    	System.out.println("============");
-    	System.out.println(P);
-    	System.out.println(query);
-    	
-    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
-    	
-    	List<Rule> datalog = mr.rewrite(query);
-    	
-    	System.out.println("\nRewritings:\n");
-    	for(Rule r : datalog) {
-    		System.out.println(r);
-    	}
-    	
-	    assertTrue( true );
-	}
+//	public void testApp2()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("D(X), A(X, Y) :- B1(Y).\n" +
+//    	"D(X), A(X,Y) :- B2(Y). \n"
+//    	+ "B(Z), C(Z, Y) :- B3(Y).");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y), B(Z), C(Z, Y).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r);
+//    	}
+//    	
+//	    assertTrue( true );
+//	}
 //	
 //	public void testApp3()
 //	{
@@ -210,28 +206,27 @@ public class TestModularRewriting extends TestCase
 //    	}
 //	    assertTrue( true );
 //	}
-//	
-//	public void testApp7()
-//	{
-//    	DcoreParser parser = new DcoreParser();
-//    	
-//    	Program P = parser.parse("P(X, Y), A(Y) :- T(X).\n"
-//    			+ "P(Y,X) :- B(X).");
-//    	
-//    	ConjunctiveQuery query = new QueryParser().parse("?() :- P(X, Y), A(Y).");
-//    	
-//    	System.out.println("============");
-//    	System.out.println(P);
-//    	System.out.println(query);
-//    	
-//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
-//    	
-//    	List<Rule> datalog = mr.rewrite(query);
-//    	
-//    	System.out.println("\nRewritings:\n");
-//    	for(Rule r : datalog) {
-//    		System.out.println(r);
-//    	}
-//	    assertTrue( true );
-//	}
+	
+	public void testApp7()
+	{
+    	DcoreParser parser = new DcoreParser();
+    	
+    	Program P = parser.parse("A(Y), P(X, Y):- T(X).");
+    	
+    	ConjunctiveQuery query = new QueryParser().parse("?() :- P(X, Y).");
+    	
+    	System.out.println("============");
+    	System.out.println(P);
+    	System.out.println(query);
+    	
+    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+    	
+    	List<Rule> datalog = mr.rewrite(query);
+    	
+    	System.out.println("\nRewritings:\n");
+    	for(Rule r : datalog) {
+    		System.out.println(r);
+    	}
+	    assertTrue( true );
+	}
 }

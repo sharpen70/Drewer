@@ -84,6 +84,8 @@ public class RuleBasedMark {
 			Rule source = entry.getKey();
 			Map<Atom, Set<Integer>> markedPosition = entry.getValue();
 			
+			if(markedPosition.isEmpty()) continue;
+			
 			String b_name = "BLK_" + this.rule.getRuleIndex() + "_" + b_id++;
 			Set<Atom> bricks = markedPosition.keySet();
 			
