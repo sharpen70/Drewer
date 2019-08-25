@@ -141,7 +141,7 @@ public class RuleBasedMark {
 					boolean pass = false;
 					
 					for(Variable v : marked_vars) {
-						if(this.rule.getFrontierTerm().contains(v)) {
+						if(this.rule.getFrontierVariables().contains(v)) {
 							pass = true;
 							break;
 						}
@@ -173,7 +173,7 @@ public class RuleBasedMark {
 			
 			for(Atom a : bricks) {
 				for(Variable v : a.getVariables()) 
-					if(this.rule.getFrontierTerm().contains(v)) {
+					if(this.rule.getFrontierVariables().contains(v)) {
 						pass = true;
 						break;
 					}

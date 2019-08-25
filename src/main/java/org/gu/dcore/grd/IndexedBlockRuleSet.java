@@ -23,46 +23,41 @@ public class IndexedBlockRuleSet {
 	}
 	
 	public void add(BlockRule r) {
-		if(r.getSourceRules().isEmpty()) {
-			for(Atom a : r.getHead()) {
-				Set<BlockRule> rs = normalRuleMap.get(a.getPredicate());
-				if(rs == null) {
-					rs = new HashSet<>();
-					normalRuleMap.put(a.getPredicate(), rs);
-				}
-				rs.add(r);
+		for(Atom a : r.getHead()) {
+			Set<BlockRule> rs = sourceRuleMap.get(a.getPredicate());
+			if(rs == null) {
+				rs = new HashSet<>();
+				sourceRuleMap.put(a.getPredicate(), rs);
 			}
-		}
-		else {
-			for(Atom a : r.getHead()) {
-				Set<BlockRule> rs = sourceRuleMap.get(a.getPredicate());
-				if(rs == null) {
-					rs = new HashSet<>();
-					sourceRuleMap.put(a.getPredicate(), rs);
-				}
-				rs.add(r);
-			}
-//			for(Rule s : r.getSourceRules()) {
-//				Map<Predicate, Set<BlockRule>> smap = this.blockRuleMap.get(s);
-//				if(smap == null) {
-//					smap = new HashMap<>();
-//					this.blockRuleMap.put(s, smap);
-//				}
-//				for(Atom a : r.getHead()) {
-//					Predicate P = a.getPredicate();
-//					Set<BlockRule> rs = smap.get(P);
-//					if(rs == null) {
-//						rs = new HashSet<>();
-//						smap.put(P, rs);
-//					}
-//					rs.add(r);
-//				}
-//			}
+			rs.add(r);
 		}
 	}
 	
-	public Set<BlockRule> getNormalRules(Predicate pred) {
-		Set<BlockRule> re = this.normalRuleMap.get(pred);
+//	public void add(BlockRule r) {
+//		if(r.getSourceRules().isEmpty()) {
+//			for(Atom a : r.getHead()) {
+//				Set<BlockRule> rs = normalRuleMap.get(a.getPredicate());
+//				if(rs == null) {
+//					rs = new HashSet<>();
+//					normalRuleMap.put(a.getPredicate(), rs);
+//				}
+//				rs.add(r);
+//			}
+//		}
+//		else {
+//			for(Atom a : r.getHead()) {
+//				Set<BlockRule> rs = sourceRuleMap.get(a.getPredicate());
+//				if(rs == null) {
+//					rs = new HashSet<>();
+//					sourceRuleMap.put(a.getPredicate(), rs);
+//				}
+//				rs.add(r);
+//			}
+//		}
+//	}
+//	
+	public Set<BlockRule> getRules(Predicate pred) {
+		Set<BlockRule> re = this.sourceRuleMap.get(pred);
 		if(re == null) return new HashSet<>();
 		return re;
 	}

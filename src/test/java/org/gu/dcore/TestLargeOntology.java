@@ -7,7 +7,6 @@ import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 
@@ -103,8 +102,8 @@ public class TestLargeOntology extends TestCase
 	
 	public void testApp2() throws IOException
 	{
-//		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
-		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/O.dlp";
+		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
+//		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/O.dlp";
 		
     	DcoreParser parser = new DcoreParser();
     	

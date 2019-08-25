@@ -9,16 +9,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 
 public class Unify {
-	
-	public static List<Unifier> getSinglePieceUnifier(AtomSet block, AtomSet rbody, Rule hr) {
+			
+	public static List<Unifier> getSinglePieceUnifier(AtomSet block, AtomSet _rbody, Rule hr, Set<Variable> restricted_var) {
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
+		
+		AtomSet rbody = new AtomSet(_rbody);
+		
+		if(!restricted_var.isEmpty()) {
+			Predicate restricted_predicate = PredicateFactory.instance().createPredicate("Restricted", restricted_var.size());
+			Atom restricted_atom = new Atom(restricted_predicate, restricted_var);
+			rbody.add(restricted_atom);
+		}
 		
 		for(Atom a : block) {
 			for(Atom b : hr.getHead()) {

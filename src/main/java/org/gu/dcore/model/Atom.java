@@ -18,6 +18,12 @@ public class Atom {
 		this.p = p;
 		this.terms = terms;
 	}
+	
+	public Atom(Predicate p, Set<Variable> vars) {
+		this.p = p;
+		this.terms = new ArrayList<>();
+		this.terms.addAll(vars);
+	}
 	/**
 	 * @return the p
 	 */

@@ -30,16 +30,19 @@ public class TestLUBM extends TestCase {
 	
 	public void testApp() throws IOException
 	{
-//		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
-		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/U.dlp";
+		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/U/U_m.dlp";
+//		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/U.dlp";
 		
     	DcoreParser parser = new DcoreParser();
     	
     	Program P = parser.parseFile(O);
     //	Program P = parser.parse("<http://purl.obolibrary.org/obo/pr#PR_000001765>(X0) :- <http://purl.obolibrary.org/obo/pr#PR_000001767>(X0).");
     	
-    	ConjunctiveQuery query = new QueryParser().parse("? (A) :- <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>(A, B), "
-    			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#affiliatedOrganizationOf>(B, C).");
+//    	ConjunctiveQuery query = new QueryParser().parse("? (A) :- <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>(A, B), "
+//    			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#affiliatedOrganizationOf>(B, C).");
+    	
+    	ConjunctiveQuery query = new QueryParser().parse("?(A,B) :- <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Person>(A),"
+    			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#teacherOf>(A,B), <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Course>(B).");
     	
     	System.out.println("============");
     	

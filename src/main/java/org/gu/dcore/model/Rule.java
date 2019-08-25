@@ -14,7 +14,7 @@ public class Rule {
 	private int ruleIndex;
 	
 	private Set<Variable> existentials = null;
-	private Set<Term> frontier_terms = null;
+	private Set<Variable> frontier_vars = null;
 	
 	boolean query;
 	
@@ -49,17 +49,17 @@ public class Rule {
 		Set<Term> head_terms = this.head.getTerms();
 		
 		this.existentials = new HashSet<>();
-		this.frontier_terms = new HashSet<>();
+		this.frontier_vars = new HashSet<>();
 		
 		for(Term t : head_terms) {
 			if(t instanceof Variable) {
 				Variable v = (Variable)t;
 				if(!body_vars.contains(v)) this.existentials.add(v);
-				else this.frontier_terms.add(t);
+				else this.frontier_vars.add((Variable)t);
 			}
-			else {
-				this.frontier_terms.add(t);
-			}
+//			else {
+//				this.frontier_vars.add(t);
+//			}
 		}
 	}
 	
@@ -88,9 +88,9 @@ public class Rule {
 		return this.existentials;
 	}
 	
-	public Set<Term> getFrontierTerm() {
-		if(this.frontier_terms == null) computeFrontierAndExistentials();
-		return this.frontier_terms;
+	public Set<Variable> getFrontierVariables() {
+		if(this.frontier_vars == null) computeFrontierAndExistentials();
+		return this.frontier_vars;
 	}
 	
 	public boolean isExRule() {

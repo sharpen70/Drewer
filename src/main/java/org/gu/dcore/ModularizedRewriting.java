@@ -73,15 +73,16 @@ public class ModularizedRewriting {
 			
 			AtomSet body = new AtomSet();
 			
-			for(Block b : r.getMblocks()) {
+			for(Block b : r.getBlocks()) {
 				body.add(createBlockAtom(b));
-				rewriteBlock(r, b, result, rewQueue);
+				rewriteBlock(r, b, true, result, rewQueue);
 			}
 			for(Atom a : r.getNormalAtoms()) {
 				if(a.getPredicate().getName().equals("ANS")) continue;
 				
-				for(BlockRule nr : this.ibr.getNormalRules(a.getPredicate())) {
-					rewQueue.add(nr);
+				for(BlockRule nr : this.ibr.getRules(a.getPredicate())) {
+					if(!nr.isExRule())
+						rewQueue.add(nr);
 				}
 				body.add(a);
 			}
@@ -94,13 +95,16 @@ public class ModularizedRewriting {
 		return result;
 	}
 	
-	private void rewriteBlock(BlockRule blockRule, Block block, List<Rule> result, Queue<BlockRule> rewQueue) {
-		Queue<Pair<BlockRule, Block>> bqueue = new LinkedList<>();
+	/*
+	 * restricted, whether to consider the variable in the rule head
+	 */
+	private void rewriteBlock(BlockRule blockRule, Block block, boolean restricted, List<Rule> result, Queue<BlockRule> rewQueue) {
+		Queue<Tuple<BlockRule, Block, Boolean>> bqueue = new LinkedList<>();
 		
-		bqueue.add(new Pair<>(blockRule, block));
+		bqueue.add(new Tuple<>(blockRule, block, restricted));
 		
 		while(!bqueue.isEmpty()) {
-			Pair<BlockRule, Block> br_b = bqueue.poll();
+			Tuple<BlockRule, Block, Boolean> br_b = bqueue.poll();
 			BlockRule br = br_b.a;
 			Block b = br_b.b;
 			
@@ -124,7 +128,8 @@ public class ModularizedRewriting {
 				
 				Set<BlockRule> rs = this.ibr.getRules(t.c);
 				for(BlockRule hr : rs) {
-					List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.c, t.b, hr);
+					Set<Variable> restricted_var = br_b.c ? blockRule.getFrontierVariables() : new HashSet<>();
+					List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.c, t.b, hr, restricted_var);
 					List<Pair<Unifier, AtomSet>> available_unifiers = new LinkedList<>();
 						
 					for(Unifier u : unifiers) {
@@ -159,7 +164,7 @@ public class ModularizedRewriting {
 						for(Block hb : hr.getPassBlocks()) {
 							if(!source_related(t.e, hb.getSources())) {
 								tails.add(createBlockAtom(hb));
-								bqueue.add(new Pair<>(hr, hb));
+								bqueue.add(new Tuple<>(hr, hb, false));
 							}
 							else {
 								current_sources.addAll(hb.getSources());
@@ -169,11 +174,11 @@ public class ModularizedRewriting {
 						
 						for(Block hb : hr.getMblocks()) {
 							tails.add(createBlockAtom(hb));
-							bqueue.add(new Pair<>(hr, hb));
+							bqueue.add(new Tuple<>(hr, hb, false));
 						}
 						
 						for(Atom a : hr.getNormalAtoms()) {
-							Set<BlockRule> brs = this.ibr.getNormalRules(a.getPredicate());
+							Set<BlockRule> brs = this.ibr.getRules(a.getPredicate());
 							if(brs != null) rewQueue.addAll(brs);
 	
 						}
@@ -271,6 +276,18 @@ public class ModularizedRewriting {
 		Pair(T1 a, T2 b) {
 			this.a = a;
 			this.b = b;
+		}
+	}
+	
+	private final class Tuple<T1, T2, T3> {
+		public T1 a;
+		public T2 b;
+		public T3 c;
+		
+		Tuple(T1 a, T2 b, T3 c) {
+			this.a = a;
+			this.b = b;
+			this.c = c;
 		}
 	}
 	
