@@ -81,7 +81,7 @@ public class ModularizedRewriting {
 				if(a.getPredicate().getName().equals("ANS")) continue;
 				
 				for(BlockRule nr : this.ibr.getRules(a.getPredicate())) {
-					if(!nr.isExRule())
+					if(!nr.isExRule() && selected.add(nr))
 						rewQueue.add(nr);
 				}
 				body.add(a);

@@ -1,8 +1,9 @@
-package org.gu.dcore;
+package org.gu.dcore.examples;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.gu.dcore.ModularizedRewriting;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
@@ -10,24 +11,8 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+public class TestLUBM {
 
-public class TestLUBM extends TestCase {
-	public TestLUBM( String testName )
-	{
-	    super( testName );
-	}
-	
-	/**
-	 * @return the suite of tests being tested
-	 */
-	public static Test suite()
-	{
-	    return new TestSuite( TestLUBM.class );
-	}
-	
 //	public void testApp() throws IOException
 //	{
 //		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/U/U_m.dlp";
@@ -67,7 +52,7 @@ public class TestLUBM extends TestCase {
 //	    assertTrue( true );
 //	}
 	
-	public void testApp1() throws IOException
+	public static void main(String[] args) throws IOException
 	{
 		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/A/A_m.dlp";
 //		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/U.dlp";
@@ -106,6 +91,5 @@ public class TestLUBM extends TestCase {
     	}
     	System.out.println("\nTime cost:" + (end - start) + "ms");
     	
-	    assertTrue( true );
 	}
 }

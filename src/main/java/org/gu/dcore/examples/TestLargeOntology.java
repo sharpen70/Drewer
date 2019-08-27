@@ -1,8 +1,9 @@
-package org.gu.dcore;
+package org.gu.dcore.examples;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.gu.dcore.ModularizedRewriting;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
@@ -10,30 +11,8 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-public class TestLargeOntology extends TestCase
-{
-	/**
-	 * Create the test case
-	 *
-	 * @param testName name of the test case
-	 */
-	public TestLargeOntology( String testName )
-	{
-	    super( testName );
-	}
-	
-	/**
-	 * @return the suite of tests being tested
-	 */
-	public static Test suite()
-	{
-	    return new TestSuite( TestLargeOntology.class );
-	}
-	
+public class TestLargeOntology 
+{	
 //	public void testApp() throws IOException
 //	{
 //		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
@@ -100,21 +79,25 @@ public class TestLargeOntology extends TestCase
 //	    assertTrue( true );
 //	}
 	
-	public void testApp2() throws IOException
+	public static void main(String[] args) throws IOException
 	{
-		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
+//		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/O/O_m.dlp";
 //		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/O.dlp";
-		
+		String O = "/home/sharpen/projects/evaluations/Benchmarks/OG/OG.dlp";
     	DcoreParser parser = new DcoreParser();
     	
     	Program P = parser.parseFile(O);
     //	Program P = parser.parse("<http://purl.obolibrary.org/obo/pr#PR_000001765>(X0) :- <http://purl.obolibrary.org/obo/pr#PR_000001767>(X0).");
     	
-    	ConjunctiveQuery query = new QueryParser().parse("? (X) :- <http://purl.obolibrary.org/obo/pr#lacks_part>(X, Y), "
-    			+ "<http://purl.obolibrary.org/obo/pr#SO_0000418>(Y),"
-    			+ "<http://purl.obolibrary.org/obo/pr#has_part>(X, Z)," + 
-    			"<http://purl.obolibrary.org/obo/pr#CHEBI_23367>(Z).");
+//    	ConjunctiveQuery query = new QueryParser().parse("? (X) :- <http://purl.obolibrary.org/obo/pr#lacks_part>(X, Y), "
+//    			+ "<http://purl.obolibrary.org/obo/pr#SO_0000418>(Y),"
+//    			+ "<http://purl.obolibrary.org/obo/pr#has_part>(X, Z)," + 
+//    			"<http://purl.obolibrary.org/obo/pr#CHEBI_23367>(Z).");
+//      	
+    	ConjunctiveQuery query = new QueryParser().parse("?(X0) :- <file:///c:/tmp/OpenGALEN2_FULL_WithPropertyChains.owl#isSpecificConsequenceOf>(X0, X1), "
+    			+ "<file:///c:/tmp/OpenGALEN2_FULL_WithPropertyChains.owl#InfectionProcess>(X1).");
     	
+        
     	System.out.println("============");
     	
 		Rule Qr = RuleFactory.instance().createQueryRule(query);
@@ -122,6 +105,8 @@ public class TestLargeOntology extends TestCase
     	System.out.println(Qr);
     	
     	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+    	
+    	System.out.println("Finish modularize");
     	
     	long start = System.currentTimeMillis();
     	
@@ -131,7 +116,6 @@ public class TestLargeOntology extends TestCase
     	
     	System.out.println("\nRewritings:" + datalog.size() + "\n");
     	System.out.println("\nTime cost:" + (end - start) + "ms");
-    	
-	    assertTrue( true );
+ 
 	}
 }
