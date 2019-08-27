@@ -64,13 +64,13 @@ public class ModularizedRewriting {
 		while(!rewQueue.isEmpty()) {
 			BlockRule r = rewQueue.poll();
 			
-			if(!first && r.isNormalRule()) {
-				if(selected.add(r)) {
-					result.add(r);
-				}
-				else continue;
-			}
-			
+//			if(!first && r.isNormalRule()) {
+//				if(selected.add(r)) {
+//					result.add(r);
+//				}
+//				else continue;
+//			}
+//			
 			AtomSet body = new AtomSet();
 			
 			for(Block b : r.getBlocks()) {
@@ -89,6 +89,8 @@ public class ModularizedRewriting {
 			
 			if(!r.isNormalRule() || first)
 				result.add(RuleFactory.instance().createRule(r.getHead(), body));
+			else 
+				result.add(r);
 			
 			first = false;
 		}

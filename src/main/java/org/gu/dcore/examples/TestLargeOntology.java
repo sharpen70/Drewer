@@ -94,8 +94,8 @@ public class TestLargeOntology
 //    			+ "<http://purl.obolibrary.org/obo/pr#has_part>(X, Z)," + 
 //    			"<http://purl.obolibrary.org/obo/pr#CHEBI_23367>(Z).");
 //      	
-    	ConjunctiveQuery query = new QueryParser().parse("?(X0) :- <file:///c:/tmp/OpenGALEN2_FULL_WithPropertyChains.owl#isSpecificConsequenceOf>(X0, X1), "
-    			+ "<file:///c:/tmp/OpenGALEN2_FULL_WithPropertyChains.owl#InfectionProcess>(X1).");
+    	ConjunctiveQuery query = new QueryParser().parse("?(X0) :- <file:///c:/tmp/OpenGALEN2_FULL_WithPropertyChains.owl#isConsequenceOf>(X0, X1), "
+    			+ "<file:///c:/tmp/OpenGALEN2_FULL_WithPropertyChains.owl#Hypertension>(X1).");
     	
         
     	System.out.println("============");
