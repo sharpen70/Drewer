@@ -211,9 +211,9 @@ public class TestModularRewriting extends TestCase
 	{
     	DcoreParser parser = new DcoreParser();
     	
-    	Program P = parser.parse("P(X, Y) :- A(X, Y). Q(Y) :- B(Y). A(X,Y) :- C(X,Y). C(X,Y) :- A(X,Y). B(Y) :- D(Y). C(X,Y), D(Y) :- E(X).");
+    	Program P = parser.parse("P(X, Y) :- A(X). A(X) :- P(X,Y).");
     	
-    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- P(X, Y),Q(Y).");
+    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- P(X, Y).");
     	
     	System.out.println("============");
     	System.out.println(P);

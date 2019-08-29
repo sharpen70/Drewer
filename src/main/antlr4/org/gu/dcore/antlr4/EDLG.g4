@@ -17,13 +17,13 @@ atom        : predicate | predicate '(' terms ')' ;
 
 terms       : term | term ',' terms ;
 
-term        : DESCRIPTION ;
+term        : '<' DESCRIPTION '>' | DESCRIPTION;
 
 predicate   : '<' DESCRIPTION '>' | DESCRIPTION;
 
 /*
  * Lexer Rules
  */
-DESCRIPTION : [a-zA-Z][a-zA-Z0-9_#:/\\.~-]* ;
+DESCRIPTION : ["a-zA-Z]["a-zA-Z0-9_#:/\\.\\~-]* ;
 
 WS          : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines.

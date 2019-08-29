@@ -140,14 +140,11 @@ public class DcoreParser {
 			
 			if(iri == "!") return null;
 			
-			int arity = 0;
-			
 			ArrayList<Term> terms = new ArrayList<>();
 			
 			TermsContext _terms = ctx.terms();
 			
 			while(_terms != null) {
-				arity++;
 				String ts = _terms.term().getText();
 				Term t;
 				
@@ -165,7 +162,7 @@ public class DcoreParser {
 				_terms = _terms.terms();
 			}
 			
-			Predicate predicate = PredicateFactory.instance().createPredicate(iri, arity);
+			Predicate predicate = PredicateFactory.instance().createPredicate(iri, terms.size());
 					
 			return new Atom(predicate, terms);
 		}

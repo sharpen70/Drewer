@@ -8,7 +8,7 @@ import org.gu.dcore.model.Predicate;
 public class PredicateFactory {
 	private static PredicateFactory factory = null;
 	private Map<String, Predicate> pMap = null;
-	private long id = 0;
+	private long id = 1;
 	
 	private PredicateFactory() {
 		pMap = new HashMap<>();

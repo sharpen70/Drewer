@@ -37,6 +37,7 @@ public class ModularizedRewriting {
 	private IndexedBlockRuleSet ibr;
 	
 	private final Constant blank = TermFactory.instance().createConstant("BLANK");
+	private Set<Integer> selected;
 	
 	public ModularizedRewriting(List<Rule> onto) {
 		this.modularizor = new Modularizor(onto);
@@ -46,7 +47,7 @@ public class ModularizedRewriting {
 	}
 	
 	public List<Rule> rewrite(ConjunctiveQuery q) {
-		Set<BlockRule> selected = new HashSet<>();
+		selected = new HashSet<>();
 		
 		Rule Qr = RuleFactory.instance().createQueryRule(q);
 		
@@ -64,6 +65,7 @@ public class ModularizedRewriting {
 		while(!rewQueue.isEmpty()) {
 			BlockRule r = rewQueue.poll();
 			
+			if(!selected.add(r.getRuleIndex())) continue;
 //			if(!first && r.isNormalRule()) {
 //				if(selected.add(r)) {
 //					result.add(r);
@@ -80,9 +82,9 @@ public class ModularizedRewriting {
 			for(Atom a : r.getNormalAtoms()) {
 				if(a.getPredicate().getName().equals("ANS")) continue;
 				
-				for(BlockRule nr : this.ibr.getRules(a.getPredicate())) {
-					if(!nr.isExRule() && selected.add(nr))
-						rewQueue.add(nr);
+				Set<BlockRule> brs = this.ibr.getRules(a.getPredicate());
+				for(BlockRule nr : brs) {
+					if(!nr.isExRule()) rewQueue.add(nr);
 				}
 				body.add(a);
 			}
@@ -113,65 +115,65 @@ public class ModularizedRewriting {
 			Atom blockAtom = createBlockAtom(b);
 			AtomSet na = new AtomSet(b.getBricks());
 			
-			Set<BlockRule> accessed = new HashSet<>();
-			
 			Rule init_rule = RuleFactory.instance().createRule(new AtomSet(blockAtom), na);
 			result.add(init_rule);
 			
-			Queue<Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, Set<Rule>>> queue = new LinkedList<>();
-	
-			queue.add(new Tuple5<>(blockAtom.getTerms(), br.getBody(), na, new AtomSet(), b.getSources()));
+			Queue<Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, Set<Integer>>> queue = new LinkedList<>();
+			queue.add(new Tuple5<>(blockAtom.getTerms(), br.getBody(), na, new AtomSet(), new HashSet<>()));
+//			Queue<Tuple4<ArrayList<Term>, AtomSet, AtomSet, AtomSet>> queue = new LinkedList<>();
+//			queue.add(new Tuple4<>(blockAtom.getTerms(), br.getBody(), na, new AtomSet()));
+
 			
 			List<AtomSet> rewrited = new LinkedList<>();
 			rewrited.add(br.getBody());
 			
 			while(!queue.isEmpty()) {
-				Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, Set<Rule>> t = queue.poll();	
+				Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, Set<Integer>> t = queue.poll();	
+//				Tuple4<ArrayList<Term>, AtomSet, AtomSet, AtomSet> t = queue.poll();	
 				
-				Set<BlockRule> rs = this.ibr.getRules(t.c);
+				AtomSet rewrite_target = t.c;
+				Set<BlockRule> rs = this.ibr.getRules(rewrite_target);
+				
 				for(BlockRule hr : rs) {
+					Set<Integer> processed = new HashSet<>(t.e);
 					Set<Variable> restricted_var = br_b.c ? blockRule.getFrontierVariables() : new HashSet<>();
 					List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.c, t.b, hr, restricted_var);
 					List<Pair<Unifier, AtomSet>> available_unifiers = new LinkedList<>();
 						
 					for(Unifier u : unifiers) {
 						AtomSet rewriting = rewrite(t.b, hr.getBody(), u);
-						boolean subsumed = false;
-						
-						//Remove redundant rewritings
-						Iterator<AtomSet> it = rewrited.iterator();
-						while(it.hasNext()) {
-							AtomSet rew = it.next();
-							
-							if(isMoreGeneral(rew, rewriting)) {
-								subsumed = true; break;
+//						System.out.println(rewriting);
+//						AtomSet rewriting = new AtomSet();
+
+						if(hr.isExRule())  {
+							boolean subsumed = false;
+							//Remove redundant rewritings
+							Iterator<AtomSet> it = rewrited.iterator();
+							while(it.hasNext()) {
+								AtomSet rew = it.next();
+								
+								if(isMoreGeneral(rew, rewriting)) {
+									subsumed = true; break;
+								}
+								if(isMoreGeneral(rewriting, rew)) {
+									it.remove();
+								}
 							}
-							if(isMoreGeneral(rewriting, rew)) {
-								it.remove();
+							if(!subsumed) {
+								available_unifiers.add(new Pair<>(u, rewriting));
+								rewrited.add(rewriting);
 							}
 						}
-						
-						if(!subsumed) {
-							available_unifiers.add(new Pair<>(u, rewriting));
-							rewrited.add(rewriting);
-						}
+						else available_unifiers.add(new Pair<>(u, rewriting));
 					}	
 			
 					if(!available_unifiers.isEmpty()) {
-						Set<Rule> current_sources = new HashSet<>(t.e);
 						AtomSet current_target = new AtomSet();
 						
 						AtomSet tails = new AtomSet();
 						
 						for(Block hb : hr.getPassBlocks()) {
-							if(!source_related(t.e, hb.getSources())) {
-								tails.add(createBlockAtom(hb));
-								bqueue.add(new Tuple<>(hr, hb, false));
-							}
-							else {
-								current_sources.addAll(hb.getSources());
-								current_target.addAll(hb.getBricks());
-							}
+							current_target.addAll(hb.getBricks());
 						}
 						
 						for(Block hb : hr.getMblocks()) {
@@ -187,12 +189,17 @@ public class ModularizedRewriting {
 						tails.addAll(hr.getNormalAtoms());		
 						
 						if(!hr.isExRule() ) {
-							if(accessed.add(hr)) {
-								Rule n_rule = RuleFactory.instance().
-										createRule(hr.getHead(), current_target, tails);
-								result.add(n_rule);
+							if(processed.add(hr.getRuleIndex())) {
+								if(selected.add(hr.getRuleIndex())) {
+									if(hr.getMblocks().isEmpty()) result.add(hr);
+									else {
+										Rule n_rule = RuleFactory.instance().
+											createRule(hr.getHead(), current_target, tails);
+										result.add(n_rule);
+									}
+								}
 							}
-							if(current_target.isEmpty()) continue;
+							else continue;
 						}
 						
 						for(Pair<Unifier, AtomSet> p : available_unifiers) {
@@ -214,6 +221,7 @@ public class ModularizedRewriting {
 							AtomSet uc = u.getImageOf(tails, true);
 							
 							uc.addAll(t.d);
+							
 							if(hr.isExRule()) {
 								Atom newhead =  AtomFactory.instance().createAtom(blockAtom.getPredicate(), rw_t);
 								Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(newhead), rewriting, uc);
@@ -221,7 +229,7 @@ public class ModularizedRewriting {
 							}
 								
 							if(!current_target.isEmpty()) {
-								queue.add(new Tuple5<>(rw_t, p.b, rewriting, uc, current_sources));
+								queue.add(new Tuple5<>(rw_t, p.b, rewriting, uc, processed));
 							}	
 						}	
 					}
@@ -290,6 +298,20 @@ public class ModularizedRewriting {
 			this.a = a;
 			this.b = b;
 			this.c = c;
+		}
+	}
+	
+	private final class Tuple4<T1, T2, T3, T4> {
+		public T1 a;
+		public T2 b;
+		public T3 c;
+		public T4 d;
+		
+		Tuple4(T1 a, T2 b, T3 c, T4 d) {
+			this.a = a;
+			this.b = b;
+			this.c = c;
+			this.d = d;
 		}
 	}
 	

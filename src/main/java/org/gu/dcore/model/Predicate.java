@@ -8,7 +8,7 @@ package org.gu.dcore.model;
 public class Predicate {
 	private long id;
 	private String name;
-	private int arity;
+	private final int arity;
 	
 	public Predicate(String _name, long _id, int _arity) {
 		this.name = _name;
@@ -20,12 +20,6 @@ public class Predicate {
 	 */
 	public long getId() {
 		return id;
-	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(long id) {
-		this.id = id;
 	}
 	
 	public int getArity() {

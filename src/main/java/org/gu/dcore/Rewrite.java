@@ -16,9 +16,9 @@ public class Rewrite {
 	public static void main(String[] args) throws Exception {
 		String dlp = args[0];
 		String queries = args[1];
-		String result = args[2];
 		
-		PrintStream outstream = new PrintStream(new File(result));
+		PrintStream outstream = args.length < 3 ? System.out : new PrintStream(new File(args[2]));
+		
 		Scanner scanner = new Scanner(new File(queries));
 		
     	DcoreParser parser = new DcoreParser();

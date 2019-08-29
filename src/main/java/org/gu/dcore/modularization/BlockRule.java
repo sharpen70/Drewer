@@ -41,7 +41,6 @@ public class BlockRule extends Rule {
 		for(Block b : blocks) {
 			if(b.pass) {
 				this.passblocks.add(b);
-				this.sourceRules.addAll(b.getSources());
 			}
 			else this.mblocks.add(b);
 			

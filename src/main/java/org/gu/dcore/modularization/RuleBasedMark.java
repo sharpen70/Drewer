@@ -149,8 +149,7 @@ public class RuleBasedMark {
 						}
 					}
 					
-					Block b = new Block(b_name, bricks, source, 
-							pass);
+					Block b = new Block(b_name, bricks, pass);
 					
 					blocks.add(b);
 				}
@@ -183,8 +182,7 @@ public class RuleBasedMark {
 			}
 			
 			
-			blocks.add(new Block(b_name, markedPosition.keySet(), source, 
-					pass));
+			blocks.add(new Block(b_name, markedPosition.keySet(), pass));
 		}
 		
 		return blocks;

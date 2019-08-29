@@ -10,8 +10,6 @@ import org.gu.dcore.model.Variable;
 
 public class Block {
 	private String block_name = "";
-	private Set<Rule> sources;
-	
 	private Set<Atom> bricks;
 	
 	public boolean pass = false;
@@ -29,17 +27,14 @@ public class Block {
 //		}
 //	}
 	
-	public Block(String b_name, Set<Atom> bricks, Rule source, boolean pass) {
+	public Block(String b_name, Set<Atom> bricks, boolean pass) {
 		this.block_name = b_name;
 		this.bricks = new HashSet<>(bricks);
-		this.sources = new HashSet<>();
-		this.sources.add(source);
 		
 		this.pass = pass;
 	}
 	
 	public void merge(Block b) {
-		this.sources.addAll(b.sources);
 		this.bricks.addAll(b.bricks);
 		this.pass = this.pass || b.pass;
 	}
@@ -58,14 +53,11 @@ public class Block {
 	
 	public boolean overlap(Block b) {
 		boolean ol = false;
-		boolean allin = true;
 		
 		for(Atom a : b.bricks) {
 			if(this.bricks.contains(a)) ol = true;
-			else allin = false;
 		}
 		
-		if(ol && !allin) System.out.println("Got ya: " + this.toString() + " " + b.toString());
 		return ol;
 	}
 	
@@ -76,10 +68,6 @@ public class Block {
 	
 	public boolean contains(Atom a) {
 		return this.bricks.contains(a);
-	}
-	
-	public Set<Rule> getSources() {
-		return this.sources;
 	}
 	
 	public Set<Term> getVariables() {

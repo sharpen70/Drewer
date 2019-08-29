@@ -29,7 +29,7 @@ public class RuleFactory {
 	}
 	
 	public Rule createQueryRule(ConjunctiveQuery q) {
-		Predicate Q = PredicateFactory.instance().createPredicate("Q", q.getAnsVar().size());
+		Predicate Q = new Predicate("Q", 0, q.getAnsVar().size());
 		Atom Qhead = AtomFactory.instance().createAtom(Q, q.getAnsVar());
 		AtomSet body = new AtomSet(q.getBody());
 		if(!q.getAnsVar().isEmpty()) {

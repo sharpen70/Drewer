@@ -74,7 +74,13 @@ public class Rule {
 			Set<Integer> indice = new HashSet<>();
 			
 			for(int i = 0; i < a.getPredicate().getArity(); i++) {
+				try {
 				if(a.getTerm(i).equals(v)) indice.add(i);
+				}
+				catch (IndexOutOfBoundsException e) {
+					e.printStackTrace();
+					System.out.println(a + " " + a.getPredicate().getArity());
+				}
 			}
 			
 			if(!indice.isEmpty()) pp.add(new PredPosition(a.getPredicate(), indice));
