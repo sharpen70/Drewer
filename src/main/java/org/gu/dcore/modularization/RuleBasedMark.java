@@ -2,6 +2,7 @@ package org.gu.dcore.modularization;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,6 @@ public class RuleBasedMark {
 		List<Block> blocks = new LinkedList<>();
 		
 		for(Entry<Rule, Map<Atom, Set<Integer>>> entry : this.marked.entrySet()) {
-			Rule source = entry.getKey();
 			Map<Atom, Set<Integer>> markedPosition = entry.getValue();
 			
 			if(markedPosition.isEmpty()) continue;
@@ -89,12 +89,57 @@ public class RuleBasedMark {
 			String b_name = "BLK_" + this.rule.getRuleIndex() + "_" + b_id++;
 			Set<Atom> bricks = markedPosition.keySet();
 			
-			Set<Variable> shared_vars = new HashSet<>();
-			Set<Variable> marked_vars = new HashSet<>();
+//			Set<Variable> shared_vars = new HashSet<>();
+//			Set<Variable> marked_vars = new HashSet<>();
 			
 			boolean validBlock = true;
 			boolean possibleBlock = true;
 			
+//			List<Pair<Set<Atom>, Set<Variable>>> markedAtomsets;
+			
+			List<Entry<Atom, Set<Integer>>> markedAtoms = new LinkedList<>();
+			markedAtoms.addAll(markedPosition.entrySet());
+			
+			while(!markedAtoms.isEmpty()) {
+				Iterator<Entry<Atom, Set<Integer>>> it = markedAtoms.iterator();
+				
+				Set<Variable> marked_vars = new HashSet<>();
+				Set<Atom> atoms = new HashSet<>();
+				
+				boolean valid = true;
+				
+				while(it.hasNext()) {
+					Entry<Atom, Set<Integer>> markedAtom = it.next();
+					Atom atom = markedAtom.getKey();
+					Set<Integer> positions = markedAtom.getValue();
+					
+					if(atoms.isEmpty()) {
+						atoms.add(atom);
+						for(Integer i : positions) {
+							Term t = atom.getTerm(i);
+							if(t instanceof Variable) {	
+								marked_vars.add((Variable)t);
+							}
+						}
+						it.remove();
+					}
+					else {
+						boolean join = false;
+						for(int i = 0; i < atom.getTerms().size(); i++) {
+							Term t = atom.getTerm(i);
+							if(t instanceof Variable) {
+								boolean t_marked = positions.contains(i);
+								boolean t_joined = marked_vars.contains(t);
+								
+								if(t_marked && t_joined) {
+									join = true;
+								}
+							}
+						}
+					}
+					if(!valid) break;
+				}
+			}
 			for(Entry<Atom, Set<Integer>> mp : markedPosition.entrySet()) {
 				Atom atom = mp.getKey();
 				Set<Integer> positions = mp.getValue();
@@ -165,7 +210,6 @@ public class RuleBasedMark {
 		List<Block> blocks = new LinkedList<>();
 		
 		for(Entry<Rule, Map<Atom, Set<Integer>>> entry : this.marked.entrySet()) {
-			Rule source = entry.getKey();
 			Map<Atom, Set<Integer>> markedPosition = entry.getValue();
 			
 			String b_name = "BLK_" + this.rule.getRuleIndex() + "_" + b_id++;

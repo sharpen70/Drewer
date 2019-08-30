@@ -31,6 +31,7 @@ import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
+import org.gu.dcore.utils.Pair;
 
 public class ModularizedRewriting {
 	private Modularizor modularizor;
@@ -279,16 +280,6 @@ public class ModularizedRewriting {
 			return new Homomorphism(f, h).exist();		
 	}
 	
-	private final class Pair<T1, T2> {
-		public T1 a;
-		public T2 b;
-		
-		Pair(T1 a, T2 b) {
-			this.a = a;
-			this.b = b;
-		}
-	}
-	
 	private final class Tuple<T1, T2, T3> {
 		public T1 a;
 		public T2 b;
@@ -301,19 +292,19 @@ public class ModularizedRewriting {
 		}
 	}
 	
-	private final class Tuple4<T1, T2, T3, T4> {
-		public T1 a;
-		public T2 b;
-		public T3 c;
-		public T4 d;
-		
-		Tuple4(T1 a, T2 b, T3 c, T4 d) {
-			this.a = a;
-			this.b = b;
-			this.c = c;
-			this.d = d;
-		}
-	}
+//	private final class Tuple4<T1, T2, T3, T4> {
+//		public T1 a;
+//		public T2 b;
+//		public T3 c;
+//		public T4 d;
+//		
+//		Tuple4(T1 a, T2 b, T3 c, T4 d) {
+//			this.a = a;
+//			this.b = b;
+//			this.c = c;
+//			this.d = d;
+//		}
+//	}
 	
 	private final class Tuple5<T1, T2, T3, T4, T5> {
 		public T1 a;
