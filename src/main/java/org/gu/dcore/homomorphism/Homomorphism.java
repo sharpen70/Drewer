@@ -52,8 +52,11 @@ public class Homomorphism {
 			int i = dir + 1;
 			for(; i < subs.size(); i++) {
 				NormalSubstitution lv_sub = subs.get(i);
-				cur_sub = cur_sub.add(lv_sub);
-				if(cur_sub != null) break;
+				NormalSubstitution merged_sub = cur_sub.add(lv_sub);
+				if(merged_sub != null) {
+					cur_sub = merged_sub;
+					break;
+				}
 			}
 			if(i >= subs.size()) {
 				this.directions[level] = 0;

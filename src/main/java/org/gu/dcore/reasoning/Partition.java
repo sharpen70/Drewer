@@ -129,31 +129,25 @@ public class Partition {
 		if(this.substitution == null) {
 			this.substitution = new NormalSubstitution();
 			for(Set<Object> category : this.categories) {
-				Object mapto = null;
-				
-				Iterator<Object> it = category.iterator();
-				Object first = it.next();
+				Term mapto = null;
 
 				for(Object t : category) {
 					if(t instanceof Constant) {
-						mapto = t;
+						mapto = (Constant)t;
 						break;
 					}
-				}
-				
-				if(mapto == null) mapto = first;
-				Term mapto_t;
-				if(mapto instanceof Constant) {
-					mapto_t = (Constant)mapto;
-				}
-				else {
-					Integer value = (Integer)mapto;
-					mapto_t = new Variable((value >= var_offset ? (value - var_offset) : value));
-				}
-							
+					else {
+						if(mapto == null) {
+							Integer value = (Integer)t;
+							if(value < var_offset) {
+								mapto = new Variable(value);
+							}
+						}
+					}
+				}	
 				
 				for(Object o : category) {
-					if(!o.equals(mapto)) this.substitution.add((Integer)o, mapto_t);
+					if(!o.equals(mapto)) this.substitution.add((Integer)o, mapto);
 				}
 			}
 		}
