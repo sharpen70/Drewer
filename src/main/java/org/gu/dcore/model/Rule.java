@@ -121,11 +121,21 @@ public class Rule {
 	
 	@Override
 	public String toString() {
-		String s = "[" + this.ruleIndex + "] "; 
+		String s = ""; 
 		s += head.toString();
-		s += " <- ";
+		s += " :- ";
 		s += body.toString();
 		s += ".";
+		
+		return s;
+	}
+	
+	public String toRDFox() {
+		String s = "";
+		s += body.toRDFox();
+		s += " -> ";
+		s += head.toRDFox();
+		s += " .";
 		
 		return s;
 	}

@@ -33,7 +33,7 @@ public class Atom {
 	/**
 	 * @param p the p to set
 	 */
-	public void setP(Predicate p) {
+	public void setPredicate(Predicate p) {
 		this.p = p;
 	}
 	/**
@@ -109,6 +109,23 @@ public class Atom {
 		for(int i = 0; i < terms.size(); i++) {
 			Term t = terms.get(i);
 			out = out + t;
+			if(i != terms.size() - 1) {
+				out = out + ", ";
+			}
+		}
+		
+		out = out + ")";
+		
+		return out;
+	}
+	
+	public String toRDFox() {
+		String out = p.toString();
+		out = out + "(";
+		
+		for(int i = 0; i < terms.size(); i++) {
+			Term t = terms.get(i);
+			out = out + t.toRDFox();
 			if(i != terms.size() - 1) {
 				out = out + ", ";
 			}

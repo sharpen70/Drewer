@@ -8,44 +8,44 @@ import java.util.regex.Pattern;
 
 public class ConvertCSVToFacts {
 	public static void main(String[] args) throws Exception {
-		File input_dir;
-		PrintWriter writer;
-		
-		if(args.length < 2) {
-			input_dir = new File("/home/sharpen/projects/chaseBench/scenarios/deep/data/");
-			writer = new PrintWriter(System.out);
-		}
-		else {
-			input_dir = new File(args[0]);
-			writer = new PrintWriter(new File(args[1]));
-		}
-		
-		for(File csv : input_dir.listFiles()) {
-			String predicate_name = csv.getName().split("\\.")[0];
-			Scanner scanner = new Scanner(csv);
+		String chasebench = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/";
+	
+		File dir = new File(chasebench);
 			
-			while(scanner.hasNextLine()) {
-				String s = scanner.nextLine();				
-				Pattern pattern = Pattern.compile("\"(.*?)\"");
-				Matcher matcher = pattern.matcher(s);
+		for(File f : dir.listFiles()) {
+			File data = new File(f, "data");
+			File facts = new File(f, "facts");
+			facts.mkdir();
+			
+			for(File csv : data.listFiles()) {
+				String predicate_name = csv.getName().split("\\.")[0];
+				Scanner scanner = new Scanner(csv);
+				PrintWriter writer = new PrintWriter(new File(facts, predicate_name));
 				
-				String atom = predicate_name + "(";
-				
-				boolean first = true;
-				
-				while(matcher.find()) {
-					if(!first) atom += ", ";
-					atom += matcher.group(1);
-					first = false;
+				while(scanner.hasNextLine()) {
+					String s = scanner.nextLine();				
+					String[] terms = s.split(",");
+					
+					String atom = predicate_name + "(";
+					
+					for(int i = 0; i < terms.length; i++) {
+						String a;
+						if(!terms[i].startsWith("\"")) a = "\"" + terms[i] + "\"";
+						else a = terms[i];
+						
+						if(i > 0) atom += ",";
+						atom += a;
+					}
+					
+					atom += ").\n";
+					writer.write(atom);
 				}
-		
-				atom += ").\n";
-				writer.write(atom);
+				
+				scanner.close();
+				writer.close();
 			}
-			
-			scanner.close();
 		}
 		
-		writer.close();
+		
 	}
 }

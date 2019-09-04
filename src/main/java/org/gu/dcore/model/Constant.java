@@ -27,6 +27,13 @@ public class Constant implements Term {
 	public String toString() {
 		return this.name;
 	}
+	
+	@Override
+	public String toRDFox() {
+		String str = this.name.startsWith("\"") ? this.name : "\"" + this.name + "\"";
+		return str;
+	}
+	
 	@Override
 	public boolean isConstant() {
 		return true;

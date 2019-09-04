@@ -48,7 +48,8 @@ public class ModularizedRewriting {
 	}
 	
 	public List<Rule> rewrite(ConjunctiveQuery q) {
-		selected = new HashSet<>();
+		this.selected = new HashSet<>();
+		PredicateFactory.instance().rewrite_reset();
 		
 		Rule Qr = RuleFactory.instance().createQueryRule(q);
 		
@@ -267,7 +268,7 @@ public class ModularizedRewriting {
 		Set<Term> variables = b.getVariables();
 		ArrayList<Term> atom_t = new ArrayList<>(variables);;
 		
-		Predicate blockPred = PredicateFactory.instance().createPredicate(b.getBlockName(), atom_t.size());
+		Predicate blockPred = PredicateFactory.instance().createBlockPredicate(b.getBlockName(), atom_t.size());
 		Atom blockAtom = AtomFactory.instance().createAtom(blockPred, variables);	
 		
 		return blockAtom;

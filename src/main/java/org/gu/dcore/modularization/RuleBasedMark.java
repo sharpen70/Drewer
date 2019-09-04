@@ -144,7 +144,7 @@ public class RuleBasedMark {
 				}
 				
 				if(valid) {
-					String b_name = "BLK_" + this.rule.getRuleIndex() + "_" + b_id++;
+					String b_name = "blk_r" + this.rule.getRuleIndex() + "_n" + b_id++;
 					boolean pass = this.rule.getFrontierVariables().contains(possibleBlock.b);
 					blocks.add(new Block(b_name, possibleBlock.a, pass));
 				}

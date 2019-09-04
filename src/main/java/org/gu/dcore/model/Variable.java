@@ -13,6 +13,11 @@ public class Variable implements Term {
 	
 	@Override
 	public String toString() {
+		return "X" + this.value;
+	}
+	
+	@Override
+	public String toRDFox() {
 		return "?" + this.value;
 	}
 	

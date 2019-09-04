@@ -34,8 +34,8 @@ public class ConjunctiveQuery {
 			first = false;
 		}
 		
-		s += ") :- ";
-		s += this.querybody + ".";
+		s += ") <- ";
+		s += this.querybody;
 		
 		return s;
 	}

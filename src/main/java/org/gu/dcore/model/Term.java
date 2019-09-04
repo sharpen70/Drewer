@@ -8,4 +8,5 @@ package org.gu.dcore.model;
 public interface Term {
 	public boolean isVariable();
 	public boolean isConstant();
+	public String toRDFox();
 }

@@ -136,7 +136,7 @@ public class DcoreParser {
 	private class AtomVisitor extends EDLGBaseVisitor<Atom> {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
-			String iri = ctx.predicate().getText();
+			String iri = ctx.predicate().DESCRIPTION().getText();
 			
 			if(iri == "!") return null;
 			
@@ -145,7 +145,7 @@ public class DcoreParser {
 			TermsContext _terms = ctx.terms();
 			
 			while(_terms != null) {
-				String ts = _terms.term().getText();
+				String ts = _terms.term().DESCRIPTION().getText();
 				Term t;
 				
 				if(Character.isUpperCase(ts.charAt(0))) {

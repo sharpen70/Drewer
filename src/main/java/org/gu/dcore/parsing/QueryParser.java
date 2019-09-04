@@ -94,7 +94,7 @@ public class QueryParser {
 	private class AtomVisitor extends QUERYBaseVisitor<Atom> {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
-			String iri = ctx.predicate().getText();			
+			String iri = ctx.predicate().DESCRIPTION().getText();			
 						
 			TermsContext _terms = ctx.terms();
 			
@@ -112,7 +112,7 @@ public class QueryParser {
 			ArrayList<Term> terms = new ArrayList<>();
 			
 			while(ctx != null) {
-				String ts = ctx.term().getText();
+				String ts = ctx.term().DESCRIPTION().getText();
 				Term t;
 				
 				if(Character.isUpperCase(ts.charAt(0))) {
