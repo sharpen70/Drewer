@@ -1,5 +1,6 @@
 package org.gu.dcore.modularization;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.gu.dcore.grd.IndexedBlockRuleSet;
@@ -9,27 +10,38 @@ public class Modularizor {
 	private List<Rule> onto;
 	private BaseMarking marking;
 	private IndexedBlockRuleSet ibs;
+	private List<BlockRule> blockonto;
 	
 	public Modularizor(List<Rule> onto) {
 		this.onto = onto;
-		this.ibs = new IndexedBlockRuleSet();
 		this.marking = new BaseMarking(onto);
 	}
 	
 	public void modularize() {
+		this.ibs = new IndexedBlockRuleSet();
+		this.blockonto = new LinkedList<>();
+		
 		for(Rule r : onto) {
 			this.marking.mark(r);
 		}
 		
 		for(Rule r: onto) {
-			this.ibs.add(this.marking.getBlockRule(r));
+			BlockRule br = this.marking.getBlockRule(r);
+			this.ibs.add(br);
+			this.blockonto.add(br);
 		}
 	}
 	
 	public IndexedBlockRuleSet getIndexedBlockOnto() {
+		if(this.ibs == null) modularize();
 		return this.ibs;
 	}
 	
+	
+	public List<BlockRule> getBlockOnto() {
+		if(this.blockonto == null) modularize();
+		return this.blockonto;
+	}
 //	public List<BlockRule> getBlockRules(Rule r, List<Block> blocks) {
 //		List<BlockRule> blockRules = new LinkedList<>();
 //		
