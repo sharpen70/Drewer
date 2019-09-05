@@ -24,7 +24,7 @@ public class ConjunctiveQuery {
 	
 	@Override
 	public String toString() {
-		String s = "Q(";
+		String s = "?(";
 		
 		boolean first = true;
 		
@@ -34,8 +34,27 @@ public class ConjunctiveQuery {
 			first = false;
 		}
 		
-		s += ") <- ";
+		s += ") :- ";
 		s += this.querybody;
+		s += " .";
+		
+		return s;
+	}
+	
+	public String toRDFox() {
+		String s = "q(";
+		
+		boolean first = true;
+		
+		for(Term t : ansVar) {
+			if(!first) s += ",";
+			s += t.toRDFox();
+			first = false;
+		}
+		
+		s += ") <- ";
+		s += this.querybody.toRDFox();
+		s += " .";
 		
 		return s;
 	}

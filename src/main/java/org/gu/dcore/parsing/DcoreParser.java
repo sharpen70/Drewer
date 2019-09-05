@@ -31,6 +31,7 @@ import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
+import org.gu.dcore.utils.Utils;
 
 
 /**
@@ -42,6 +43,8 @@ public class DcoreParser {
 	private Map<String, Term> vMap;
 	private int v = 0;
 	
+	boolean full = true;
+	
 	public DcoreParser() {
 		vMap = new HashMap<>();
 	}
@@ -52,16 +55,22 @@ public class DcoreParser {
 	 * @throws IOException 
 	 */
 	public Program parseFile(String programFile) throws IOException {		
-		return this.parse(CharStreams.fromFileName(programFile));
+		return this.parse(CharStreams.fromFileName(programFile), true);
+	}
+	
+	public Program parseFile(String programFile, boolean full_iri) throws IOException {		
+		return this.parse(CharStreams.fromFileName(programFile), full_iri);
 	}
 	
 	public Program parse(String s) {
-		return this.parse(CharStreams.fromString(s));
+		return this.parse(CharStreams.fromString(s), true);
 	}
 	
-	public Program parse(CharStream charStream) {
+	public Program parse(CharStream charStream, boolean full_iri) {
 		PredicateFactory.reset();
 		TermFactory.reset();
+		
+		this.full = full_iri;
 		
 		EDLGLexer lexer = new EDLGLexer(charStream);
 		
@@ -137,6 +146,7 @@ public class DcoreParser {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
 			String iri = ctx.predicate().DESCRIPTION().getText();
+			iri = full ? iri : Utils.getShortIRI(iri);
 			
 			if(iri == "!") return null;
 			

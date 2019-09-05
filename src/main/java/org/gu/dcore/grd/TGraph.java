@@ -100,10 +100,11 @@ public class TGraph {
 			
 			boolean recusive = false;
 			
-			for(Integer i : nextNodes) {
+			for(int j = p.b; j < nextNodes.size(); j++) {
+				int i = nextNodes.get(j);
 				if(DFN[i] == 0) {
 					recusive = true;
-					t.push(new Pair<>(x, i));
+					t.push(new Pair<>(x, j + 1));
 					t.push(new Pair<>(i, 0));
 					break;
 				}

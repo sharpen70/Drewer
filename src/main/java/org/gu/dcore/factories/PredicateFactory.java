@@ -1,5 +1,6 @@
 package org.gu.dcore.factories;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +62,11 @@ public class PredicateFactory {
 		return p;
 	}
 	
-	public Map<String, Predicate> getRewMap() {
-		return this.rew_Map;
+	public Collection<Predicate> getPredicates() {
+		return this.pMap.values();
+	}
+	
+	public Collection<Predicate> getRewPredicates() {
+		return this.rew_Map.values();
 	}
 }

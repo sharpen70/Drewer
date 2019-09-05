@@ -27,7 +27,7 @@ public class ConvertSourceTGD {
 		for(File f : dir.listFiles()) {
 			String tgds = chasebench + f.getName() + "/st.dlp";
 			DcoreParser parser = new DcoreParser();
-			Program P = parser.parseFile(tgds);
+			Program P = parser.parseFile(tgds, true);
 			
 			Map<Predicate, Predicate> sourcePredicates = new HashMap<>();
 			

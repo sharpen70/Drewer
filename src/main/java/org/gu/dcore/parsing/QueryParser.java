@@ -24,24 +24,33 @@ import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
+import org.gu.dcore.utils.Utils;
 
 public class QueryParser {
 	private Map<String, Term> vMap;
 	private int v = 0;
+	
+	private boolean full = true;
 	
 	public QueryParser() {
 		vMap = new HashMap<>();
 	}
 	
 	public ConjunctiveQuery parseFile(String programFile) throws IOException {		
-		return this.parse(CharStreams.fromFileName(programFile));
+		return this.parse(CharStreams.fromFileName(programFile), true);
 	}
 	
 	public ConjunctiveQuery parse(String s) {
-		return this.parse(CharStreams.fromString(s));
+		return this.parse(CharStreams.fromString(s), true);
 	}
 	
-	public ConjunctiveQuery parse(CharStream charStream) {
+	public ConjunctiveQuery parse(String s, boolean full_iri) {
+		return this.parse(CharStreams.fromString(s), full_iri);
+	}
+	
+	public ConjunctiveQuery parse(CharStream charStream, boolean full_iri) {
+		full = full_iri;
+		
 		QUERYLexer lexer = new QUERYLexer(charStream);
 		
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -95,7 +104,8 @@ public class QueryParser {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
 			String iri = ctx.predicate().DESCRIPTION().getText();			
-						
+			iri = full ? iri : Utils.getShortIRI(iri);
+			
 			TermsContext _terms = ctx.terms();
 			
 			ArrayList<Term> terms = _terms.accept(new TermsVisitor());
