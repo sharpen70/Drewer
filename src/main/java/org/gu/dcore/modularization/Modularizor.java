@@ -18,6 +18,9 @@ public class Modularizor {
 	}
 	
 	public void modularize() {
+		System.out.println("Modularizing ontology ...");
+		long start = System.currentTimeMillis();
+		
 		this.ibs = new IndexedBlockRuleSet();
 		this.blockonto = new LinkedList<>();
 		
@@ -30,6 +33,7 @@ public class Modularizor {
 			this.ibs.add(br);
 			this.blockonto.add(br);
 		}
+		System.out.println("Done modularization, taking " + (System.currentTimeMillis() - start) + " ms");
 	}
 	
 	public IndexedBlockRuleSet getIndexedBlockOnto() {

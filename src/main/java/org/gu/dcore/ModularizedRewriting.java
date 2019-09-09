@@ -43,8 +43,7 @@ public class ModularizedRewriting {
 	public ModularizedRewriting(List<Rule> onto) {
 		this.modularizor = new Modularizor(onto);
 		this.modularizor.modularize();
-		this.ibr = this.modularizor.getIndexedBlockOnto();
-		
+		this.ibr = this.modularizor.getIndexedBlockOnto();		
 	}
 	
 	public List<Rule> rewrite(ConjunctiveQuery q) {
