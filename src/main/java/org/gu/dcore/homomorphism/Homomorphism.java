@@ -41,7 +41,7 @@ public class Homomorphism {
 		return backtrack();
 	}
 	
-	public boolean backtrack() {
+	private boolean backtrack() {
 		int level = 0;
 		
 		while(level >= 0 && level < level_size) {
@@ -59,7 +59,7 @@ public class Homomorphism {
 				}
 			}
 			if(i >= subs.size()) {
-				this.directions[level] = 0;
+				this.directions[level] = -1;
 				level--;
 			}
 			else {
