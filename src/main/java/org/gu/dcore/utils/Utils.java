@@ -1,7 +1,14 @@
 package org.gu.dcore.utils;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.gu.dcore.homomorphism.HomoUtils;
+import org.gu.dcore.homomorphism.Homomorphism;
+import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.reasoning.Unifier;
 
 public class Utils {
 	public static String getShortIRI(String iri) {
@@ -21,5 +28,47 @@ public class Utils {
 		}
 		
 		return iri;
+	}
+	
+	/*
+	 * f the set of atoms being replaced
+	 * b the set of atoms to replace
+	 * u the unifier for replacing
+	 */
+	public static AtomSet rewrite(AtomSet f, AtomSet b, Unifier u) {
+		AtomSet uf = u.getImageOf(f, false);
+		AtomSet ub = u.getImageOf(b, true);
+		
+		AtomSet up = u.getImageOfPiece();
+		
+		uf = HomoUtils.minus(uf, up);
+		uf = HomoUtils.simple_union(uf, ub);
+		
+		return uf;
+	}
+	
+	public static boolean isMoreGeneral(AtomSet f, AtomSet h) {
+		if (HomoUtils.contains(f, h)) 
+			return true;
+		else 
+			return new Homomorphism(f, h).exist();		
+	}
+	
+	public static void addAndKeepMinimal(LinkedList<AtomSet> atomsets, LinkedList<AtomSet> toAdd) {
+		for(AtomSet tocheck : toAdd) {
+			boolean subsumed = false;
+			Iterator<AtomSet> it = atomsets.iterator();
+			while(it.hasNext()) {
+				AtomSet rew = it.next();
+				
+				if(Utils.isMoreGeneral(rew, tocheck)) {
+					subsumed = true; break;
+				}
+				if(Utils.isMoreGeneral(tocheck, rew)) {
+					it.remove();
+				}
+			}
+			if(!subsumed) atomsets.add(tocheck);
+		}
 	}
 }

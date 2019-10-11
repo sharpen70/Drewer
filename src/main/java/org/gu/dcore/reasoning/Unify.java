@@ -18,8 +18,12 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Unify {
-			
-	public static List<Unifier> getSinglePieceUnifier(AtomSet block, AtomSet _rbody, Rule hr, Set<Variable> restricted_var) {
+	
+	public static List<Unifier> getUnifiers(AtomSet body, Rule hr) {
+		return getSinglePieceUnifiers(body, body, hr, new HashSet<>());
+	}
+	
+	public static List<Unifier> getSinglePieceUnifiers(AtomSet block, AtomSet _rbody, Rule hr, Set<Variable> restricted_var) {
 		List<Unifier> singlePieceUnifiers = new LinkedList<>();
 		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
 		

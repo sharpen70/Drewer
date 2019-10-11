@@ -32,6 +32,7 @@ import org.gu.dcore.modularization.RuleBasedMark;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.utils.Pair;
+import org.gu.dcore.utils.Utils;
 
 public class ModularizedRewriting {
 	private Modularizor modularizor;
@@ -184,11 +185,11 @@ public class ModularizedRewriting {
 				for(BlockRule hr : rs) {
 					Set<Integer> processed = new HashSet<>(t.e);
 					Set<Variable> restricted_var = br_b.c ? blockRule.getFrontierVariables() : new HashSet<>();
-					List<Unifier> unifiers = Unify.getSinglePieceUnifier(t.c, t.b, hr, restricted_var);
+					List<Unifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
 					List<Pair<Unifier, AtomSet>> available_unifiers = new LinkedList<>();
 						
 					for(Unifier u : unifiers) {
-						AtomSet rewriting = rewrite(t.b, hr.getBody(), u);
+						AtomSet rewriting = Utils.rewrite(t.b, hr.getBody(), u);
 //						System.out.println(rewriting);
 //						AtomSet rewriting = new AtomSet();
 
@@ -199,10 +200,10 @@ public class ModularizedRewriting {
 							while(it.hasNext()) {
 								AtomSet rew = it.next();
 								
-								if(isMoreGeneral(rew, rewriting)) {
+								if(Utils.isMoreGeneral(rew, rewriting)) {
 									subsumed = true; break;
 								}
-								if(isMoreGeneral(rewriting, rew)) {
+								if(Utils.isMoreGeneral(rewriting, rew)) {
 									it.remove();
 								}
 							}
@@ -251,7 +252,7 @@ public class ModularizedRewriting {
 						
 						for(Pair<Unifier, AtomSet> p : available_unifiers) {
 							Unifier u = p.a;
-							AtomSet rewriting = rewrite(t.c, current_target, u);
+							AtomSet rewriting = Utils.rewrite(t.c, current_target, u);
 						
 							Set<Term> eliminated = new HashSet<>();
 							for(Variable v : hr.getExistentials()) {
@@ -292,23 +293,6 @@ public class ModularizedRewriting {
 		return false;
 	}
 	
-	/*
-	 * f the set of atoms being replaced
-	 * b the set of atoms to replace
-	 * u the unifier for replacing
-	 */
-	private AtomSet rewrite(AtomSet f, AtomSet b, Unifier u) {
-		AtomSet uf = u.getImageOf(f, false);
-		AtomSet ub = u.getImageOf(b, true);
-		
-		AtomSet up = u.getImageOfPiece();
-		
-		uf = HomoUtils.minus(uf, up);
-		uf = HomoUtils.simple_union(uf, ub);
-		
-		return uf;
-	}
-	
 	private Atom createBlockAtom(Block b) {
 		Set<Term> variables = b.getVariables();
 		ArrayList<Term> atom_t = new ArrayList<>(variables);;
@@ -317,13 +301,6 @@ public class ModularizedRewriting {
 		Atom blockAtom = AtomFactory.instance().createAtom(blockPred, variables);	
 		
 		return blockAtom;
-	}
-	
-	private boolean isMoreGeneral(AtomSet f, AtomSet h) {
-		if (HomoUtils.contains(f, h)) 
-			return true;
-		else 
-			return new Homomorphism(f, h).exist();		
 	}
 	
 	private final class Tuple<T1, T2, T3> {
