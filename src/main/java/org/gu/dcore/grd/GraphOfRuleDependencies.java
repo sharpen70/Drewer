@@ -10,7 +10,7 @@ import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 
-public class GraphOfDependencies {
+public class GraphOfRuleDependencies {
 	private TGraph grd;
 	private List<Rule> onto;
 	
@@ -18,7 +18,7 @@ public class GraphOfDependencies {
 	private List<List<Rule>> loopsRule;
 	private boolean computed = false;
 	
-	public GraphOfDependencies(List<Rule> rules) {
+	public GraphOfRuleDependencies(List<Rule> rules) {
 		this.onto = rules;
 		this.ruleMap = new HashMap<>();
 		
@@ -65,7 +65,7 @@ public class GraphOfDependencies {
 	
 	private void compute() {
 		this.loopsRule  = new LinkedList<List<Rule>>();
-		List<List<Integer>> loops = this.grd.getLoops();
+		List<List<Integer>> loops = this.grd.getSCCs();
 		
 		for(List<Integer> loop : loops) {
 			List<Rule> rs = new LinkedList<>();

@@ -61,7 +61,7 @@ public class SeparableChecker {
 	
 	public boolean check() {
 		buildBlockGraph();
-		List<List<Integer>> loops =  this.blockGraph.getLoops();
+		List<List<Integer>> loops =  this.blockGraph.getSCCs();
 		
 		for(List<Integer> loop : loops) {
 			for(Integer i : loop) {

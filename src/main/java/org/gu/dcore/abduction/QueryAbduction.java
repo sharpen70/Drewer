@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Queue;
 
 import org.gu.dcore.ModularizedRewriting;
-import org.gu.dcore.grd.GraphOfDependencies;
+import org.gu.dcore.grd.GraphOfRuleDependencies;
 import org.gu.dcore.grd.IndexedByHeadPredRuleSet;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
@@ -39,7 +39,7 @@ public class QueryAbduction {
 		ModularizedRewriting mr = new ModularizedRewriting(this.ontology);
 		Pair<Rule, List<Rule>> rewriting = mr.pRewrite(query);
 		
-		GraphOfDependencies grd = new GraphOfDependencies(rewriting.b);
+		GraphOfRuleDependencies grd = new GraphOfRuleDependencies(rewriting.b);
 		
 		List<Rule> roots = grd.getRulesNotInSCCs();
 		
@@ -51,23 +51,22 @@ public class QueryAbduction {
 		
 		List<AtomSet> explanations = new LinkedList<>();
 		LinkedList<AtomSet> to_explore = new LinkedList<>();
-		
 		to_explore.add(root_e);
 		
 		while(!to_explore.isEmpty()) {
 			AtomSet e = to_explore.poll();
 			
-			List<AtomSet> obtained = new LinkedList<>();
-			
 			for(Rule r : rs.getRules(e)) {
 				List<Unifier> unifiers = Unify.getUnifiers(e, r);		
 				for(Unifier u : unifiers) {
-					obtained.add(Utils.rewrite(e, r.getBody(), u));
+					Utils.addAndKeepMinimal(to_explore, Utils.rewrite(e, r.getBody(), u));
 				}
 			}
 			
 			
-		}		
+		}
+		
+		return explanations; 
 	}
 	
 	public List<Explanation> getLevelExplanations(int i) {

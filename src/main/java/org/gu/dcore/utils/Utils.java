@@ -1,7 +1,7 @@
 package org.gu.dcore.utils;
 
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,21 +54,25 @@ public class Utils {
 			return new Homomorphism(f, h).exist();		
 	}
 	
-	public static void addAndKeepMinimal(LinkedList<AtomSet> atomsets, LinkedList<AtomSet> toAdd) {
+	public static void addAndKeepMinimal(List<AtomSet> atomsets, List<AtomSet> toAdd) {
 		for(AtomSet tocheck : toAdd) {
-			boolean subsumed = false;
-			Iterator<AtomSet> it = atomsets.iterator();
-			while(it.hasNext()) {
-				AtomSet rew = it.next();
-				
-				if(Utils.isMoreGeneral(rew, tocheck)) {
-					subsumed = true; break;
-				}
-				if(Utils.isMoreGeneral(tocheck, rew)) {
-					it.remove();
-				}
-			}
-			if(!subsumed) atomsets.add(tocheck);
+			addAndKeepMinimal(atomsets, tocheck);
 		}
+	}
+	
+	public static void addAndKeepMinimal(List<AtomSet> atomsets, AtomSet toAdd) {
+		boolean subsumed = false;
+		Iterator<AtomSet> it = atomsets.iterator();
+		while(it.hasNext()) {
+			AtomSet rew = it.next();
+			
+			if(Utils.isMoreGeneral(rew, toAdd)) {
+				subsumed = true; break;
+			}
+			if(Utils.isMoreGeneral(toAdd, rew)) {
+				it.remove();
+			}
+		}
+		if(!subsumed) atomsets.add(toAdd);
 	}
 }

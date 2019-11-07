@@ -11,7 +11,9 @@ public class TGraph {
 	private ArrayList<List<Integer>> graph;
 	private int size;
 	
-	private List<List<Integer>> loops;
+	private List<List<Integer>> SCCs;
+	private List<Integer> entryNodes;	
+	private List<Integer> freeNodes;
 	
 	private int[] DFN, LOW;
 	private int order;
@@ -22,22 +24,37 @@ public class TGraph {
 		this.size = size;
 		this.graph = new ArrayList<>();
 		
-		for(int i = 0; i < size; i++) this.graph.add(new LinkedList<>()); 
+		for(int i = 0; i < size; i++) this.graph.add(new ArrayList<>()); 
+	}
+	
+	public TGraph(int size, boolean[][] edges) {
+		this.size = size;
+		this.graph = new ArrayList<>();
+		
+		for(int i = 0; i < size; i++) {
+			ArrayList<Integer> e = new ArrayList<Integer>();
+			this.graph.add(e); 
+
+			for(int j = 0; j < size; j++) {
+				if(edges[i][j]) e.add(j);
+			}
+		}
 	}
 	
 	public void addEdge(int i, int j) {
 		List<Integer> nodes = this.graph.get(i);
-		nodes.add(j);
+		if(!nodes.contains(j))
+			nodes.add(j);
 	}
 	
-	public List<List<Integer>> getLoops() {
-		if(this.loops == null) computeLoops();
+	public List<List<Integer>> getSCCs() {
+		if(this.SCCs == null) computeSCCs(null);
 		
-		return this.loops;
+		return this.SCCs;
 	}
 	
-	private void computeLoops() {
-		this.loops = new LinkedList<>();
+	public void computeSCCs(List<Integer> roots) {
+		this.SCCs = new LinkedList<>();
 		
 		DFN = new int[size];
 		LOW = new int[size];
@@ -45,9 +62,16 @@ public class TGraph {
 		
 		stack = new Stack<>();
 		
-		for(int i = 0; i < size; i++) {
-			if(DFN[i] == 0) iterative_tarjan(i);
+		if(roots == null) {
+			for(int i = 0; i < size; i++) 
+				if(DFN[i] == 0) iterative_tarjan(i);
 		}
+		else {
+			for(Integer i : roots)
+				if(DFN[i] == 0) iterative_tarjan(i);
+		}
+		
+		while(!stack.isEmpty()) freeNodes.add(stack.pop());
 	}
 	
 	private void tarjan(int x) {
@@ -68,6 +92,7 @@ public class TGraph {
 		}
 		
 		if(LOW[x] == DFN[x]) {
+			this.entryNodes.add(x);
 			List<Integer> scc = new LinkedList<>();
 			while(!stack.isEmpty()) {
 				int c = stack.pop();
@@ -75,9 +100,9 @@ public class TGraph {
 				if(c == x) break;
 			}
 			if(scc.size() == 1) {
-				if(nextNodes.contains(x)) loops.add(scc);
+				if(nextNodes.contains(x)) SCCs.add(scc);
 			}
-			else loops.add(scc);
+			else SCCs.add(scc);
 		}
 	}
 	
@@ -116,6 +141,7 @@ public class TGraph {
 			if(recusive) continue;
 			
 			if(LOW[x] == DFN[x]) {
+				this.entryNodes.add(x);
 				List<Integer> scc = new LinkedList<>();
 				while(!stack.isEmpty()) {
 					int c = stack.pop();
@@ -123,9 +149,9 @@ public class TGraph {
 					if(c == x) break;
 				}
 				if(scc.size() == 1) {
-					if(nextNodes.contains(x)) loops.add(scc);
+					if(nextNodes.contains(x)) SCCs.add(scc);
 				}
-				else loops.add(scc);
+				else SCCs.add(scc);
 			}
 			
 			if(!t.isEmpty()) {
@@ -133,5 +159,13 @@ public class TGraph {
 				LOW[v] = Integer.min(LOW[v], LOW[x]);
 			}
 		}				
+	}
+	
+	public List<Integer> getFreeNodes() {
+		return this.freeNodes;
+	}
+	
+	public List<Integer> getEntryNodes() {
+		return this.entryNodes;
 	}
 }
