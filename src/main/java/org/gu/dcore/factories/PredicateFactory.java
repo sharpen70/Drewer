@@ -2,6 +2,8 @@ package org.gu.dcore.factories;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.gu.dcore.model.Predicate;
@@ -68,5 +70,13 @@ public class PredicateFactory {
 	
 	public Collection<Predicate> getRewPredicates() {
 		return this.rew_Map.values();
+	}
+	
+	public List<Predicate> getPredicateSet() {
+		List<Predicate> plist = new LinkedList<Predicate>();
+		plist.addAll(this.pMap.values());
+		plist.addAll(this.rew_Map.values());
+		
+		return plist;
 	}
 }

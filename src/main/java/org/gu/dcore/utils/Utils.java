@@ -54,6 +54,21 @@ public class Utils {
 			return new Homomorphism(f, h).exist();		
 	}
 	
+	public static void removeSubsumed(List<AtomSet> s1, List<AtomSet> s2) {
+		Iterator<AtomSet> it1 = s1.iterator();
+		while(it1.hasNext()) {
+			AtomSet atomset = it1.next();
+			Iterator<AtomSet> it2 = s2.iterator();
+			while(it2.hasNext()) {
+				AtomSet atomset2 = it2.next();
+				if(Utils.isMoreGeneral(atomset2, atomset)) {
+					it1.remove();
+					break;
+				}
+			}
+		}
+	}
+	
 	public static void addAndKeepMinimal(List<AtomSet> atomsets, List<AtomSet> toAdd) {
 		for(AtomSet tocheck : toAdd) {
 			addAndKeepMinimal(atomsets, tocheck);

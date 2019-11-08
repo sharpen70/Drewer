@@ -41,7 +41,7 @@ public class IndexedByHeadPredRuleSet {
 		}
 	}
 	
-	public Set<Rule> get(Predicate p) {
+	public Set<Rule> getRulesByPredicate(Predicate p) {
 		Set<Rule> re = this.ruleMap.get(p);
 		if(re == null) return new HashSet<>();
 		return re;

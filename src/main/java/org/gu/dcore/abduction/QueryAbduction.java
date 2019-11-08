@@ -1,11 +1,14 @@
 package org.gu.dcore.abduction;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Set;
 
 import org.gu.dcore.ModularizedRewriting;
-import org.gu.dcore.grd.GraphOfRuleDependencies;
+import org.gu.dcore.factories.PredicateFactory;
+import org.gu.dcore.grd.GraphOfPredicateDependencies;
 import org.gu.dcore.grd.IndexedByHeadPredRuleSet;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
@@ -22,9 +25,9 @@ public class QueryAbduction {
 	private ConjunctiveQuery query;
 	private List<Rule> ontology;
 	private DataStore store;
-	private List<Predicate> abducibles;
+	private Set<Predicate> abducibles;
 	 
-	public QueryAbduction(List<Rule> onto, ConjunctiveQuery q, DataStore D, List<Predicate> abdu) {
+	public QueryAbduction(List<Rule> onto, ConjunctiveQuery q, DataStore D, Set<Predicate> abdu) {
 		this.abducibles = abdu;
 		this.store = D;
 		this.ontology = onto;
@@ -36,37 +39,79 @@ public class QueryAbduction {
 	}
 	
 	public List<PatternExplanation> getPatternExplanations() {
+		List<PatternExplanation> result = new LinkedList<PatternExplanation>();
+		
+		/* Compute datalog rewriting of the abduction problem */
 		ModularizedRewriting mr = new ModularizedRewriting(this.ontology);
 		Pair<Rule, List<Rule>> rewriting = mr.pRewrite(query);
 		
-		GraphOfRuleDependencies grd = new GraphOfRuleDependencies(rewriting.b);
+		AtomSet rewrited_observation = rewriting.a.getBody();
+		List<Rule> rewrited_program = rewriting.b;
 		
-		List<Rule> roots = grd.getRulesNotInSCCs();
+		/* Compute the set of predicates that may incur loops */
+		List<Predicate> plist = PredicateFactory.instance().getPredicateSet();
+
+		GraphOfPredicateDependencies gpd = new GraphOfPredicateDependencies(rewrited_program, plist);
+		List<List<Predicate>> sccs = gpd.getSCCPredicates();
+		Set<Predicate> scc_predicates = new HashSet<>();
 		
-		return null;
-	}
-	
-	private List<AtomSet> getUnfoldedExplanations(AtomSet root_e, List<Rule> roots) {
-		IndexedByHeadPredRuleSet rs = new IndexedByHeadPredRuleSet(roots);
+		for(List<Predicate> scc : sccs) {
+			scc_predicates.addAll(scc);
+		}
 		
-		List<AtomSet> explanations = new LinkedList<>();
-		LinkedList<AtomSet> to_explore = new LinkedList<>();
-		to_explore.add(root_e);
-		
-		while(!to_explore.isEmpty()) {
-			AtomSet e = to_explore.poll();
-			
-			for(Rule r : rs.getRules(e)) {
-				List<Unifier> unifiers = Unify.getUnifiers(e, r);		
-				for(Unifier u : unifiers) {
-					Utils.addAndKeepMinimal(to_explore, Utils.rewrite(e, r.getBody(), u));
-				}
-			}
-			
+		/* Compute Pattern rules for predicates in loops */
+		Iterator<Predicate> sit = scc_predicates.iterator();
+		while(sit.hasNext()) {
+			Predicate sp = sit.next();
 			
 		}
 		
-		return explanations; 
+		/* Minimal rewriting to compute explanations */
+		IndexedByHeadPredRuleSet rs = new IndexedByHeadPredRuleSet(rewrited_program);
+		
+		LinkedList<AtomSet> to_explore = new LinkedList<>();
+		LinkedList<AtomSet> finalSet = new LinkedList<>();
+		
+		to_explore.add(rewrited_observation);
+		
+		while(!to_explore.isEmpty()) {
+			AtomSet e = to_explore.poll();
+			finalSet.add(e);
+			
+			for(Atom a : e) {
+				Predicate p = a.getPredicate();
+				
+				/* For predicates that don't involve in loops, perform traditional rewriting*/
+				if(!scc_predicates.contains(p)) {
+					for(Rule r : rs.getRulesByPredicate(p)) {
+						List<Unifier> unifiers = Unify.getSinglePieceUnifiers(new AtomSet(a), e, r, new HashSet<>());	
+						List<AtomSet> rewritings = new LinkedList<>();
+						
+						for(Unifier u : unifiers) {
+							 rewritings.add(Utils.rewrite(e, r.getBody(), u));
+						}
+						
+						Utils.removeSubsumed(rewritings, finalSet);
+						Utils.removeSubsumed(to_explore, rewritings);
+						Utils.removeSubsumed(finalSet, rewritings);
+						
+						to_explore.addAll(rewritings);
+					}	
+				}
+				/* */
+				else {
+					
+				}
+			}
+
+		}
+		
+		return result; 
+	}
+
+	private List<Rule> getPatternRules(Predicate predicate) {
+		List<Rule> patterns = new LinkedList<>();
+		return null;
 	}
 	
 	public List<Explanation> getLevelExplanations(int i) {
