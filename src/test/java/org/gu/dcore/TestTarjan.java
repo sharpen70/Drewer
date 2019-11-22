@@ -41,7 +41,7 @@ public class TestTarjan extends TestCase {
 		g.addEdge(3, 3);
 		g.addEdge(0, 0);
 		
-		List<List<Integer>> loops = g.getLoops();
+		List<List<Integer>> loops = g.getSCCs();
 		
 		for(List<Integer> loop : loops) System.out.println(loop);
 	}

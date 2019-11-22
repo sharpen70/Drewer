@@ -15,6 +15,7 @@ import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.reasoning.Substitution;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.DataStore;
@@ -80,6 +81,8 @@ public class QueryAbduction {
 			
 			for(Atom a : e) {
 				Predicate p = a.getPredicate();
+				List<Substitution> substitutions = this.store.getAtomMappings(a);
+				
 				
 				/* For predicates that don't involve in loops, perform traditional rewriting*/
 				if(!scc_predicates.contains(p)) {
@@ -108,7 +111,11 @@ public class QueryAbduction {
 		
 		return result; 
 	}
-
+	
+	private List<Pair<Atom, List<Substitution>>> explanation_reduce(AtomSet e) {
+		return null;
+	}
+	
 	private List<Rule> getPatternRules(Predicate predicate) {
 		List<Rule> patterns = new LinkedList<>();
 		return null;
