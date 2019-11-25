@@ -1,9 +1,11 @@
 package org.gu.dcore.abduction;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.gu.dcore.ModularizedRewriting;
@@ -15,6 +17,7 @@ import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.model.Term;
 import org.gu.dcore.reasoning.Substitution;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
@@ -81,7 +84,6 @@ public class QueryAbduction {
 			
 			for(Atom a : e) {
 				Predicate p = a.getPredicate();
-				List<Substitution> substitutions = this.store.getAtomMappings(a);
 				
 				
 				/* For predicates that don't involve in loops, perform traditional rewriting*/
@@ -112,7 +114,17 @@ public class QueryAbduction {
 		return result; 
 	}
 	
-	private List<Pair<Atom, List<Substitution>>> explanation_reduce(AtomSet e) {
+	private List<Rule> rule_reduce(Rule r, IndexedByHeadPredRuleSet dependencies) {
+		AtomSet body = r.getBody();
+		ArrayList<Map<Term, List<Long>>> matched_tuples = new ArrayList<>(); 
+		for(int i = 0; i < body.size(); i++) {
+			matched_tuples.add(this.store.getAtomMappings(a));
+		}
+		
+		return null;
+	}
+	
+	private List<Pair<Atom, List<Substitution>>> atomset_reduce(AtomSet e) {
 		return null;
 	}
 	

@@ -2,10 +2,11 @@ package org.gu.dcore.store;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Predicate;
-import org.gu.dcore.reasoning.Substitution;
+import org.gu.dcore.model.Term;
 
 public class RelationalDataStore implements DataStore {
 	private HashMap<Predicate, Relation> relational_data;
@@ -26,8 +27,8 @@ public class RelationalDataStore implements DataStore {
 		return this.relational_data.get(predicate);
 	}
 	
-	public List<Substitution> getAtomMappings(Atom a) {
+	public Map<Term, List<Long>> getAtomMappings(Atom a) {
 		Relation relation = this.relational_data.get(a.getPredicate());
-		return relation.getSubstitution(a.getTerms());
+		return relation.getMatchTerms(a.getTerms());
 	}
 }

@@ -2,6 +2,7 @@ package org.gu.dcore.store;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Term;
@@ -29,7 +30,7 @@ public class Relation {
 		return this.predicate;
 	}
 	
-	public List<Substitution> getSubstitution(ArrayList<Term> map_terms) {
+	public Map<Term, List<Long>> getMatchTerms(ArrayList<Term> map_terms) {
 		return null;
 	}
 }
