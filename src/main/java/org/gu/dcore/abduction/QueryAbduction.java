@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.gu.dcore.ModularizedRewriting;
@@ -17,7 +16,6 @@ import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.model.Term;
 import org.gu.dcore.reasoning.Substitution;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
@@ -116,9 +114,19 @@ public class QueryAbduction {
 	
 	private List<Rule> rule_reduce(Rule r, IndexedByHeadPredRuleSet dependencies) {
 		AtomSet body = r.getBody();
-		ArrayList<Map<Term, List<Long>>> matched_tuples = new ArrayList<>(); 
-		for(int i = 0; i < body.size(); i++) {
-			matched_tuples.add(this.store.getAtomMappings(a));
+		ArrayList<List<Long[]>> matched_tuples = new ArrayList<>(); 
+		
+		LinkedList<Pair<Integer, List<Long[]>>> queue = new LinkedList<>();
+		Pair<Integer, List<Long[]>> init = new Pair<>(0, new LinkedList<>());
+		queue.add(init);
+		
+		while(queue.isEmpty()) {
+			Pair<Integer, List<Long[]>> p = queue.pop();
+			int level = p.a;
+			List<Long[]> tuples = p.b;
+			
+			Utils.join_mod(tuples, matched_tuples.get(level));
+			
 		}
 		
 		return null;

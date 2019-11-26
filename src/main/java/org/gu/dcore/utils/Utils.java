@@ -70,6 +70,9 @@ public class Utils {
 		}
 	}
 	
+	public static void join_mod(List<Long[]> a, List<Long[]> b) {
+	}
+	
 	public static void addAndKeepMinimal(List<AtomSet> atomsets, List<AtomSet> toAdd) {
 		for(AtomSet tocheck : toAdd) {
 			addAndKeepMinimal(atomsets, tocheck);
