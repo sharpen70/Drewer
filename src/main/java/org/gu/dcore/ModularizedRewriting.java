@@ -14,8 +14,6 @@ import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.grd.IndexedBlockRuleSet;
-import org.gu.dcore.homomorphism.HomoUtils;
-import org.gu.dcore.homomorphism.Homomorphism;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
@@ -31,7 +29,9 @@ import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
-import org.gu.dcore.utils.Pair;
+import org.gu.dcore.tuple.Pair;
+import org.gu.dcore.tuple.Tuple;
+import org.gu.dcore.tuple.Tuple5;
 import org.gu.dcore.utils.Utils;
 
 public class ModularizedRewriting {
@@ -302,47 +302,4 @@ public class ModularizedRewriting {
 		
 		return blockAtom;
 	}
-	
-	private final class Tuple<T1, T2, T3> {
-		public T1 a;
-		public T2 b;
-		public T3 c;
-		
-		Tuple(T1 a, T2 b, T3 c) {
-			this.a = a;
-			this.b = b;
-			this.c = c;
-		}
-	}
-	
-//	private final class Tuple4<T1, T2, T3, T4> {
-//		public T1 a;
-//		public T2 b;
-//		public T3 c;
-//		public T4 d;
-//		
-//		Tuple4(T1 a, T2 b, T3 c, T4 d) {
-//			this.a = a;
-//			this.b = b;
-//			this.c = c;
-//			this.d = d;
-//		}
-//	}
-	
-	private final class Tuple5<T1, T2, T3, T4, T5> {
-		public T1 a;
-		public T2 b;
-		public T3 c;
-		public T4 d;
-		public T5 e;
-		
-		Tuple5(T1 a, T2 b, T3 c, T4 d, T5 e) {
-			this.a = a;
-			this.b = b;
-			this.c = c;
-			this.d = d;
-			this.e = e;
-		}
-	}
-	
 }

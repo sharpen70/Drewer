@@ -16,11 +16,13 @@ import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.model.Term;
 import org.gu.dcore.reasoning.Substitution;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.DataStore;
-import org.gu.dcore.utils.Pair;
+import org.gu.dcore.tuple.Pair;
+import org.gu.dcore.tuple.Tuple;
 import org.gu.dcore.utils.Utils;
 
 public class QueryAbduction {
@@ -114,16 +116,33 @@ public class QueryAbduction {
 	
 	private List<Rule> rule_reduce(Rule r, IndexedByHeadPredRuleSet dependencies) {
 		AtomSet body = r.getBody();
+		int size = body.size();
 		ArrayList<List<Long[]>> matched_tuples = new ArrayList<>(); 
 		
-		LinkedList<Pair<Integer, List<Long[]>>> queue = new LinkedList<>();
-		Pair<Integer, List<Long[]>> init = new Pair<>(0, new LinkedList<>());
+		List<Rule> reduce_result = new LinkedList<>();
+		
+		List<Pair<AtomSet, List<Long[]>>> liftedAtomSet = new LinkedList<>();
+		LinkedList<Tuple<Integer, boolean[], List<Long[]>>> queue = new LinkedList<>();
+		Tuple<Integer, boolean[], List<Long[]>> init = new Tuple<>(0, new boolean[size], new LinkedList<>());
 		queue.add(init);
 		
 		while(queue.isEmpty()) {
-			Pair<Integer, List<Long[]>> p = queue.pop();
+			Tuple<Integer, boolean[], List<Long[]>> p = queue.pop();
 			int level = p.a;
-			List<Long[]> tuples = p.b;
+			boolean[] selected_atoms = p.b;
+			List<Long[]> tuples = p.c;
+			
+			if(level >= body.size()) {
+				for(int i = 0; i < size; i++) {
+					if(selected_atoms[i]) {
+						Atom a = body.getAtom(i);
+						Predicate pred = a.getPredicate();
+						ArrayList<Term> terms = a.getTerms();
+						ArrayList<Term> new_terms = new ArrayList<>();
+					}
+				}
+				continue;
+			}
 			
 			Utils.join_mod(tuples, matched_tuples.get(level));
 			

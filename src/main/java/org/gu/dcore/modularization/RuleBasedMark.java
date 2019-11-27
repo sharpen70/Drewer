@@ -13,7 +13,7 @@ import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
-import org.gu.dcore.utils.Pair;
+import org.gu.dcore.tuple.Pair;
 
 public class RuleBasedMark {
 	public Rule rule;

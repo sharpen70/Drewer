@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import org.gu.dcore.utils.Pair;
+import org.gu.dcore.tuple.Pair;
 
 public class TGraph {
 	private ArrayList<List<Integer>> graph;

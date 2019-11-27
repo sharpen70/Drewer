@@ -1,4 +1,4 @@
-package org.gu.dcore.utils;
+package org.gu.dcore.tuple;
 
 public final class Pair<T1, T2> {
 	public T1 a;
