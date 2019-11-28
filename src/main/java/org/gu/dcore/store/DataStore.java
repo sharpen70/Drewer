@@ -7,5 +7,5 @@ import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Term;
 
 public interface DataStore {
-	Map<Term, List<Long>> getAtomMappings(Atom a);
+	List<Long[]> getMatchedTuples(Atom a, int[] index_mapping);
 }

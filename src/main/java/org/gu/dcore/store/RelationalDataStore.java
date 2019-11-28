@@ -27,8 +27,8 @@ public class RelationalDataStore implements DataStore {
 		return this.relational_data.get(predicate);
 	}
 	
-	public Map<Term, List<Long>> getAtomMappings(Atom a) {
+	public List<Long[]> getMatchedTuples(Atom a, int[] index_mapping) {
 		Relation relation = this.relational_data.get(a.getPredicate());
-		return relation.getMatchTerms(a.getTerms());
+		return relation.getMatchTuples(a.getTerms());
 	}
 }
