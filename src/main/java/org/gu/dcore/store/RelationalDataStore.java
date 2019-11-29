@@ -31,4 +31,6 @@ public class RelationalDataStore implements DataStore {
 		Relation relation = this.relational_data.get(a.getPredicate());
 		return relation.getMatchTuples(a.getTerms());
 	}
+	
+	
 }

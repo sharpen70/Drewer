@@ -1,6 +1,7 @@
 package org.gu.dcore.utils;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,7 +9,6 @@ import java.util.regex.Pattern;
 import org.gu.dcore.homomorphism.HomoUtils;
 import org.gu.dcore.homomorphism.Homomorphism;
 import org.gu.dcore.model.AtomSet;
-import org.gu.dcore.reasoning.Substitution;
 import org.gu.dcore.reasoning.Unifier;
 
 public class Utils {
@@ -70,8 +70,9 @@ public class Utils {
 		}
 	}
 	
-	public static void join_mod(List<Long[]> a, List<Long[]> b) {
-		
+	public List<Long[]> full_join(List<Long[]> a, List<Long[]> b, int[] a_key, int[] b_key) {
+		List<Long[]> result = new LinkedList<>();
+		return result;
 	}
 	
 	public static void addAndKeepMinimal(List<AtomSet> atomsets, List<AtomSet> toAdd) {
