@@ -125,7 +125,18 @@ public class Rule {
 		s += head.toString();
 		s += " :- ";
 		s += body.toString();
-		s += ".";
+		s += " .";
+		
+		return s;
+	}
+	
+	public String toVLog() {
+		String s = "";
+		s += head.toRDFox();
+		s += " :- ";
+		s += body.toRDFox();
+
+		s += " .";
 		
 		return s;
 	}

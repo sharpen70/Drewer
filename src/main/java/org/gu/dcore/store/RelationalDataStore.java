@@ -26,11 +26,10 @@ public class RelationalDataStore implements DataStore {
 	public Relation getRelation(Predicate predicate) {
 		return this.relational_data.get(predicate);
 	}
-	
+	@Override
 	public List<Long[]> getMatchedTuples(Atom a, int[] index_mapping) {
-		Relation relation = this.relational_data.get(a.getPredicate());
-		return relation.getMatchTuples(a.getTerms());
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
 	
 }

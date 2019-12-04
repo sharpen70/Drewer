@@ -134,10 +134,7 @@ public class QueryAbduction {
 			var_index.put(v, index++);
 		}
 		
-		ArrayList<List<Long[]>> matched_tuples = new ArrayList<>(); 
-		for(int i = 0; i < size; i++) {
-			matched_tuples.add(this.store);
-		}
+
 		
 		List<Rule> reduce_result = new LinkedList<>();
 		
@@ -212,7 +209,6 @@ public class QueryAbduction {
 				continue;
 			}
 			
-			Utils.join_mod(tuples, matched_tuples.get(level));
 			
 		}
 		
