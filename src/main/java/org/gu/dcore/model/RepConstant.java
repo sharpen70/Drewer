@@ -22,5 +22,9 @@ public class RepConstant implements Term {
 	public String toRDFox() {
 		return null;
 	}
-
+	
+	@Override
+	public String toVlog() {
+		return null;
+	}
 }

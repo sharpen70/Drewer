@@ -27,6 +27,7 @@ import org.gu.dcore.model.Variable;
 import org.gu.dcore.reasoning.Substitution;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
+import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DataStore;
 import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.tuple.Tuple;
@@ -134,25 +135,23 @@ public class QueryAbduction {
 			var_index.put(v, index++);
 		}
 		
-
-		
 		List<Rule> reduce_result = new LinkedList<>();
 		
-		LinkedList<Tuple<Integer, boolean[], List<Long[]>>> queue = new LinkedList<>();
-		Tuple<Integer, boolean[], List<Long[]>> init = new Tuple<>(0, new boolean[size], new LinkedList<>());
+		LinkedList<Tuple<Integer, boolean[], Column>> queue = new LinkedList<>();
+		Tuple<Integer, boolean[], Column> init = new Tuple<>(0, new boolean[size], new Column(vars.size()));
 		queue.add(init);
 		
 		while(queue.isEmpty()) {
-			Tuple<Integer, boolean[], List<Long[]>> p = queue.pop();
+			Tuple<Integer, boolean[], Column> p = queue.pop();
 			int level = p.a;
 			boolean[] selected_atoms = p.b;
-			List<Long[]> tuples = p.c;
+			List<String[]> tuples = p.c.getTuples();
 						
 			if(level >= body.size()) {
 				Map<Term, RepConstant> repConstant_map = new HashMap<>();
 				ArrayList<Integer> column_index = new ArrayList<>();
 				
-				Long[] first_tuple = tuples.iterator().next();
+				String[] first_tuple = tuples.iterator().next();
 				int map_index = 0;
 				
 				AtomSet atomset_lifted = new AtomSet();
@@ -184,8 +183,8 @@ public class QueryAbduction {
 						atomset_lifted.add(liftedAtom);
 					}
 				}
-				List<Long[]> mappings = new ArrayList<>();
-				for(Long[] arr : tuples) {
+				List<String[]> mappings = new ArrayList<>();
+				for(String[] arr : tuples) {
 					int arr_size = column_index.size();
 					Long[] n_arr = new Long[arr_size];
 					for(int i = 0; i < arr_size; i++) n_arr[i] = arr[column_index.get(i)];

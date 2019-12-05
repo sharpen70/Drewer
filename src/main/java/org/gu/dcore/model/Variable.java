@@ -22,6 +22,11 @@ public class Variable implements Term {
 	}
 	
 	@Override
+	public String toVlog() {
+		return "?V" + this.value;
+	}
+	
+	@Override
 	public int hashCode() {
 		return this.value;
 	}

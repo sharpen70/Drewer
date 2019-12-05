@@ -35,6 +35,11 @@ public class Constant implements Term {
 	}
 	
 	@Override
+	public String toVlog() {
+		return this.name;
+	}
+	
+	@Override
 	public boolean isConstant() {
 		return true;
 	}
