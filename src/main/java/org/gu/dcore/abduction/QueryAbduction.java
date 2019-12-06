@@ -12,13 +12,13 @@ import java.util.Set;
 import org.gu.dcore.ModularizedRewriting;
 import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.PredicateFactory;
-import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.grd.GraphOfPredicateDependencies;
 import org.gu.dcore.grd.IndexedByHeadPredRuleSet;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
+import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Rule;
@@ -148,63 +148,23 @@ public class QueryAbduction {
 			List<String[]> tuples = p.c.getTuples();
 						
 			if(level >= body.size()) {
-				Map<Term, RepConstant> repConstant_map = new HashMap<>();
-				ArrayList<Integer> column_index = new ArrayList<>();
-				
-				String[] first_tuple = tuples.iterator().next();
-				int map_index = 0;
-				
-				AtomSet atomset_lifted = new AtomSet();
-				for(int i = 0; i < size; i++) {
-					if(!selected_atoms[i]) {
-						Atom a = body.getAtom(i);
-						Predicate pred = a.getPredicate();
-						ArrayList<Term> terms = a.getTerms();
-						ArrayList<Term> new_terms = new ArrayList<>(); 
-						
-						for(int ti = 0; ti < terms.size(); ti++) {
-							Term t = terms.get(ti);
-							if(t.isVariable()) {
-								RepConstant c = repConstant_map.get(t);
-								if(c == null) {
-									int v_idx = var_index.get(t);
-									if(first_tuple[v_idx] != null) {
-										RepConstant rc = TermFactory.instance().getRepConstant(map_index++);
-										repConstant_map.put(t, rc);
-										column_index.add(v_idx);
-										new_terms.add(rc);
-									}
-									else new_terms.add(t);
-								}
-							}
-							else new_terms.add(t);
-						}
-						Atom liftedAtom = AtomFactory.instance().createAtom(pred, new_terms);
-						atomset_lifted.add(liftedAtom);
-					}
-				}
-				List<String[]> mappings = new ArrayList<>();
-				for(String[] arr : tuples) {
-					int arr_size = column_index.size();
-					Long[] n_arr = new Long[arr_size];
-					for(int i = 0; i < arr_size; i++) n_arr[i] = arr[column_index.get(i)];
-				}
-				AtomSet liftedhead = new AtomSet();
-				for(Atom a : head) {
-					ArrayList<Term> headterms = new ArrayList<Term>();
-					for(int i = 0; i < a.getTerms().size(); i++) {
-						Term t = a.getTerm(i);
-						if(t.isVariable()) {
-							RepConstant rc = repConstant_map.get(t);
-							if(rc != null) headterms.add(rc);
-							else headterms.add(t);
-						}
-						else headterms.add(t);
-					}
-					liftedhead.add(AtomFactory.instance().createAtom(a.getPredicate(), headterms));
-				}
-				Rule liftedrule = RuleFactory.instance().createRule(liftedhead, atomset_lifted);
-				
+//				
+//				AtomSet liftedhead = new AtomSet();
+//				for(Atom a : head) {
+//					ArrayList<Term> headterms = new ArrayList<Term>();
+//					for(int i = 0; i < a.getTerms().size(); i++) {
+//						Term t = a.getTerm(i);
+//						if(t.isVariable()) {
+//							RepConstant rc = repConstant_map.get(t);
+//							if(rc != null) headterms.add(rc);
+//							else headterms.add(t);
+//						}
+//						else headterms.add(t);
+//					}
+//					liftedhead.add(AtomFactory.instance().createAtom(a.getPredicate(), headterms));
+//				}
+//				Rule liftedrule = RuleFactory.instance().createRule(liftedhead, atomset_lifted);
+//				
 				continue;
 			}
 			
@@ -212,6 +172,48 @@ public class QueryAbduction {
 		}
 		
 		return null;
+	}
+	
+	private LiftedAtomSet liftAtomSet(AtomSet A, Map<Variable, Integer> var_index, boolean[] selected_atoms, Column column) {
+		Map<Term, RepConstant> repConstant_map = new HashMap<>();
+		ArrayList<Integer> column_index = new ArrayList<>();
+		
+		boolean[] position_blank = column.getPosition_blank();
+		
+		int map_index = 0;
+		
+		AtomSet atomset_lifted = new AtomSet();
+		for(int i = 0; i < A.size(); i++) {
+			if(!selected_atoms[i]) {
+				Atom a = A.getAtom(i);
+				Predicate pred = a.getPredicate();
+				ArrayList<Term> terms = a.getTerms();
+				ArrayList<Term> new_terms = new ArrayList<>(); 
+				
+				for(int ti = 0; ti < terms.size(); ti++) {
+					Term t = terms.get(ti);
+					if(t.isVariable()) {
+						RepConstant c = repConstant_map.get(t);
+						if(c == null) {
+							int v_idx = var_index.get(t);
+							if(position_blank[v_idx]) {
+								RepConstant rc = TermFactory.instance().getRepConstant(map_index++);
+								repConstant_map.put(t, rc);
+								column_index.add(v_idx);
+								new_terms.add(rc);
+							}
+							else new_terms.add(t);
+						}
+					}
+					else new_terms.add(t);
+				}
+				Atom liftedAtom = AtomFactory.instance().createAtom(pred, new_terms);
+				atomset_lifted.add(liftedAtom);
+			}
+		}
+		column.remap(column_index);
+		
+		return new LiftedAtomSet(atomset_lifted, column);
 	}
 	
 	private List<Pair<Atom, List<Substitution>>> atomset_reduce(AtomSet e) {

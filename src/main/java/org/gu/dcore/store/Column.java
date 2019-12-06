@@ -1,5 +1,6 @@
 package org.gu.dcore.store;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,17 +15,27 @@ import org.semanticweb.vlog4j.core.model.api.Term;
 
 public class Column {
 	List<String[]> tuples;
+	int[] columnMap;
+	boolean[] position_blank;
 	int arity = 0;
 	
-	public Column(int arity) {
+	public Column(int arity, int[] columnMap) {
 		this.arity = arity;
+		this.columnMap = columnMap;
+		this.position_blank = new boolean[arity];
+		
+		for(int i = 0; i < columnMap.length; i++) this.position_blank[i] = true;
+	}
+	
+	public boolean[] getPosition_blank() {
+		return this.position_blank;
 	}
 	
 	public void add(String[] t) {
 		if(t.length == this.arity) this.tuples.add(t);
 	}
 	
-	public void add(QueryResult answer, int[] columnMap) {
+	public void add(QueryResult answer) {
 		String[] tuple = new String[this.arity];
 		int i = 0;
 		for(Term t : answer.getTerms()) {
@@ -33,8 +44,15 @@ public class Column {
 		this.tuples.add(tuple);
 	}
 	
-	public void remap() {
-		
+	public void remap(ArrayList<Integer> map) {
+		List<String[]> nts = new LinkedList<>();
+		for(String[] t : this.tuples) {
+			String[] nt = new String[map.size()];
+			for(int i = 0; i < map.size(); i++) 
+				nt[i] = t[map.get(i)];
+			nts.add(nt);
+		}
+		this.tuples = nts;
 	}
 	
 	public List<String[]> getTuples() {
@@ -45,7 +63,7 @@ public class Column {
 	 *   a = a/(a\cap b), b = b/(a\cap b) 
 	 */ 
 	public Column full_join(Column b, int[] join_key) {
-		Column result = new Column(this.arity);
+		Column result = new Column(this.arity, this.columnMap);
 		Map<Join_key, List<String[]>> index = new HashMap<>();
 		Set<Join_key> hit_key = new HashSet<>();
 		
@@ -101,16 +119,16 @@ public class Column {
 		return result;
 	}
 	
-	public Column inner_join(Column b, int[] jki, int[] bjki) {
-		Column result = new Column(this.arity + b.arity - jki.length);
-		Map<Join_key, List<String[]>> index = new HashMap<>();
-		
-		Column left, right;
-		if(this.tuples.size() < b.tuples.size()) { left = this; right = b; }
-		else { left = b; right = this;}
-		
-		return result;
-	}
+//	public Column inner_join(Column b, int[] jki, int[] bjki) {
+//		Column result = new Column(this.arity + b.arity - jki.length);
+//		Map<Join_key, List<String[]>> index = new HashMap<>();
+//		
+//		Column left, right;
+//		if(this.tuples.size() < b.tuples.size()) { left = this; right = b; }
+//		else { left = b; right = this;}
+//		
+//		return result;
+//	}
 	
 	private class Join_key {
 		String[] keys;

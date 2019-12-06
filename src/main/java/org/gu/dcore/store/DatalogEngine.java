@@ -39,7 +39,7 @@ public class DatalogEngine {
 	public Column answerAtomicQuery(Atom atom, int[] mapping, int arity) throws IOException, ParsingException {
 		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVlog());
 		
-		Column result = new Column(arity);
+		Column result = new Column(arity, mapping);
 		
 		if(reasoner == null) reasoner = new VLogReasoner(kb);
 		
@@ -47,7 +47,7 @@ public class DatalogEngine {
 		
 		final QueryResultIterator answers = reasoner.answerQuery(query, false);
 		
-		answers.forEachRemaining(answer -> result.add(answer, mapping));
+		answers.forEachRemaining(answer -> result.add(answer));
 		
 		return result;
 	}
