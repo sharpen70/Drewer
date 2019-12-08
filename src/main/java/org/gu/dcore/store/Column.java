@@ -19,11 +19,15 @@ public class Column {
 	boolean[] position_blank;
 	int arity = 0;
 	
-	public Column(int arity, int[] columnMap) {
+	public Column(int arity) {
 		this.arity = arity;
-		this.columnMap = columnMap;
 		this.position_blank = new boolean[arity];
+	}
+	
+	public Column(int arity, int[] columnMap) {
+		this(arity);
 		
+		this.columnMap = columnMap;		
 		for(int i = 0; i < columnMap.length; i++) this.position_blank[i] = true;
 	}
 	
@@ -59,10 +63,22 @@ public class Column {
 		return this.tuples;
 	}
 	
-	/*   Tuples in a, b are changed after join, 
+	/* Column b is assumed to having the same arity as this
+	 * Tuples in a, b are changed after join, 
 	 *   a = a/(a\cap b), b = b/(a\cap b) 
 	 */ 
-	public Column full_join(Column b, int[] join_key) {
+	public Column full_join(Column b) {
+		if(this.arity != b.arity) return null;
+		
+		ArrayList<Integer> join_key = new ArrayList<>();
+		
+		for(int i = 0; i < this.arity; i++) {
+			if(this.position_blank[i] && b.position_blank[i])
+				join_key.add(i);
+		}
+		
+		if(join_key.size() == 0) return b;
+		
 		Column result = new Column(this.arity, this.columnMap);
 		Map<Join_key, List<String[]>> index = new HashMap<>();
 		Set<Join_key> hit_key = new HashSet<>();
@@ -73,8 +89,8 @@ public class Column {
 		
 		/* build hash index */
 		for(String[] tuple : left.tuples) {
-			String[] keys = new String[join_key.length];
-			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key[i]];
+			String[] keys = new String[join_key.size()];
+			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key.get(i)];
 			Join_key jk = new Join_key(keys);
 			List<String[]> rows = index.get(jk);
 			if(rows == null) {
@@ -88,8 +104,8 @@ public class Column {
 		Iterator<String[]> it = right.tuples.iterator();
 		while(it.hasNext()) {
 			String[] b_tuple = it.next();
-			String[] keys = new String[join_key.length];
-			for(int i = 0; i < keys.length; i++) keys[i] = b_tuple[join_key[i]];
+			String[] keys = new String[join_key.size()];
+			for(int i = 0; i < keys.length; i++) keys[i] = b_tuple[join_key.get(i)];
 			Join_key jk = new Join_key(keys);
 			
 			List<String[]> rows = index.get(jk);
@@ -108,10 +124,11 @@ public class Column {
 		}
 		
 		it = left.tuples.iterator();
+		
 		while(it.hasNext()) {
 			String[] tuple = it.next();
-			String[] keys = new String[join_key.length];
-			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key[i]];
+			String[] keys = new String[join_key.size()];
+			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key.get(i)];
 			Join_key jk = new Join_key(keys);
 			if(hit_key.contains(jk)) it.remove();
 		}

@@ -1,5 +1,6 @@
 package org.gu.dcore.abduction;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,17 +30,19 @@ import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DataStore;
+import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.tuple.Tuple;
 import org.gu.dcore.utils.Utils;
+import org.semanticweb.vlog4j.parser.ParsingException;
 
 public class QueryAbduction {
 	private ConjunctiveQuery query;
 	private List<Rule> ontology;
-	private DataStore store;
+	private DatalogEngine store;
 	private Set<Predicate> abducibles;
 	 
-	public QueryAbduction(List<Rule> onto, ConjunctiveQuery q, DataStore D, Set<Predicate> abdu) {
+	public QueryAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
 		this.abducibles = abdu;
 		this.store = D;
 		this.ontology = onto;
@@ -122,7 +125,7 @@ public class QueryAbduction {
 		return result; 
 	}
 	
-	private List<Rule> rule_reduce(Rule r, IndexedByHeadPredRuleSet dependencies) {
+	private List<Rule> rule_reduce(Rule r, IndexedByHeadPredRuleSet dependencies) throws IOException, ParsingException {
 		AtomSet body = r.getBody();
 		AtomSet head = r.getHead();
 		int size = body.size();
@@ -135,6 +138,19 @@ public class QueryAbduction {
 			var_index.put(v, index++);
 		}
 		
+		Column[] columns = new Column[size];
+		
+		for(int i = 0; i < size; i++) {
+			Atom a = body.getAtom(i);
+			Set<Variable> vs = a.getVariables();
+			int[] mapping = new int[vs.size()];
+			int m = 0;
+			for(Variable v : vs) {
+				mapping[m++] = var_index.get(v);
+			}
+			columns[i] = this.store.answerAtomicQuery(a, mapping, vars.size());
+		}		
+
 		List<Rule> reduce_result = new LinkedList<>();
 		
 		LinkedList<Tuple<Integer, boolean[], Column>> queue = new LinkedList<>();
@@ -145,9 +161,10 @@ public class QueryAbduction {
 			Tuple<Integer, boolean[], Column> p = queue.pop();
 			int level = p.a;
 			boolean[] selected_atoms = p.b;
-			List<String[]> tuples = p.c.getTuples();
-						
+			Column current_column = p.c;
+			
 			if(level >= body.size()) {
+				LiftedAtomSet la = liftAtomSet(body, var_index, selected_atoms, current_column);
 //				
 //				AtomSet liftedhead = new AtomSet();
 //				for(Atom a : head) {
@@ -168,7 +185,16 @@ public class QueryAbduction {
 				continue;
 			}
 			
+			boolean[] current_t = selected_atoms.clone();
+			current_t[level] = true;
+			boolean[] current_f = selected_atoms.clone();
+			current_f[level] = false;
 			
+			Column join_column = current_column.full_join(columns[level]);
+			
+			level++;			
+			queue.add(new Tuple<>(level, current_t, join_column));
+			queue.add(new Tuple<>(level, current_f, current_column));
 		}
 		
 		return null;
