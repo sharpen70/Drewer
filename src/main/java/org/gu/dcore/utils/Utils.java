@@ -1,14 +1,19 @@
 package org.gu.dcore.utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.homomorphism.HomoUtils;
 import org.gu.dcore.homomorphism.Homomorphism;
+import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.Term;
 import org.gu.dcore.reasoning.Unifier;
 
 public class Utils {
@@ -96,4 +101,24 @@ public class Utils {
 		}
 		if(!subsumed) atomsets.add(toAdd);
 	}
+	
+	public static Atom substitute(Atom a, Map<Term, Term> submap) {
+		ArrayList<Term> terms = new ArrayList<>();
+		
+		for(int i = 0; i < a.getTerms().size(); i++) {
+			Term t = a.getTerm(i);
+			Term mt = submap.get(t);
+			
+			if(mt != null) terms.add(mt);
+			else terms.add(t);
+		}
+		
+		return AtomFactory.instance().createAtom(a.getPredicate(), terms);
+	}
+	
+	public static AtomSet substitute(AtomSet as, Map<Term, Term> submap) {
+		AtomSet result = new AtomSet();
+		for(Atom a : as) result.add(substitute(a, submap));
+		return result;
+	}	
 }

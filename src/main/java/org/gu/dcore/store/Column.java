@@ -21,6 +21,7 @@ public class Column {
 	
 	public Column(int arity) {
 		this.arity = arity;
+		this.tuples = new LinkedList<>();
 		this.position_blank = new boolean[arity];
 	}
 	
@@ -29,6 +30,10 @@ public class Column {
 		
 		this.columnMap = columnMap;		
 		for(int i = 0; i < columnMap.length; i++) this.position_blank[i] = true;
+	}
+	
+	public int size() {
+		return this.tuples.size();
 	}
 	
 	public boolean[] getPosition_blank() {
