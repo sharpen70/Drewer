@@ -8,6 +8,7 @@ import java.util.Set;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
@@ -118,20 +119,25 @@ public class Unifier {
 			boolean constant = false;
 			boolean existential = false;
 			boolean frontier = false;
+			boolean repconstant = false;
 			
 			Set<Atom> separatingAtoms = new HashSet<>();
 			
 			for(Term t : c) {
 				if(t instanceof Constant) {
-					if(constant == true) { this.valid = false; return; }
+					if(constant || existential) { this.valid = false; return; }
 					constant = true;
+				}
+				else if(t instanceof RepConstant) {
+					if(existential) { this.valid = false; return; }
+					repconstant = true;
 				}
 				else if(t instanceof Variable){
 					int value = ((Variable)t).getValue();
 					
 					if(value >= this.partition.getVOffset()) {
 						if(hr.isExistentialVar(value - this.partition.getVOffset())) 
-							if(existential || frontier) { this.valid = false; return; }
+							if(existential || frontier || constant || repconstant) { this.valid = false; return; }
 							else existential = true;
 						else
 							if(existential) { this.valid = false; return; }

@@ -63,6 +63,11 @@ public class Partition {
 			h = TermFactory.instance().getVariable(v);
 		}
 		
+		if(h instanceof RepConstant) {
+			int v = ((RepConstant) h).getValue() + this.rc_offset;
+			h = TermFactory.instance().getRepConstant(v);
+		}
+		
 		for(Set<Term> category : this.categories) {
 			boolean this_round = false;			
 	

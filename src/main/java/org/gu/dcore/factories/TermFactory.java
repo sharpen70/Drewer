@@ -12,13 +12,11 @@ public class TermFactory {
 	private static TermFactory factory = null;
 	
 	private Map<String, Constant> cMap = null;
-	private ArrayList<RepConstant> rc;
-	private ArrayList<Variable> vs;
+
 	private long id = 0;
 	
 	private TermFactory() {
 		this.cMap = new HashMap<>();
-		this.rc = new ArrayList<>();
 	}
 	
 	public static TermFactory instance() {
@@ -43,20 +41,10 @@ public class TermFactory {
 	}
 	
 	public RepConstant getRepConstant(int i) {
-		if(i >= rc.size()) {
-			for(int t = rc.size(); t <= i; t++) {
-				rc.add(new RepConstant(t));
-			}
-		}
-		return rc.get(i);
+		return new RepConstant(i);
 	}
 	
 	public Variable getVariable(int i) {
-		if(i >= vs.size()) {
-			for(int t = vs.size(); t <= i; t++) {
-				vs.add(new Variable(i));
-			}
-		}
-		return vs.get(i);
+		return new Variable(i);
 	}
 }
