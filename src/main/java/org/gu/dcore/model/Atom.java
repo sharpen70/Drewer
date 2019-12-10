@@ -13,6 +13,7 @@ public class Atom {
 	private Predicate p;
 	private ArrayList<Term> terms;
 	private Set<Variable> vars;
+	private Set<RepConstant> rcs;
 	
 	public Atom(Predicate p, ArrayList<Term> terms) {
 		this.p = p;
@@ -55,20 +56,27 @@ public class Atom {
 	}
 	
 	public Set<Variable> getVariables() {
-		if(this.vars == null) vars();
+		if(this.vars == null) terms();
 		return this.vars;
 	}
 	
+	public Set<RepConstant> getRepConstants() {
+		if(this.rcs == null) terms();
+		return this.rcs;
+	}
+	
 	public boolean contains(Variable v) {
-		if(this.vars == null) vars();
+		if(this.vars == null) terms();
 		return this.vars.contains(v);
 	}
 	
-	private void vars() {
+	private void terms() {
 		this.vars = new HashSet<>();
+		this.rcs = new HashSet<>();
 		
 		for(Term t : this.terms) {
 			if(t instanceof Variable) vars.add((Variable) t);
+			if(t instanceof Variable) rcs.add((RepConstant) t);
 		}
 	}
 	

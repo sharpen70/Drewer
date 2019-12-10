@@ -45,8 +45,10 @@ public class Unifier {
 	}
 	
 	public Term getImageOf(Term t, boolean withOffset) {
-		int offset = withOffset ? this.partition.getOffset() : 0;
-		return this.partition.getSubstitution().getImageOf(t, offset);
+		int v_offset = withOffset ? this.partition.getVOffset() : 0;
+		int rc_offset = withOffset ? this.partition.getRCOffset() : 0;
+		
+		return this.partition.getSubstitution().getImageOf(t, v_offset, rc_offset);
 	}
 	
 	public Atom getImageOf(Atom a, boolean withOffset) {
@@ -56,14 +58,16 @@ public class Unifier {
 	public AtomSet getImageOfPiece() {
 		AtomSet up = new AtomSet();
 		for(Atom a : this.B) {
-			up.add(this.partition.getSubstitution().getImageOf(a, 0));
+			up.add(this.partition.getSubstitution().getImageOf(a, 0, 0));
 		}
 		return up;
 	}
 	
 	public AtomSet getImageOf(AtomSet atomset, boolean withOffset) {
-		int offset = withOffset ? this.partition.getOffset() : 0;
-		return this.partition.getSubstitution().getImageOf(atomset, offset);
+		int v_offset = withOffset ? this.partition.getVOffset() : 0;
+		int rc_offset = withOffset ? this.partition.getRCOffset() : 0;
+		
+		return this.partition.getSubstitution().getImageOf(atomset, v_offset, rc_offset);
 	}
 	
 //	public Set<Term> getImageOf(Set<Variable> vars) {
@@ -110,23 +114,23 @@ public class Unifier {
 			if(!this.B.contains(a)) minus.add(a);
 		}
 		
-		for(Set<Object> c : this.partition.categories) {
+		for(Set<Term> c : this.partition.categories) {
 			boolean constant = false;
 			boolean existential = false;
 			boolean frontier = false;
 			
 			Set<Atom> separatingAtoms = new HashSet<>();
 			
-			for(Object o : c) {
-				if(o instanceof Constant) {
+			for(Term t : c) {
+				if(t instanceof Constant) {
 					if(constant == true) { this.valid = false; return; }
 					constant = true;
 				}
-				else {
-					int value = (int)o;
+				else if(t instanceof Variable){
+					int value = ((Variable)t).getValue();
 					
-					if(value >= this.partition.getOffset()) {
-						if(hr.isExistentialVar(value - this.partition.getOffset())) 
+					if(value >= this.partition.getVOffset()) {
+						if(hr.isExistentialVar(value - this.partition.getVOffset())) 
 							if(existential || frontier) { this.valid = false; return; }
 							else existential = true;
 						else

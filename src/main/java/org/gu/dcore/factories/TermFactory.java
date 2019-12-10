@@ -13,9 +13,8 @@ public class TermFactory {
 	
 	private Map<String, Constant> cMap = null;
 	private ArrayList<RepConstant> rc;
+	private ArrayList<Variable> vs;
 	private long id = 0;
-	
-	private int var_index = 0;
 	
 	private TermFactory() {
 		this.cMap = new HashMap<>();
@@ -52,7 +51,12 @@ public class TermFactory {
 		return rc.get(i);
 	}
 	
-	public Variable createVariable() {
-		return new Variable(var_index++);
+	public Variable getVariable(int i) {
+		if(i >= vs.size()) {
+			for(int t = vs.size(); t <= i; t++) {
+				vs.add(new Variable(i));
+			}
+		}
+		return vs.get(i);
 	}
 }

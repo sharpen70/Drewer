@@ -2,10 +2,10 @@ package org.gu.dcore.model;
 
 /* Representative Constant */
 public class RepConstant implements Term {
-	private int name;
+	private int value;
 	
-	public RepConstant(int name) {
-		this.name = name;
+	public RepConstant(int value) {
+		this.value = value;
 	}
 	
 	@Override
@@ -26,5 +26,9 @@ public class RepConstant implements Term {
 	@Override
 	public String toVlog() {
 		return null;
+	}
+	
+	public int getValue() {
+		return this.value;
 	}
 }

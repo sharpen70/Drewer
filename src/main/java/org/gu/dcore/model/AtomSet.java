@@ -9,7 +9,10 @@ import java.util.Set;
 public class AtomSet implements Iterable<Atom> {
 	private ArrayList<Atom> atoms;
 	private Set<Variable> vars;
-	private Integer maxVarValue;
+	private Set<RepConstant> rcs;
+	
+	private int maxVarValue = -1;
+	private int maxRCValue = -1;
 	
 	public AtomSet() {
 		atoms = new ArrayList<>();
@@ -23,6 +26,14 @@ public class AtomSet implements Iterable<Atom> {
 	public AtomSet(ArrayList<Atom> _atoms) {
 		this.atoms = _atoms;
 	}
+	
+	public void setMaxVarValue(int v) {
+		this.maxVarValue = v;
+	}
+	
+	public void setMaxVarRCValue(int v) {
+		this.maxRCValue = v;
+	}	
 	
 	public AtomSet(Collection<Atom> atoms) {
 		this.atoms = new ArrayList<>();
@@ -87,15 +98,36 @@ public class AtomSet implements Iterable<Atom> {
 		return this.vars;
 	}
 	
+	public Set<RepConstant> getRepConstants() {
+		if(this.rcs != null) return this.rcs;
+		
+		this.rcs = new HashSet<>();
+		
+		for(Atom a : this.atoms) {
+			rcs.addAll(a.getRepConstants());
+		}
+		
+		return this.rcs;
+	}
+	
 	public int getMaxVarValue() {
-		if(this.maxVarValue == null) {
-			this.maxVarValue = -1;
+		if(this.maxVarValue == -1) {
 			for(Variable v : this.getVariables()) {
 				if(v.getValue() > this.maxVarValue)
 					this.maxVarValue = v.getValue();
 			}
 		}
 		return this.maxVarValue;
+	}
+	
+	public int getMaxRCValue() {
+		if(this.maxRCValue == -1) {
+			for(RepConstant rc : this.getRepConstants()) {
+				if(rc.getValue() > this.maxRCValue)
+					this.maxRCValue = rc.getValue();
+			}
+		}
+		return this.maxRCValue;
 	}
 	
 	public Set<Term> getTerms() {

@@ -286,13 +286,6 @@ public class ModularizedRewriting {
 		}
 	}
 	
-	public boolean source_related(Set<Rule> s1, Collection<Rule> s2) {
-		for(Rule r : s2) {
-			if(s1.contains(r)) return true;
-		}
-		return false;
-	}
-	
 	private Atom createBlockAtom(Block b) {
 		Set<Term> variables = b.getVariables();
 		ArrayList<Term> atom_t = new ArrayList<>(variables);;

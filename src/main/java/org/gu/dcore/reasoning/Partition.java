@@ -6,50 +6,64 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class Partition {
-	public List<Set<Object>> categories;	
+	public List<Set<Term>> categories;	
 		
 	private NormalSubstitution substitution = null;
-	private int var_offset;
+	private int var_offset = 0;
+	private int rc_offset = 0;
 	
 	public Partition(int var_offset) {
 		this.categories = new LinkedList<>();
 		this.var_offset = var_offset;
 	}
 	
+	public Partition(int var_offset, int rc_offset) {
+		this(var_offset);
+		this.rc_offset = rc_offset;
+	}
+	
 	public Partition getCopy() {
 		Partition p = new Partition(this.var_offset);
 		
-		for(Set<Object> c : this.categories) {
-			Set<Object> nc = new HashSet<>(c);
+		for(Set<Term> c : this.categories) {
+			Set<Term> nc = new HashSet<>(c);
 			p.categories.add(nc);
 		}
 		
 		return p;
 	}
 	
-	public int getOffset() {
+	public int getVOffset() {
 		return this.var_offset;
+	}
+	
+	public int getRCOffset() {
+		return this.rc_offset;
 	}
 	/*
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule
 	 * 		   eV: whether h is an existential variable
 	 */
-	public void add(Object b, Object h) {		
+	public void add(Term b, Term h) {		
 		boolean b_in = false;
 		boolean h_in = false;
 		
-		Set<Object> first = null;
+		Set<Term> first = null;
 		
-		if(b instanceof Variable) b = ((Variable) b).getValue();
-		if(h instanceof Variable) h = ((Variable) h).getValue() + this.var_offset;
+		if(h instanceof Variable) {
+			int v = ((Variable) h).getValue() + this.var_offset;
+			h = TermFactory.instance().getVariable(v);
+		}
 		
-		for(Set<Object> category : this.categories) {
+		for(Set<Term> category : this.categories) {
 			boolean this_round = false;			
 	
 			if(b_in && h_in) break;
@@ -81,7 +95,7 @@ public class Partition {
 		if(b_in && !h_in) first.add(h); 
 		if(!b_in && h_in) first.add(b);
 		if(!b_in && !h_in) {
-			Set<Object> category = new HashSet<>();			
+			Set<Term> category = new HashSet<>();			
 			category.add(b); category.add(h);			
 			this.categories.add(category);
 		}
@@ -90,17 +104,17 @@ public class Partition {
 	public Partition join(Partition p) {
 		Partition re = this.getCopy();
 		
-		Iterator<Set<Object>> it = p.categories.iterator();
+		Iterator<Set<Term>> it = p.categories.iterator();
 		
 		while(it.hasNext()) {
-			Set<Object> pc = it.next();
+			Set<Term> pc = it.next();
 			
-			Set<Object> hit = null;			
+			Set<Term> hit = null;			
 			
-			Iterator<Set<Object>> rit = re.categories.iterator();
+			Iterator<Set<Term>> rit = re.categories.iterator();
 			while(rit.hasNext()) {
-				Set<Object> tc = rit.next();
-				for(Object t : pc) {
+				Set<Term> tc = rit.next();
+				for(Term t : pc) {
 					if(tc.contains(t)) {
 						if(hit == null) {
 							hit = tc;
@@ -116,7 +130,7 @@ public class Partition {
 			}
 			
 			if(hit == null) {
-				Set<Object> c = new HashSet<>();
+				Set<Term> c = new HashSet<>();
 				c.addAll(pc);
 				re.categories.add(c);
 			}
@@ -128,19 +142,23 @@ public class Partition {
 	public NormalSubstitution getSubstitution() {
 		if(this.substitution == null) {
 			this.substitution = new NormalSubstitution();
-			for(Set<Object> category : this.categories) {
+			for(Set<Term> category : this.categories) {
 				Term mapto = null;
 
-				for(Object t : category) {
+				for(Term t : category) {
 					if(t instanceof Constant) {
-						mapto = (Constant)t;
+						mapto = t;
 						break;
+					}
+					else if(t instanceof RepConstant) {
+						if(mapto == null || mapto instanceof Variable) {
+							mapto = t;
+						}
 					}
 					else {
 						if(mapto == null) {
-							Integer value = (Integer)t;
-							if(value < var_offset) {
-								mapto = new Variable(value);
+							if(((Variable)t).getValue() < this.var_offset) {
+								mapto = t;
 							}
 						}
 					}

@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.gu.dcore.factories.AtomFactory;
+import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
@@ -39,37 +41,41 @@ public class NormalSubstitution implements Substitution {
 		return re;
 	}
 	
-	public Term getImageOf(Term t, int offset) {
+	public Term getImageOf(Term t, int v_offset, int rc_offset) {
 		if(t instanceof Constant) return t;
-		int v = ((Variable)t).getValue();
-		Term _t = this.sMap.get(v + offset);
-		if(_t == null) {
-			if(offset != 0) return new Variable(v + offset);
-			else return t;
+		if(t instanceof RepConstant) {
+			t = TermFactory.instance().getRepConstant(((RepConstant)t).getValue() + rc_offset);
 		}
-		else return _t;
+		if(t instanceof Variable) {
+			t = TermFactory.instance().getVariable(((Variable)t).getValue() + v_offset);
+		}
+		Term _t = this.sMap.get(t);
+		if(_t == null) return _t;
+		else return t;
 	}
 	
-	public Atom getImageOf(Atom a, int offset) {
+	public Atom getImageOf(Atom a, int v_offset, int rc_offset) {
 		ArrayList<Term> terms = a.getTerms();
 		ArrayList<Term> substituted_terms = new ArrayList<>();
 		
 		for(int i = 0; i < terms.size(); i++) {
 			Term t = terms.get(i);
-			substituted_terms.add(getImageOf(t, offset));
+			substituted_terms.add(getImageOf(t, v_offset, rc_offset));
 		}
 		
 		return AtomFactory.instance().createAtom(a.getPredicate(), substituted_terms);
 	}
 	
-	public AtomSet getImageOf(AtomSet atomset, int offset) {
+	public AtomSet getImageOf(AtomSet atomset, int v_offset, int rc_offset) {
 		ArrayList<Atom> atoms = new ArrayList<>();
 		
 		for(Atom a : atomset) {
-			atoms.add(this.getImageOf(a, offset));
+			atoms.add(this.getImageOf(a, v_offset, rc_offset));
 		}
 		
-		return new AtomSet(atoms);
+		AtomSet image = new AtomSet(atoms);
+		
+		return image;
 	}
 	
 //	public Rule getImageOf(Rule rule, int offset) {

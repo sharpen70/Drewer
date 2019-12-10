@@ -120,6 +120,8 @@ public class DcoreParser {
 			
 			if(head == null) return null;
 			
+			body.setMaxVarValue(v);
+			
 			return RuleFactory.instance().createRule(head, body);
 		}
 	}
@@ -161,7 +163,7 @@ public class DcoreParser {
 				if(Character.isUpperCase(ts.charAt(0))) {
 					t = vMap.get(ts);
 					if(t == null) {
-						t = new Variable(v++);
+						t = TermFactory.instance().getVariable(v++);
 						vMap.put(ts, t);
 					}
 				}
