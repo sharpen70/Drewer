@@ -152,7 +152,6 @@ public abstract class QueryAbduction {
 		}
 		column.remap(column_index);
 		LiftedAtomSet result = new LiftedAtomSet(atomset_lifted, column, repConstant_map);
-		result.setMaxVarRCValue(map_index);
 		return result;
 	}
 }

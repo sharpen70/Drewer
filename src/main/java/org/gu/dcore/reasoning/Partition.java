@@ -159,6 +159,10 @@ public class Partition {
 						if(mapto == null || mapto instanceof Variable) {
 							mapto = t;
 						}
+						else if(mapto instanceof RepConstant && 
+								((RepConstant)mapto).getValue() >= this.rc_offset) {
+							mapto = t;
+						}
 					}
 					else {
 						if(mapto == null) {
@@ -169,8 +173,10 @@ public class Partition {
 					}
 				}	
 				
-				for(Object o : category) {
-					if(!o.equals(mapto)) this.substitution.add((Integer)o, mapto);
+				for(Term t : category) {
+					if(!t.equals(mapto)) {
+						this.substitution.add(t, mapto);
+					}
 				}
 			}
 		}

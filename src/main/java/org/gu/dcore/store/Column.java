@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.semanticweb.vlog4j.core.model.api.QueryResult;
@@ -66,6 +67,29 @@ public class Column {
 	
 	public List<String[]> getTuples() {
 		return this.tuples;
+	}
+	
+	public void filter(Map<Integer, Object> eqs) {
+		Iterator<String[]> it = this.tuples.iterator();
+		while(it.hasNext()) {
+			String[] tuple = it.next();
+			for(Entry<Integer, Object> entry : eqs.entrySet()) {
+				Object o = entry.getValue();
+				Integer i = entry.getKey();
+				if(o instanceof Integer) {
+					if(tuple[i] != tuple[(int)o]) {
+						it.remove();
+						break;
+					}
+				}
+				if(o instanceof String) {
+					if(tuple[i] != o) {
+						it.remove();
+						break;
+					}
+				}
+			}
+		}
 	}
 	
 	/* Column b is assumed to having the same arity as this

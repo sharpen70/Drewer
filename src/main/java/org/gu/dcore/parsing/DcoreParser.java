@@ -120,8 +120,6 @@ public class DcoreParser {
 			
 			if(head == null) return null;
 			
-			body.setMaxVarValue(v);
-			
 			return RuleFactory.instance().createRule(head, body);
 		}
 	}

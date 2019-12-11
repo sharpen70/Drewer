@@ -15,7 +15,7 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class NormalSubstitution implements Substitution {
-	private Map<Integer, Term> sMap = null;
+	private Map<Term, Term> sMap = null;
 	
 	public NormalSubstitution() {
 		this.sMap = new HashMap<>();
@@ -25,7 +25,7 @@ public class NormalSubstitution implements Substitution {
 		this.sMap = new HashMap<>(sub.sMap);
 	}
 	
-	public boolean add(Integer v, Term t) {
+	public boolean add(Term v, Term t) {
 		Term st = this.sMap.get(v);
 		if(st != null && !st.equals(t)) return false;
 		
@@ -35,7 +35,7 @@ public class NormalSubstitution implements Substitution {
 	
 	public NormalSubstitution add(NormalSubstitution sub) {
 		NormalSubstitution re = new NormalSubstitution(this);
-		for(Entry<Integer, Term> entry : sub.sMap.entrySet()) {
+		for(Entry<Term, Term> entry : sub.sMap.entrySet()) {
 			if(!re.add(entry.getKey(), entry.getValue())) return null;
 		}
 		return re;

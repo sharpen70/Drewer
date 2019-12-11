@@ -38,7 +38,7 @@ public class Unify {
 		for(Atom a : block) {
 			for(Atom b : hr.getHead()) {
 				if(a.getPredicate().equals(b.getPredicate())) {
-					Partition partition = new Partition(rbody.getMaxVarValue());
+					Partition partition = new Partition(rbody.getMaxVarValue() + 1);
 					
 					for(int i = 0; i < a.getPredicate().getArity(); i++) {
 						Term at = a.getTerm(i);

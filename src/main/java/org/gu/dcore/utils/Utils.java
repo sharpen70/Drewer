@@ -1,6 +1,7 @@
 package org.gu.dcore.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,8 +14,12 @@ import org.gu.dcore.homomorphism.HomoUtils;
 import org.gu.dcore.homomorphism.Homomorphism;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
+import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.LiftedAtomSet;
+import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.reasoning.Unifier;
+import org.gu.dcore.store.Column;
 
 public class Utils {
 	public static String getShortIRI(String iri) {
@@ -42,7 +47,11 @@ public class Utils {
 	 * u the unifier for replacing
 	 */
 	public static AtomSet rewrite(AtomSet f, AtomSet b, Unifier u) {
+		adjust_column_with_unifier(f, u, false);
+		adjust_column_with_unifier(b, u, true);
+		
 		AtomSet uf = u.getImageOf(f, false);
+		
 		AtomSet ub = u.getImageOf(b, true);
 		
 		AtomSet up = u.getImageOfPiece();
@@ -50,7 +59,31 @@ public class Utils {
 		uf = HomoUtils.minus(uf, up);
 		uf = HomoUtils.simple_union(uf, ub);
 		
+		
 		return uf;
+	}
+	
+	/*
+	 * rhs denote whether atomset belongs to the rule for unification
+	 */
+	private static void adjust_column_with_unifier(AtomSet atomset, Unifier u, boolean rhs) {
+		if(!(atomset instanceof LiftedAtomSet)) return;
+		LiftedAtomSet liftedAtomset = (LiftedAtomSet)atomset;
+		Column column = liftedAtomset.getColumn();
+		Map<Integer, Object> eqs = new HashMap<>();
+		
+		for(RepConstant rc : atomset.getRepConstants()) {
+			Term t = u.getImageOf(rc, rhs);
+			if(t instanceof Constant) {
+				String name = ((Constant) t).getName();
+				eqs.put(rc.getValue(), name);
+			}
+			if(!rhs && (t instanceof RepConstant)) {
+				int value = ((RepConstant) t).getValue();
+				eqs.put(rc.getValue(), value);
+			}
+		}
+		column.filter(eqs);
 	}
 	
 	public static boolean isMoreGeneral(AtomSet f, AtomSet h) {
