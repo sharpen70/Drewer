@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.gu.dcore.utils.Utils;
+
 public class AtomSet implements Iterable<Atom> {
 	private ArrayList<Atom> atoms;
 	private Set<Variable> vars;
@@ -108,6 +110,29 @@ public class AtomSet implements Iterable<Atom> {
 		}
 		
 		return this.rcs;
+	}
+	
+	/* sort the atoms such that a_j is connected with a_i (i < j) if possible*/
+	public void resort() {
+		Set<Variable> vs = new HashSet<>();
+		vs.addAll(this.atoms.get(0).getVariables());
+		
+		for(int i = 1; i < this.size(); i++) {
+			Atom ai = this.atoms.get(i);
+			Set<Variable> ivs = ai.getVariables();
+			if(Utils.vars_disjoint(vs, ivs)) {
+				for(int j = i + 1; j < this.size(); j++) {
+					Atom aj = this.atoms.get(j);
+					Set<Variable> jvs = aj.getVariables();
+					if(!Utils.vars_disjoint(vs, jvs)) {
+						this.atoms.set(i, aj);
+						this.atoms.set(j, ai);
+						ivs = jvs;
+					}
+				}
+			}
+			vs.addAll(ivs);
+		}
 	}
 	
 	public int getMaxVarValue() {

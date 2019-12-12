@@ -92,6 +92,88 @@ public class Column {
 		}
 	}
 	
+	public Column join(Column b, int[] jka, int[] jkb) {
+		int aty = this.arity + b.arity - jka.length;
+		Column result = new Column(aty);
+		
+		int jk_length = jka.length;
+		
+		if(jk_length == 0) {
+			
+		}
+		
+		List<String[]> left, right;
+		int[] left_key, right_key;
+		
+		boolean this_left = true;
+		if(this.tuples.size() < b.tuples.size()) {
+			left = this.tuples; left_key = jka;
+			right = b.tuples; right_key = jkb;
+		}
+		else {
+			left = b.tuples; left_key = jkb;
+			right = this.tuples; right_key = jka;
+			this_left = false;
+		}
+		
+		/* build index map */
+		Map<String[], List<String[]>> index = new HashMap<>();
+		
+		for(String[] t : left) {
+			String[] jk = new String[jk_length];
+			for(int i = 0; i < jk_length; i++) {
+				jk[i] = t[left_key[i]];
+			}
+			List<String[]> ts = index.get(jk);
+			if(ts == null) {
+				ts = new LinkedList<>();
+				index.put(jk, ts);
+			}
+			ts.add(t);
+		}
+		
+		/* Probe */
+		for(String[] t : right) {
+			String[] jk = new String[jk_length];
+			for(int i = 0; i < jk_length; i++) {
+				jk[i] = t[right_key[i]];
+			}
+			List<String[]> mts = index.get(jk);
+			if(mts != null) {
+				for(String[] mt : mts) {
+					String[] nt = new String[aty];
+					String[] merge, tomerge;
+					int[] tomerge_jk;
+					
+					if(this_left) {
+						merge = mt;
+						tomerge = t;
+						tomerge_jk = right_key;
+					}
+					else {
+						merge = t;
+						tomerge = mt;
+						tomerge_jk = left_key;
+					}
+					
+					int m;
+					for(m = 0; m < merge.length; m++) {
+						nt[m] = merge[m];
+					}
+					boolean[] removed = new boolean[tomerge.length];
+					for(int i = 0; i < tomerge_jk.length; i++) removed[tomerge_jk[i]] = true;
+					
+					for(int i = 0; i < tomerge.length; i++) {
+						if(!removed[i]) nt[m++] = tomerge[i];
+					}
+					result.add(nt);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/* Column b is assumed to having the same arity as this
 	 * Tuples in a, b are changed after join, 
 	 *   a = a/(a\cap b), b = b/(a\cap b) 
@@ -109,8 +191,8 @@ public class Column {
 		if(join_key.size() == 0) return b;
 		
 		Column result = new Column(this.arity, this.columnMap);
-		Map<Join_key, List<String[]>> index = new HashMap<>();
-		Set<Join_key> hit_key = new HashSet<>();
+		Map<String[], List<String[]>> index = new HashMap<>();
+		Set<String[]> hit_key = new HashSet<>();
 		
 		Column left, right;
 		if(this.tuples.size() < b.tuples.size()) { left = this; right = b; }
@@ -120,11 +202,10 @@ public class Column {
 		for(String[] tuple : left.tuples) {
 			String[] keys = new String[join_key.size()];
 			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key.get(i)];
-			Join_key jk = new Join_key(keys);
-			List<String[]> rows = index.get(jk);
+			List<String[]> rows = index.get(keys);
 			if(rows == null) {
 				rows = new LinkedList<>();
-				index.put(jk, rows);
+				index.put(keys, rows);
 			}
 			rows.add(tuple);
 		}
@@ -135,11 +216,10 @@ public class Column {
 			String[] b_tuple = it.next();
 			String[] keys = new String[join_key.size()];
 			for(int i = 0; i < keys.length; i++) keys[i] = b_tuple[join_key.get(i)];
-			Join_key jk = new Join_key(keys);
 			
-			List<String[]> rows = index.get(jk);
+			List<String[]> rows = index.get(keys);
 			if(rows != null) {
-				hit_key.add(jk);
+				hit_key.add(keys);
 				for(String[] row : rows) {
 					String[] merge = new String[this.arity];
 					for(int i = 0; i < this.arity; i++) {
@@ -158,53 +238,9 @@ public class Column {
 			String[] tuple = it.next();
 			String[] keys = new String[join_key.size()];
 			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key.get(i)];
-			Join_key jk = new Join_key(keys);
-			if(hit_key.contains(jk)) it.remove();
+			if(hit_key.contains(keys)) it.remove();
 		}
 		
 		return result;
-	}
-	
-//	public Column inner_join(Column b, int[] jki, int[] bjki) {
-//		Column result = new Column(this.arity + b.arity - jki.length);
-//		Map<Join_key, List<String[]>> index = new HashMap<>();
-//		
-//		Column left, right;
-//		if(this.tuples.size() < b.tuples.size()) { left = this; right = b; }
-//		else { left = b; right = this;}
-//		
-//		return result;
-//	}
-	
-	private class Join_key {
-		String[] keys;
-		
-		Join_key(String[] keys) {
-			this.keys = keys;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if(!(obj instanceof Join_key)) return false;
-			
-			Join_key that = (Join_key)obj;
-			
-			if(this.keys.length != that.keys.length) return false;
-			for(int i = 0; i < this.keys.length; i++) {
-				if(this.keys[i] != that.keys[i]) return false;
-			}
-			return true;
-		}
-		
-		@Override
-		public int hashCode() {
-			int code = 7;
-			
-			for(int i = 0; i < this.keys.length; i++) {
-				code = 31 * code + this.keys[i].hashCode();
-			}
-			
-			return code;
-		}
 	}
 }

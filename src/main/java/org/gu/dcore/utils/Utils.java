@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,7 @@ import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.store.Column;
 
@@ -50,10 +52,8 @@ public class Utils {
 		adjust_column_with_unifier(f, u, false);
 		adjust_column_with_unifier(b, u, true);
 		
-		AtomSet uf = u.getImageOf(f, false);
-		
-		AtomSet ub = u.getImageOf(b, true);
-		
+		AtomSet uf = u.getImageOf(f, false);		
+		AtomSet ub = u.getImageOf(b, true);	
 		AtomSet up = u.getImageOfPiece();
 		
 		uf = HomoUtils.minus(uf, up);
@@ -113,28 +113,6 @@ public class Utils {
 		return result;
 	}
 	
-	public static void addAndKeepMinimal(List<AtomSet> atomsets, List<AtomSet> toAdd) {
-		for(AtomSet tocheck : toAdd) {
-			addAndKeepMinimal(atomsets, tocheck);
-		}
-	}
-	
-	public static void addAndKeepMinimal(List<AtomSet> atomsets, AtomSet toAdd) {
-		boolean subsumed = false;
-		Iterator<AtomSet> it = atomsets.iterator();
-		while(it.hasNext()) {
-			AtomSet rew = it.next();
-			
-			if(Utils.isMoreGeneral(rew, toAdd)) {
-				subsumed = true; break;
-			}
-			if(Utils.isMoreGeneral(toAdd, rew)) {
-				it.remove();
-			}
-		}
-		if(!subsumed) atomsets.add(toAdd);
-	}
-	
 	public static Atom substitute(Atom a, Map<Term, Term> submap) {
 		ArrayList<Term> terms = new ArrayList<>();
 		
@@ -153,5 +131,10 @@ public class Utils {
 		AtomSet result = new AtomSet();
 		for(Atom a : as) result.add(substitute(a, submap));
 		return result;
-	}	
+	}
+	
+	public static boolean vars_disjoint(Set<Variable> a, Set<Variable> b) {
+		for(Term t : b) if(a.contains(t)) return false;				
+		return true;
+	}
 }

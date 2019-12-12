@@ -52,6 +52,8 @@ public abstract class QueryAbduction {
 			var_index.put(v, index++);
 		}
 		
+		e.resort();
+		
 		Column[] columns = new Column[size];
 		
 		for(int i = 0; i < size; i++) {

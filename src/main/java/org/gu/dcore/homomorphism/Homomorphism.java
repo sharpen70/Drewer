@@ -85,7 +85,7 @@ public class Homomorphism {
 				if(!st.equals(tt)) return null;
 			}
 			else {
-				if(!sub.add(((Variable)st).getValue(), tt)) return null;
+				if(!sub.add(st, tt)) return null;
 			}
 		}
 		
