@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -14,9 +15,11 @@ import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.model.Term;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.DatalogEngine;
+import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
@@ -40,7 +43,7 @@ public class SupportedAbduction extends QueryAbduction {
 		while(!queue.isEmpty()) {
 			AtomSet current = queue.poll();
 			
-			List<LiftedAtomSet> cleaned = atomset_reduce(current);
+			List<Pair<LiftedAtomSet, Map<Term, Term>>> cleaned = atomset_reduce(current);
 			List<AtomSet> rewritings = new LinkedList<>();
 			
 			if(cleaned.isEmpty()) {
@@ -48,15 +51,15 @@ public class SupportedAbduction extends QueryAbduction {
 				rewritings.addAll(rewrite(current));
 			}
 			else {
-				for(LiftedAtomSet la : cleaned) {
-					rewritings.addAll(rewrite(la));
+				for(Pair<LiftedAtomSet, Map<Term, Term>> la : cleaned) {
+					rewritings.addAll(rewrite(la.a));
 				}
 			}
 			
-			Utils.removeSubsumed(rewritings, final_set);
-			Utils.removeSubsumed(rewritings, exploration_set);
-			Utils.removeSubsumed(exploration_set, rewritings);
-			Utils.removeSubsumed(final_set, rewritings);
+			Utils.removeSubsumed(rewritings, final_set, false);
+			Utils.removeSubsumed(rewritings, exploration_set, false);
+			Utils.removeSubsumed(exploration_set, rewritings, false);
+			Utils.removeSubsumed(final_set, rewritings, false);
 			
 			exploration_set.addAll(rewritings);
 		}
@@ -69,7 +72,7 @@ public class SupportedAbduction extends QueryAbduction {
 		
 		for(Atom a : atomset) {
 			for(Rule r : this.irs.getRulesByPredicate(a.getPredicate())) {
-				List<Unifier> unifiers = Unify.getSinglePieceUnifiers(new AtomSet(a), atomset, r, new HashSet<>());
+				List<Unifier> unifiers = Unify.getSinglePieceUnifiers(atomset, r);
 				
 				for(Unifier u : unifiers) {
 					 rewritings.add(Utils.rewrite(atomset, r.getBody(), u));

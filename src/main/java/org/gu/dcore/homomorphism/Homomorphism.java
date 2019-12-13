@@ -13,14 +13,17 @@ public class Homomorphism {
 	private AtomSet source;
 	private AtomSet target;
 	
+	private boolean normal = true;
+	
 	private int level_size;
 	private ArrayList<ArrayList<NormalSubstitution>> substitutionsPerLv;
 	private NormalSubstitution[] subsCurrentPath;
 	private int[] directions;
 			
-	public Homomorphism(AtomSet source, AtomSet target) {
+	public Homomorphism(AtomSet source, AtomSet target, boolean normal) {
 		this.source = source;
 		this.target = target;
+		this.normal = normal;
 		
 		this.level_size = source.size();
 		this.substitutionsPerLv = new ArrayList<>(this.level_size);
@@ -72,7 +75,8 @@ public class Homomorphism {
 		return level > 0;
 	}
 	
-	private NormalSubstitution homo(Atom source, Atom target) {
+	/* normal:  normal homomorphism or homomorphism with extended renaming */
+	private NormalSubstitution homo(Atom source, Atom target, boolean normal) {
 		if(!source.getPredicate().equals(target.getPredicate())) return null;
 		
 		NormalSubstitution sub = new NormalSubstitution();
@@ -81,7 +85,7 @@ public class Homomorphism {
 			Term st = source.getTerm(i);
 			Term tt = target.getTerm(i);
 			
-			if(st instanceof Constant) {
+			if(st instanceof Constant && (normal || st instanceof Constant)) {
 				if(!st.equals(tt)) return null;
 			}
 			else {
@@ -98,7 +102,7 @@ public class Homomorphism {
 			for(int j = 0; j < target.size(); j++) {
 				Atom sa = source.getAtom(i);
 				Atom sb = target.getAtom(j);
-				NormalSubstitution sub = homo(sa, sb);
+				NormalSubstitution sub = homo(sa, sb, this.normal);
 				if(sub != null) subs.add(sub);
 			}
 			if(subs.isEmpty()) return false;

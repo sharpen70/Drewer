@@ -81,9 +81,9 @@ public class PatternAbdunction extends QueryAbduction {
 							 rewritings.add(Utils.rewrite(e, r.getBody(), u));
 						}
 						
-						Utils.removeSubsumed(rewritings, finalSet);
-						Utils.removeSubsumed(to_explore, rewritings);
-						Utils.removeSubsumed(finalSet, rewritings);
+						Utils.removeSubsumed(rewritings, finalSet, false);
+						Utils.removeSubsumed(to_explore, rewritings, false);
+						Utils.removeSubsumed(finalSet, rewritings, false);
 						
 						to_explore.addAll(rewritings);
 					}	

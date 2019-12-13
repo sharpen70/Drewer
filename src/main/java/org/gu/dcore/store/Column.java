@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.gu.dcore.model.RepConstant;
+import org.gu.dcore.model.Term;
+import org.gu.dcore.tuple.Pair;
 import org.semanticweb.vlog4j.core.model.api.QueryResult;
-import org.semanticweb.vlog4j.core.model.api.Term;
 
 
 public class Column {
@@ -48,7 +50,7 @@ public class Column {
 	public void add(QueryResult answer) {
 		String[] tuple = new String[this.arity];
 		int i = 0;
-		for(Term t : answer.getTerms()) {
+		for(org.semanticweb.vlog4j.core.model.api.Term t : answer.getTerms()) {
 			tuple[columnMap[i++]] = t.toString();
 		}
 		this.tuples.add(tuple);
@@ -92,11 +94,10 @@ public class Column {
 		}
 	}
 	
-	public Column join(Column b, int[] jka, int[] jkb) {
+	public Pair<Column, Map<Term, Term>> join(Column b, int[] jka, int[] jkb, int jk_length) {
 		int aty = this.arity + b.arity - jka.length;
 		Column result = new Column(aty);
-		
-		int jk_length = jka.length;
+		Map<Term, Term> tune = new HashMap<>();
 		
 		if(jk_length == 0) {
 			
@@ -164,14 +165,17 @@ public class Column {
 					for(int i = 0; i < tomerge_jk.length; i++) removed[tomerge_jk[i]] = true;
 					
 					for(int i = 0; i < tomerge.length; i++) {
-						if(!removed[i]) nt[m++] = tomerge[i];
+						if(!removed[i]) {
+							tune.put(new RepConstant(i), new RepConstant(m));
+							nt[m++] = tomerge[i];
+						}
 					}
 					result.add(nt);
 				}
 			}
 		}
 		
-		return result;
+		return new Pair<>(result, tune);
 	}
 	
 	/* Column b is assumed to having the same arity as this

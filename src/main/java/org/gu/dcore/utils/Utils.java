@@ -22,6 +22,7 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.store.Column;
+import org.gu.dcore.tuple.Pair;
 
 public class Utils {
 	public static String getShortIRI(String iri) {
@@ -48,18 +49,45 @@ public class Utils {
 	 * b the set of atoms to replace
 	 * u the unifier for replacing
 	 */
-	public static AtomSet rewrite(AtomSet f, AtomSet b, Unifier u) {
-		adjust_column_with_unifier(f, u, false);
-		adjust_column_with_unifier(b, u, true);
+	public static AtomSet rewrite(AtomSet f, AtomSet b, Unifier u) {	
+		Column c = null;
+		
+		if(f instanceof LiftedAtomSet || b instanceof LiftedAtomSet) {
+			adjust_column_with_unifier(f, u, false);
+			adjust_column_with_unifier(b, u, true);
+			
+			if(f instanceof LiftedAtomSet && b instanceof LiftedAtomSet) {
+				Column fc = ((LiftedAtomSet)f).getColumn();
+				Column bc = ((LiftedAtomSet)b).getColumn();
+				
+				int rc_size = b.getRepConstants().size();
+				int[] jka, jkb;
+				jka = new int[rc_size]; jkb = new int[rc_size];
+				int ji = 0;
+				for(RepConstant rc : b.getRepConstants()) {
+					Term t = u.getImageOf(rc, true);
+					if(t != null && t instanceof RepConstant) {
+						jka[ji] = ((RepConstant)t).getValue();
+						jkb[ji] = rc.getValue();
+						ji++;
+					}
+				}
+				Pair<Column, Map<Term, Term>> result = fc.join(bc, jka, jkb, rc_size);
+				c = result.a;
+				b = substitute(b, result.b);
+			}
+			else if(f instanceof LiftedAtomSet) c = ((LiftedAtomSet)f).getColumn();
+			else c = ((LiftedAtomSet)b).getColumn();
+		}
 		
 		AtomSet uf = u.getImageOf(f, false);		
 		AtomSet ub = u.getImageOf(b, true);	
 		AtomSet up = u.getImageOfPiece();
-		
+	
 		uf = HomoUtils.minus(uf, up);
-		uf = HomoUtils.simple_union(uf, ub);
+		uf = HomoUtils.simple_union(uf, ub);		
 		
-		
+		if(c != null) uf = new LiftedAtomSet(uf, c);
 		return uf;
 	}
 	
@@ -86,21 +114,21 @@ public class Utils {
 		column.filter(eqs);
 	}
 	
-	public static boolean isMoreGeneral(AtomSet f, AtomSet h) {
+	public static boolean isMoreGeneral(AtomSet f, AtomSet h, boolean normal) {
 		if (HomoUtils.contains(f, h)) 
 			return true;
 		else 
-			return new Homomorphism(f, h).exist();		
+			return new Homomorphism(f, h, normal).exist();		
 	}
 	
-	public static void removeSubsumed(List<AtomSet> s1, List<AtomSet> s2) {
+	public static void removeSubsumed(List<AtomSet> s1, List<AtomSet> s2, boolean normal) {
 		Iterator<AtomSet> it1 = s1.iterator();
 		while(it1.hasNext()) {
 			AtomSet atomset = it1.next();
 			Iterator<AtomSet> it2 = s2.iterator();
 			while(it2.hasNext()) {
 				AtomSet atomset2 = it2.next();
-				if(Utils.isMoreGeneral(atomset2, atomset)) {
+				if(Utils.isMoreGeneral(atomset2, atomset, normal)) {
 					it1.remove();
 					break;
 				}

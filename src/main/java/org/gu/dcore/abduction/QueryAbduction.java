@@ -23,6 +23,7 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
+import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.tuple.Tuple;
 import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
@@ -40,8 +41,8 @@ public abstract class QueryAbduction {
 		this.query = q;
 	}
 	
-	protected List<LiftedAtomSet> atomset_reduce(AtomSet e) throws IOException, ParsingException {
-		List<LiftedAtomSet> result = new LinkedList<>();
+	protected List<Pair<LiftedAtomSet, Map<Term, Term>>> atomset_reduce(AtomSet e) throws IOException, ParsingException {
+		List<Pair<LiftedAtomSet, Map<Term, Term>>> result = new LinkedList<>();
 		int size = e.size();
 		
 		/* build the index of variable in retrieved table */
@@ -79,7 +80,7 @@ public abstract class QueryAbduction {
 			
 			if(level >= e.size()) {
 				if(current_column.size() != 0) {
-					LiftedAtomSet la = liftAtomSet(e, var_index, selected_atoms, current_column);
+					Pair<LiftedAtomSet, Map<Term, Term>> la = liftAtomSet(e, var_index, selected_atoms, current_column);
 					result.add(la);
 				}
 				continue;
@@ -103,19 +104,19 @@ public abstract class QueryAbduction {
 	protected List<LiftedRule> rule_reduce(Rule r) throws IOException, ParsingException {
 		List<LiftedRule> result = new LinkedList<>();
 		
-		List<LiftedAtomSet> liftedAtomset = atomset_reduce(r.getBody());
+		List<Pair<LiftedAtomSet, Map<Term, Term>>> liftedAtomset = atomset_reduce(r.getBody());
 		
-		for(LiftedAtomSet la : liftedAtomset) {
-			AtomSet nhead = Utils.substitute(r.getHead(), la.getLiftedMap());
-			Rule nr = RuleFactory.instance().createRule(nhead, la);
+		for(Pair<LiftedAtomSet, Map<Term, Term>> la : liftedAtomset) {
+			AtomSet nhead = Utils.substitute(r.getHead(), la.b);
+			Rule nr = RuleFactory.instance().createRule(nhead, la.a);
 			
-			result.add(new LiftedRule(nr, la.getColumn()));
+			result.add(new LiftedRule(nr, la.a.getColumn()));
 		}
 		
 		return result;
 	}
 	
-	protected LiftedAtomSet liftAtomSet(AtomSet A, Map<Variable, Integer> var_index, boolean[] selected_atoms, Column column) {
+	protected Pair<LiftedAtomSet, Map<Term, Term>> liftAtomSet(AtomSet A, Map<Variable, Integer> var_index, boolean[] selected_atoms, Column column) {
 		Map<Term, Term> repConstant_map = new HashMap<>();
 		ArrayList<Integer> column_index = new ArrayList<>();
 		
@@ -153,7 +154,7 @@ public abstract class QueryAbduction {
 			}
 		}
 		column.remap(column_index);
-		LiftedAtomSet result = new LiftedAtomSet(atomset_lifted, column, repConstant_map);
-		return result;
+		LiftedAtomSet result = new LiftedAtomSet(atomset_lifted, column);
+		return new Pair<>(result, repConstant_map);
 	}
 }

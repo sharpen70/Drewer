@@ -19,7 +19,7 @@ import org.gu.dcore.model.Variable;
 
 public class Unify {
 	
-	public static List<Unifier> getUnifiers(AtomSet body, Rule hr) {
+	public static List<Unifier> getSinglePieceUnifiers(AtomSet body, Rule hr) {
 		return getSinglePieceUnifiers(body, body, hr, new HashSet<>());
 	}
 	

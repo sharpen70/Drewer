@@ -31,4 +31,16 @@ public class RepConstant implements Term {
 	public int getValue() {
 		return this.value;
 	}
+	
+	@Override
+	public int hashCode() {
+		return this.value;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof RepConstant)) return false;
+		RepConstant _obj = (RepConstant) obj;
+		return this.value == _obj.value;
+	}
 }
