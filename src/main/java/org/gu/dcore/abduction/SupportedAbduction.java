@@ -1,7 +1,6 @@
 package org.gu.dcore.abduction;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,12 +46,16 @@ public class SupportedAbduction extends QueryAbduction {
 			List<AtomSet> rewritings = new LinkedList<>();
 			
 			if(cleaned.isEmpty()) {
-				final_set.add(current);
+				if(allAbducibles(current))
+					final_set.add(current);
 				rewritings.addAll(rewrite(current));
 			}
 			else {
 				for(Pair<LiftedAtomSet, Map<Term, Term>> la : cleaned) {
-					rewritings.addAll(rewrite(la.a));
+					AtomSet as = la.a;
+					if(allAbducibles(as))
+						final_set.add(as);
+					rewritings.addAll(rewrite(as));
 				}
 			}
 			
@@ -67,11 +70,24 @@ public class SupportedAbduction extends QueryAbduction {
 		return result;
 	}
 	
+	private boolean allAbducibles(AtomSet atomset) {
+		for(Atom a : atomset) {
+			if(!this.abducibles.contains(a.getPredicate()))
+				return false;
+		}
+		
+		return true;
+	}
+	
 	private List<AtomSet> rewrite(AtomSet atomset) {
 		List<AtomSet> rewritings = new LinkedList<>();
 		
 		for(Atom a : atomset) {
-			for(Rule r : this.irs.getRulesByPredicate(a.getPredicate())) {
+			Set<Rule> rules_to_rewrite = this.irs.getRulesByPredicate(a.getPredicate());
+			if(!this.abducibles.contains(a.getPredicate()) &&
+					rules_to_rewrite.isEmpty()) return new LinkedList<>();
+			
+			for(Rule r : rules_to_rewrite) {
 				List<Unifier> unifiers = Unify.getSinglePieceUnifiers(atomset, r);
 				
 				for(Unifier u : unifiers) {
