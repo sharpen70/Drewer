@@ -18,7 +18,7 @@ import org.semanticweb.vlog4j.core.model.api.QueryResult;
 
 public class Column {
 	List<String[]> tuples;
-	int[] columnMap;
+	int[] columnMap = null;
 	boolean[] position_blank;
 	int arity = 0;
 	
@@ -28,11 +28,16 @@ public class Column {
 		this.position_blank = new boolean[arity];
 	}
 	
+	/* unsafe, arity must not smaller than the maximum value in columnMap */
 	public Column(int arity, int[] columnMap) {
 		this(arity);
 		
 		this.columnMap = columnMap;		
 		for(int i = 0; i < columnMap.length; i++) this.position_blank[i] = true;
+	}
+	
+	public int getArity() {
+		return this.arity;
 	}
 	
 	public int size() {
@@ -51,7 +56,8 @@ public class Column {
 		String[] tuple = new String[this.arity];
 		int i = 0;
 		for(org.semanticweb.vlog4j.core.model.api.Term t : answer.getTerms()) {
-			tuple[columnMap[i++]] = t.toString();
+			if(columnMap != null) tuple[columnMap[i++]] = t.toString();
+			else tuple[i++] = t.toString(); 
 		}
 		this.tuples.add(tuple);
 	}
@@ -192,7 +198,9 @@ public class Column {
 				join_key.add(i);
 		}
 		
-		if(join_key.size() == 0) return b;
+		if(join_key.size() == 0) {
+			return b;
+		}
 		
 		Column result = new Column(this.arity, this.columnMap);
 		Map<String[], List<String[]>> index = new HashMap<>();
@@ -246,5 +254,19 @@ public class Column {
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		for(String[] t : this.tuples) {
+			String ts = "";
+			for(int i = 0; i < t.length; i++) {
+				if(i != 0) ts += ", ";
+				ts += t[i];
+			}
+			s += ts + "\n";
+		}
+		return s;
 	}
 }

@@ -64,6 +64,10 @@ public class PredicateFactory {
 		return p;
 	}
 	
+	public Predicate getPredicate(String iri) {
+		return this.pMap.get(iri);
+	}
+	
 	public Collection<Predicate> getPredicates() {
 		return this.pMap.values();
 	}

@@ -72,7 +72,7 @@ public abstract class QueryAbduction {
 		Tuple<Integer, boolean[], Column> init = new Tuple<>(0, new boolean[size], new Column(vars.size()));
 		queue.add(init);
 		
-		while(queue.isEmpty()) {
+		while(!queue.isEmpty()) {
 			Tuple<Integer, boolean[], Column> p = queue.pop();
 			int level = p.a;
 			boolean[] selected_atoms = p.b;
@@ -91,11 +91,21 @@ public abstract class QueryAbduction {
 			boolean[] current_f = selected_atoms.clone();
 			current_f[level] = false;
 			
-			Column join_column = current_column.full_join(columns[level]);
+			Column next_column = columns[level];
+			level++;	
 			
-			level++;			
-			queue.add(new Tuple<>(level, current_t, join_column));
-			queue.add(new Tuple<>(level, current_f, current_column));
+			if(next_column.getTuples().isEmpty()) {
+				queue.add(new Tuple<>(level, current_f, current_column));
+			}
+			else if(current_column.getTuples().isEmpty()) {				
+				queue.add(new Tuple<>(level, current_t, next_column));
+			}					
+			else {
+				Column join_column = current_column.full_join(next_column);
+				
+				queue.add(new Tuple<>(level, current_t, join_column));
+				queue.add(new Tuple<>(level, current_f, current_column));
+			}
 		}
 		
 		return result;

@@ -76,7 +76,7 @@ public class Atom {
 		
 		for(Term t : this.terms) {
 			if(t instanceof Variable) vars.add((Variable) t);
-			if(t instanceof Variable) rcs.add((RepConstant) t);
+			if(t instanceof RepConstant) rcs.add((RepConstant) t);
 		}
 	}
 	

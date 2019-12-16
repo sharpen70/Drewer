@@ -9,6 +9,7 @@ import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
@@ -41,11 +42,17 @@ public class FreshIndividualSubstitution implements Substitution {
 	}
 	
 	public AtomSet imageOf(AtomSet atomset) {
-		AtomSet image = new AtomSet();
+		AtomSet image;
+		ArrayList<Atom> atoms = new ArrayList<>();
 		
 		for(Atom atom : atomset) {
-			image.add(imageOf(atom));
+			atoms.add(imageOf(atom));
 		}
+		
+		if(atomset instanceof LiftedAtomSet) {
+			image = new LiftedAtomSet(atoms, ((LiftedAtomSet) atomset).getColumn());
+		}
+		else image = new AtomSet(atoms);
 		
 		return image;
 	}

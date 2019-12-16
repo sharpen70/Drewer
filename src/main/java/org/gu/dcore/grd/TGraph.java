@@ -12,7 +12,7 @@ public class TGraph {
 	private int size;
 	
 	private List<List<Integer>> SCCs;
-	private List<Integer> entryNodes;	
+//	private List<Integer> entryNodes;	
 	private List<Integer> freeNodes;
 	
 	private int[] DFN, LOW;
@@ -92,7 +92,7 @@ public class TGraph {
 		}
 		
 		if(LOW[x] == DFN[x]) {
-			this.entryNodes.add(x);
+//			this.entryNodes.add(x);
 			List<Integer> scc = new LinkedList<>();
 			while(!stack.isEmpty()) {
 				int c = stack.pop();
@@ -141,7 +141,7 @@ public class TGraph {
 			if(recusive) continue;
 			
 			if(LOW[x] == DFN[x]) {
-				this.entryNodes.add(x);
+//				this.entryNodes.add(x);
 				List<Integer> scc = new LinkedList<>();
 				while(!stack.isEmpty()) {
 					int c = stack.pop();
@@ -165,7 +165,7 @@ public class TGraph {
 		return this.freeNodes;
 	}
 	
-	public List<Integer> getEntryNodes() {
-		return this.entryNodes;
-	}
+//	public List<Integer> getEntryNodes() {
+//		return this.entryNodes;
+//	}
 }

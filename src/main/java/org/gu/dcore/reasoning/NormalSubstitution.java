@@ -10,6 +10,7 @@ import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Constant;
+import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
@@ -73,7 +74,12 @@ public class NormalSubstitution implements Substitution {
 			atoms.add(this.getImageOf(a, v_offset, rc_offset));
 		}
 		
-		AtomSet image = new AtomSet(atoms);
+		AtomSet image;
+		
+		if(atomset instanceof LiftedAtomSet) {
+			image = new LiftedAtomSet(atoms, ((LiftedAtomSet) atomset).getColumn());
+		}
+		else image = new AtomSet(atoms);
 		
 		return image;
 	}

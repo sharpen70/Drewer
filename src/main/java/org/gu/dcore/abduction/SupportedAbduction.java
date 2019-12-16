@@ -15,6 +15,7 @@ import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.reasoning.FreshIndividualSubstitution;
 import org.gu.dcore.reasoning.Unifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.DatalogEngine;
@@ -30,17 +31,15 @@ public class SupportedAbduction extends QueryAbduction {
 		this.irs = new IndexedByHeadPredRuleSet(onto);
 	}
 	
-	public List<Explanation> getExplanations() throws IOException, ParsingException {
-		List<Explanation> result = new LinkedList<>();
-		
+	public List<AtomSet> getExplanations() throws IOException, ParsingException {
+		List<AtomSet> result = new LinkedList<>();		
 		List<AtomSet> final_set = new LinkedList<>();
-		List<AtomSet> exploration_set = new LinkedList<>();
+		LinkedList<AtomSet> exploration_set = new LinkedList<>();
 		
-		Queue<AtomSet> queue = new LinkedList<>();
-		queue.add(this.query.getBody());
+		exploration_set.add(this.query.getBody());
 		
-		while(!queue.isEmpty()) {
-			AtomSet current = queue.poll();
+		while(!exploration_set.isEmpty()) {
+			AtomSet current = exploration_set.poll();
 			
 			List<Pair<LiftedAtomSet, Map<Term, Term>>> cleaned = atomset_reduce(current);
 			List<AtomSet> rewritings = new LinkedList<>();
@@ -65,6 +64,11 @@ public class SupportedAbduction extends QueryAbduction {
 			Utils.removeSubsumed(final_set, rewritings, false);
 			
 			exploration_set.addAll(rewritings);
+		}
+		
+		for(AtomSet atomset : final_set) {
+			FreshIndividualSubstitution sub = new FreshIndividualSubstitution();
+			result.add(sub.imageOf(atomset));
 		}
 		
 		return result;
@@ -95,6 +99,7 @@ public class SupportedAbduction extends QueryAbduction {
 				}
 			}	
 		}
-		return null;
+		
+		return rewritings;
 	}
 }

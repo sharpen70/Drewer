@@ -17,7 +17,12 @@ public class RepConstant implements Term {
 	public boolean isConstant() {
 		return true;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "rc_" + value;
+	}
+	
 	@Override
 	public String toRDFox() {
 		return null;
