@@ -47,57 +47,6 @@ public class ModularizedRewriting {
 		this.ibr = this.modularizor.getIndexedBlockOnto();		
 	}
 	
-	public Pair<Rule, List<Rule>> pRewrite(ConjunctiveQuery q) {
-		this.selected = new HashSet<>();
-		PredicateFactory.instance().rewrite_reset();
-		
-		Rule Qr = RuleFactory.instance().createQueryRule(q);
-		
-		BaseMarking marking = this.modularizor.getMarking();
-		RuleBasedMark rbm = marking.markQueryRule(Qr);
-		
-		BlockRule bQr = marking.getBlockRule(Qr, rbm);
-	
-		List<Rule> result = new LinkedList<>();
-		Queue<BlockRule> rewQueue = new LinkedList<>();
-		rewQueue.add(bQr);
-		
-		boolean first = true;
-		
-		while(!rewQueue.isEmpty()) {
-			BlockRule r = rewQueue.poll();
-			
-			if(!selected.add(r.getRuleIndex())) continue;
-		
-			AtomSet body = new AtomSet();
-			
-			for(Block b : r.getBlocks()) {
-				body.add(createBlockAtom(b));
-				rewriteBlock(r, b, true, result, rewQueue);
-			}
-			for(Atom a : r.getNormalAtoms()) {
-				if(a.getPredicate().getName().equals("ANS")) continue;
-				
-				Set<BlockRule> brs = this.ibr.getRules(a.getPredicate());
-				for(BlockRule nr : brs) {
-					if(!nr.isExRule()) rewQueue.add(nr);
-				}
-				body.add(a);
-			}
-			
-			if(first)
-				Qr = RuleFactory.instance().createRule(r.getHead(), body); 
-			else if(!r.isNormalRule())
-				result.add(RuleFactory.instance().createRule(r.getHead(), body));
-			else 
-				result.add(r);
-			
-			first = false;
-		}
-		
-		return new Pair<>(Qr, result);
-	}
-	
 	public List<Rule> rewrite(ConjunctiveQuery q) {
 		this.selected = new HashSet<>();
 		PredicateFactory.instance().rewrite_reset();

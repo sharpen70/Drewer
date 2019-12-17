@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.gu.dcore.ModularizedRewriting;
+import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.grd.GraphOfPredicateDependencies;
 import org.gu.dcore.grd.IndexedByHeadPredRuleSet;
@@ -20,6 +21,7 @@ import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.utils.Utils;
+import org.semanticweb.vlog4j.parser.ParsingException;
 
 public class PatternAbdunction extends QueryAbduction {
 
@@ -27,74 +29,15 @@ public class PatternAbdunction extends QueryAbduction {
 		super(onto, q, D, abdu);
 	}
 
-	public List<PatternExplanation> getPatternExplanations() {
+	public List<PatternExplanation> getPatternExplanations() throws ParsingException {
 		List<PatternExplanation> result = new LinkedList<PatternExplanation>();
 		
 		/* Compute datalog rewriting of the abduction problem */
 		ModularizedRewriting mr = new ModularizedRewriting(this.ontology);
-		Pair<Rule, List<Rule>> rewriting = mr.pRewrite(query);
+		List<Rule> rewriting = mr.rewrite(query);
 		
-		AtomSet rewrited_observation = rewriting.a.getBody();
-		List<Rule> rewrited_program = rewriting.b;
+		this.store.addRules(rewriting);
 		
-		/* Compute the set of predicates that may incur loops */
-		List<Predicate> plist = PredicateFactory.instance().getPredicateSet();
-
-		GraphOfPredicateDependencies gpd = new GraphOfPredicateDependencies(rewrited_program, plist);
-		List<List<Predicate>> sccs = gpd.getSCCPredicates();
-		Set<Predicate> scc_predicates = new HashSet<>();
-		
-		for(List<Predicate> scc : sccs) {
-			scc_predicates.addAll(scc);
-		}
-		
-		/* Compute Pattern rules for predicates in loops */
-		Iterator<Predicate> sit = scc_predicates.iterator();
-		while(sit.hasNext()) {
-			Predicate sp = sit.next();
-			
-		}
-		
-		/* Minimal rewriting to compute explanations */
-		IndexedByHeadPredRuleSet rs = new IndexedByHeadPredRuleSet(rewrited_program);
-		
-		LinkedList<AtomSet> to_explore = new LinkedList<>();
-		LinkedList<AtomSet> finalSet = new LinkedList<>();
-		
-		to_explore.add(rewrited_observation);
-		
-		while(!to_explore.isEmpty()) {
-			AtomSet e = to_explore.poll();
-			finalSet.add(e);
-			
-			for(Atom a : e) {
-				Predicate p = a.getPredicate();
-				
-				
-				/* For predicates that don't involve in loops, perform traditional rewriting*/
-				if(!scc_predicates.contains(p)) {
-					for(Rule r : rs.getRulesByPredicate(p)) {
-						List<Unifier> unifiers = Unify.getSinglePieceUnifiers(new AtomSet(a), e, r, new HashSet<>());	
-						List<AtomSet> rewritings = new LinkedList<>();
-						
-						for(Unifier u : unifiers) {
-							 rewritings.add(Utils.rewrite(e, r.getBody(), u));
-						}
-						
-						Utils.removeSubsumed(rewritings, finalSet, false);
-						Utils.removeSubsumed(to_explore, rewritings, false);
-						Utils.removeSubsumed(finalSet, rewritings, false);
-						
-						to_explore.addAll(rewritings);
-					}	
-				}
-				/* */
-				else {
-					
-				}
-			}
-
-		}
 		
 		return result; 
 	}
