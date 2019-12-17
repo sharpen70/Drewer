@@ -51,8 +51,8 @@ public class NormalSubstitution implements Substitution {
 			t = TermFactory.instance().getVariable(((Variable)t).getValue() + v_offset);
 		}
 		Term _t = this.sMap.get(t);
-		if(_t == null) return _t;
-		else return t;
+		if(_t == null) return t;
+		else return _t;
 	}
 	
 	public Atom getImageOf(Atom a, int v_offset, int rc_offset) {
