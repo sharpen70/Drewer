@@ -77,6 +77,21 @@ public class Column {
 		return this.tuples;
 	}
 	
+	public void distinct(boolean[] distinct_key) {
+		Set<String[]> distinct_set = new HashSet<>();
+		
+		Iterator<String[]> it = this.tuples.iterator();
+		
+		while(it.hasNext()) {
+			String[] t = it.next();
+			String[] key = new String[t.length];
+			for(int i = 0; i < t.length; i++) {
+				if(distinct_key[i]) key[i] = t[i];
+			}
+			if(!distinct_set.add(key)) it.remove();
+		}
+	}
+	
 	public void filter(Map<Integer, Object> eqs) {
 		Iterator<String[]> it = this.tuples.iterator();
 		while(it.hasNext()) {

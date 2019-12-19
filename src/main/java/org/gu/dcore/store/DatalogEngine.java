@@ -42,18 +42,41 @@ public class DatalogEngine {
 		RuleParser.parseInto(kb, import_str);
 	}
 	
+	
+	public void materialize() throws IOException {
+		if(reasoner == null) {
+			reasoner = new VLogReasoner(kb);
+		}
+		reasoner.reason();
+	}
+	
 	public Column answerAtomicQuery(Atom atom, int[] mapping, int arity) throws IOException, ParsingException {
 		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVlog());
 		
 		Column result = new Column(arity, mapping);
 		
-		if(reasoner == null) reasoner = new VLogReasoner(kb);
-		
-		reasoner.reason();
+		if(reasoner == null) materialize();
 		
 		final QueryResultIterator answers = reasoner.answerQuery(query, false);
 		
 		answers.forEachRemaining(answer -> result.add(answer));
+		
+		return result;
+	}
+	
+	/* Answer Atomic query with specified answer variables */
+	public Column answerAtomicQuery(Atom atom, boolean[] ansVar) throws ParsingException, IOException {
+		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVlog());
+		
+		Column result = new Column(atom.getTerms().size());
+		
+		if(reasoner == null) materialize();
+		
+		final QueryResultIterator answers = reasoner.answerQuery(query, false);
+		
+		answers.forEachRemaining(answer -> result.add(answer));
+		
+		result.distinct(ansVar);
 		
 		return result;
 	}
@@ -63,10 +86,8 @@ public class DatalogEngine {
 		
 		Column result = new Column(query.getTerms().size());
 		
-		if(reasoner == null) reasoner = new VLogReasoner(kb);
-		
-		reasoner.reason();
-		
+		if(reasoner == null) materialize();
+			
 		final QueryResultIterator answers = reasoner.answerQuery(query, false);
 		
 		answers.forEachRemaining(answer -> result.add(answer));

@@ -2,6 +2,7 @@ package org.gu.dcore.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -164,5 +165,25 @@ public class Utils {
 	public static boolean vars_disjoint(Set<Variable> a, Set<Variable> b) {
 		for(Term t : b) if(a.contains(t)) return false;				
 		return true;
+	}
+	
+	public static Set<Variable> join_variables(Atom a, AtomSet atomset) {
+		Set<Variable> result = new HashSet<>();
+		
+		for(Variable v : a.getVariables()) {
+			if(is_join_variable(a, v, atomset))
+				result.add(v);
+		}
+
+		return result;
+	}
+	
+	public static boolean is_join_variable(Atom a, Variable v, AtomSet atomset) {
+		for(Atom atom : atomset) {
+			if(!a.equals(atom)) {
+					if(atom.contains(v)) return true;
+			}
+		}
+		return false; 
 	}
 }

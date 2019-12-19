@@ -11,6 +11,7 @@ import java.util.Set;
 import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
+import org.gu.dcore.grd.IndexedByHeadPredRuleSet;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
@@ -21,6 +22,8 @@ import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
+import org.gu.dcore.reasoning.Unifier;
+import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.tuple.Pair;
@@ -33,7 +36,9 @@ public abstract class QueryAbduction {
 	protected List<Rule> ontology;
 	protected DatalogEngine store;
 	protected Set<Predicate> abducibles;
-	 
+	
+	protected IndexedByHeadPredRuleSet irs;
+	
 	public QueryAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
 		this.abducibles = abdu;
 		this.store = D;
@@ -166,5 +171,34 @@ public abstract class QueryAbduction {
 		column.remap(column_index);
 		LiftedAtomSet result = new LiftedAtomSet(atomset_lifted, column);
 		return new Pair<>(result, repConstant_map);
+	}
+	
+	protected boolean allAbducibles(AtomSet atomset) {
+		for(Atom a : atomset) {
+			if(!this.abducibles.contains(a.getPredicate()))
+				return false;
+		}
+		
+		return true;
+	}
+	
+	protected List<AtomSet> rewrite(AtomSet atomset) {
+		List<AtomSet> rewritings = new LinkedList<>();
+		
+		for(Atom a : atomset) {
+			Set<Rule> rules_to_rewrite = this.irs.getRulesByPredicate(a.getPredicate());
+			if(!this.abducibles.contains(a.getPredicate()) &&
+					rules_to_rewrite.isEmpty()) return new LinkedList<>();
+			
+			for(Rule r : rules_to_rewrite) {
+				List<Unifier> unifiers = Unify.getSinglePieceUnifiers(atomset, r);
+				
+				for(Unifier u : unifiers) {
+					 rewritings.add(Utils.rewrite(atomset, r.getBody(), u));
+				}
+			}	
+		}
+		
+		return rewritings;
 	}
 }

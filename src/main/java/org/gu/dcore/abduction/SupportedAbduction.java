@@ -24,7 +24,6 @@ import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
 public class SupportedAbduction extends QueryAbduction {
-	private IndexedByHeadPredRuleSet irs;
 	
 	public SupportedAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
 		super(onto, q, D, abdu);
@@ -72,34 +71,5 @@ public class SupportedAbduction extends QueryAbduction {
 		}
 		
 		return result;
-	}
-	
-	private boolean allAbducibles(AtomSet atomset) {
-		for(Atom a : atomset) {
-			if(!this.abducibles.contains(a.getPredicate()))
-				return false;
-		}
-		
-		return true;
-	}
-	
-	private List<AtomSet> rewrite(AtomSet atomset) {
-		List<AtomSet> rewritings = new LinkedList<>();
-		
-		for(Atom a : atomset) {
-			Set<Rule> rules_to_rewrite = this.irs.getRulesByPredicate(a.getPredicate());
-			if(!this.abducibles.contains(a.getPredicate()) &&
-					rules_to_rewrite.isEmpty()) return new LinkedList<>();
-			
-			for(Rule r : rules_to_rewrite) {
-				List<Unifier> unifiers = Unify.getSinglePieceUnifiers(atomset, r);
-				
-				for(Unifier u : unifiers) {
-					 rewritings.add(Utils.rewrite(atomset, r.getBody(), u));
-				}
-			}	
-		}
-		
-		return rewritings;
 	}
 }
