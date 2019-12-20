@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gu.dcore.homomorphism.HomoUtils;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Predicate;
+import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
@@ -94,5 +96,29 @@ public class NormalQueryAbduction extends QueryAbduction {
 		}
 		
 		return result;
+	}
+	
+	private AtomSet rewrite_with_facts(AtomSet atomset, Atom a, Column facts) {
+		if(atomset instanceof LiftedAtomSet) {
+			Column c = ((LiftedAtomSet) atomset).getColumn();
+			int max_jk_size = atomset.getRepConstants().size();
+			
+			int[] jk1 = new int[max_jk_size];
+			int[] jk2 = new int[max_jk_size];
+			int m = 0;
+			
+			for(int i = 0; i < a.getTerms().size(); i++) {
+				Term t = a.getTerm(i);
+				if(t instanceof RepConstant) {
+					jk1[m] = ((RepConstant) t).getValue();
+					jk2[m] = i;
+					m++;
+				}
+			}
+			
+		}
+		AtomSet ur = HomoUtils.minus(atomset, new AtomSet(a));
+		
+		return ur;
 	}
 }
