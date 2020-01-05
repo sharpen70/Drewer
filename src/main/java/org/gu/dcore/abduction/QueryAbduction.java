@@ -39,8 +39,12 @@ public abstract class QueryAbduction {
 	
 	protected IndexedByHeadPredRuleSet irs;
 	
+	protected boolean relax_abdu = false;
+	
 	public QueryAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
 		this.abducibles = abdu;
+		if(abdu.isEmpty()) this.relax_abdu = true;
+		
 		this.store = D;
 		this.ontology = onto;
 		this.query = q;
@@ -174,6 +178,8 @@ public abstract class QueryAbduction {
 	}
 	
 	protected boolean allAbducibles(AtomSet atomset) {
+		if(this.relax_abdu) return true;
+		
 		for(Atom a : atomset) {
 			if(!this.abducibles.contains(a.getPredicate()))
 				return false;
@@ -187,7 +193,7 @@ public abstract class QueryAbduction {
 		
 		for(Atom a : atomset) {
 			Set<Rule> rules_to_rewrite = this.irs.getRulesByPredicate(a.getPredicate());
-			if(!this.abducibles.contains(a.getPredicate()) &&
+			if(!relax_abdu && !this.abducibles.contains(a.getPredicate()) &&
 					rules_to_rewrite.isEmpty()) return new LinkedList<>();
 			
 			for(Rule r : rules_to_rewrite) {

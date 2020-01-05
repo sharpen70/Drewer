@@ -36,7 +36,7 @@ public class Constant implements Term {
 	
 	@Override
 	public String toVlog() {
-		return this.name;
+		return "<" + this.name + ">";
 	}
 	
 	@Override

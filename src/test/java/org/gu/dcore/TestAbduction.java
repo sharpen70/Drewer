@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.gu.dcore.abduction.NormalQueryAbduction;
+import org.gu.dcore.abduction.QueryAbduction;
 import org.gu.dcore.abduction.SupportedAbduction;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.model.AtomSet;
@@ -47,7 +49,7 @@ public class TestAbduction extends TestCase {
     			+ "D(X) :- E(X, Y).");
     	
  //   	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
-    	ConjunctiveQuery query = new QueryParser().parse("?() :- D(Y), A(X,Y).");
+    	ConjunctiveQuery query = new QueryParser().parse("?() :- D(Y), A(X,Y), C(Y).");
     	
     	DatalogEngine engine = new DatalogEngine();
     	
@@ -57,7 +59,8 @@ public class TestAbduction extends TestCase {
     	abdu.add(PredicateFactory.instance().getPredicate("D"));
     	abdu.add(PredicateFactory.instance().getPredicate("R"));
     	
-    	SupportedAbduction abduction = new SupportedAbduction(P.getRuleSet(), query, engine, abdu);
+ //   	SupportedAbduction abduction = new SupportedAbduction(P.getRuleSet(), query, engine, abdu);
+    	NormalQueryAbduction abduction = new NormalQueryAbduction(P.getRuleSet(), query, engine, abdu);
     	
   //  	System.out.println(engine.answerAtomicQuery("A(a, ?b) ."));
     	List<AtomSet> expl = abduction.getExplanations();

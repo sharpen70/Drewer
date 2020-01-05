@@ -62,6 +62,15 @@ public class Column {
 		this.tuples.add(tuple);
 	}
 	
+	public void addwithFilter(QueryResult answer, ArrayList<Integer> filter) {
+		String[] tuple = new String[filter.size()];
+		List<org.semanticweb.vlog4j.core.model.api.Term> terms = answer.getTerms();
+		for(int i = 0; i < filter.size(); i++) {
+			tuple[i] = terms.get(filter.get(i)).toString();
+		}
+		this.tuples.add(tuple);
+	}
+	
 	public void remap(ArrayList<Integer> map) {
 		List<String[]> nts = new LinkedList<>();
 		for(String[] t : this.tuples) {
@@ -77,18 +86,14 @@ public class Column {
 		return this.tuples;
 	}
 	
-	public void distinct(boolean[] distinct_key) {
+	public void distinct() {
 		Set<String[]> distinct_set = new HashSet<>();
 		
 		Iterator<String[]> it = this.tuples.iterator();
 		
 		while(it.hasNext()) {
 			String[] t = it.next();
-			String[] key = new String[t.length];
-			for(int i = 0; i < t.length; i++) {
-				if(distinct_key[i]) key[i] = t[i];
-			}
-			if(!distinct_set.add(key)) it.remove();
+			if(!distinct_set.add(t)) it.remove();
 		}
 	}
 	

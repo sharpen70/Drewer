@@ -10,7 +10,7 @@ public class TestVlog {
 		DatalogEngine engine = new DatalogEngine();
 		
 //		String dir = "/home/peng/projects/chasebench/scenarios/deep/100/data";
-		String dir = "/home/peng/projects/chasebench/scenarios/STB-128/data";
+		String dir = "/home/sharpen/projects/chasebench-master/scenarios/STB-128/data";
 		engine.addSourceFromCSVDir(dir);
 	}
 }

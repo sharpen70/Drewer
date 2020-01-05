@@ -34,4 +34,12 @@ public class Predicate {
 	public String toString() {
 		return this.name;
 	}
+	
+	public String shortIri() {
+		int index = this.name.indexOf("#");
+		if(index != -1)
+			return this.name.substring(index + 1);
+		else 
+			return this.name;
+	}
 }
