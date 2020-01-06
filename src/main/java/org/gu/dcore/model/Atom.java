@@ -128,7 +128,7 @@ public class Atom {
 	}
 	
 	public String toVlog() {
-		String out = p.shortIri();
+		String out = "<" + p.shortIri() + ">";
 		out = out + "(";
 		
 		for(int i = 0; i < terms.size(); i++) {

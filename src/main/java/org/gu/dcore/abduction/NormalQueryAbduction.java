@@ -26,13 +26,14 @@ import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
-public class NormalQueryAbduction extends QueryAbduction {
+public class NormalQueryAbduction extends AbstactQueryAbduction {
 
 	public NormalQueryAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
 		super(onto, q, D, abdu);
 		this.irs = new IndexedByHeadPredRuleSet(onto);
 	}
 	
+	@Override
 	public List<AtomSet> getExplanations() throws IOException, ParsingException {
 		List<AtomSet> result = new LinkedList<>();		
 		List<AtomSet> final_set = new LinkedList<>();

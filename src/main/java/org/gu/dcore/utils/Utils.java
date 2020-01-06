@@ -26,6 +26,18 @@ import org.gu.dcore.store.Column;
 import org.gu.dcore.tuple.Pair;
 
 public class Utils {
+	public static String getPrefix(String iri) {
+		int sp = iri.lastIndexOf("#");
+		
+		if(sp != -1) return iri.substring(0, sp);
+		else {
+			int slash_p = iri.lastIndexOf("/");
+			if(slash_p != -1) return iri.substring(0, slash_p);
+		}
+		
+		return iri;
+	}
+	
 	public static String getShortIRI(String iri) {
 		Pattern p = Pattern.compile("\"([^\"]*)\"");
 		Matcher m = p.matcher(iri);

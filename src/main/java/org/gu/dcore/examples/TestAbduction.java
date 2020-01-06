@@ -19,15 +19,15 @@ import org.semanticweb.vlog4j.parser.ParsingException;
 
 public class TestAbduction {
 	public static void main(String[] args) throws ParsingException, IOException {
-		String onto_file = "/home/sharpen/projects/abdu_eval/tractable-abd/tboxfiles_dlp/semintec-tbox.dlp";
-		String data_file = "/home/sharpen/projects/abdu_eval/tractable-abd/aboxdump_csv/SEMINTEC";
+		String onto_file = "/home/peng/projects/tractable-abd/tboxfiles_dlp/semintec-tbox.dlp";
+		String data_file = "/home/peng/projects/abdu_eval/data/SEMINTEC";
 		
 		DcoreParser parser = new DcoreParser();
     	
     	Program P = parser.parseFile(onto_file);
     	
  //   	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
-    	ConjunctiveQuery query = new QueryParser().parse("?() :- <http://www.owl-ontologies.com/unnamed.owl#StatementIssuanceFrequencyValue>(<http://www.owl-ontologies.com/unnamed.owl#po31518>).");
+    	ConjunctiveQuery query = new QueryParser().parse("?() :- Account(<http://www.owl-ontologies.com/unnamed.owl#po31987>).");
     	
     	DatalogEngine engine = new DatalogEngine();
     	

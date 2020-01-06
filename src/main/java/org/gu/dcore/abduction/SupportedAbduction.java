@@ -23,7 +23,7 @@ import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
-public class SupportedAbduction extends QueryAbduction {
+public class SupportedAbduction extends AbstactQueryAbduction {
 	
 	public SupportedAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
 		super(onto, q, D, abdu);

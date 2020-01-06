@@ -31,9 +31,15 @@ public class QueryParser {
 	private int v = 0;
 	
 	private boolean full = true;
+	private String default_prefix = "";
 	
 	public QueryParser() {
 		vMap = new HashMap<>();
+	}
+	
+	public QueryParser(String prefix) {
+		vMap = new HashMap<>();
+		default_prefix = prefix;
 	}
 	
 	public ConjunctiveQuery parseFile(String programFile) throws IOException {		
@@ -103,8 +109,18 @@ public class QueryParser {
 	private class AtomVisitor extends QUERYBaseVisitor<Atom> {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
-			String iri = ctx.predicate().DESCRIPTION().getText();			
-			iri = full ? iri : Utils.getShortIRI(iri);
+			String iri;
+			
+			if(ctx.predicate().DESCRIPTION() != null) iri = ctx.predicate().DESCRIPTION().getText();
+			else {					
+				String bracketed = ctx.predicate().BRACKETED().getText();
+				iri = bracketed.substring(1, bracketed.length() - 1);
+			}
+			
+			if(full) {
+				if(iri.indexOf("#") == -1) iri = default_prefix + "#" + iri;
+			}
+			else iri = Utils.getShortIRI(iri);
 			
 			TermsContext _terms = ctx.terms();
 			
@@ -122,7 +138,15 @@ public class QueryParser {
 			ArrayList<Term> terms = new ArrayList<>();
 			
 			while(ctx != null) {
-				String ts = ctx.term().DESCRIPTION().getText();
+				String ts;
+				
+				if(ctx.term().DESCRIPTION() != null) ts = ctx.term().DESCRIPTION().getText();
+				else if(ctx.term().STRING() != null) ts = ctx.term().STRING().getText();
+				else {					
+					String bracketed = ctx.term().BRACKETED().getText();
+					ts = bracketed.substring(1, bracketed.length() - 1);
+				}
+				
 				Term t;
 				
 				if(Character.isUpperCase(ts.charAt(0))) {

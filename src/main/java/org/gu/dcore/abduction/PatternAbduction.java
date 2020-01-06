@@ -1,5 +1,6 @@
 package org.gu.dcore.abduction;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,13 +24,13 @@ import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
-public class PatternAbdunction extends QueryAbduction {
+public class PatternAbduction extends AbstactQueryAbduction {
 
-	public PatternAbdunction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
+	public PatternAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
 		super(onto, q, D, abdu);
 	}
-
-	public List<PatternExplanation> getPatternExplanations() throws ParsingException {
+	
+	public List<PatternExplanation> getPatternExplanations() throws IOException, ParsingException {
 		List<PatternExplanation> result = new LinkedList<PatternExplanation>();
 		
 		/* Compute datalog rewriting of the abduction problem */
@@ -40,5 +41,11 @@ public class PatternAbdunction extends QueryAbduction {
 		
 		
 		return result; 
+	}
+
+	@Override
+	public List<AtomSet> getExplanations() throws IOException, ParsingException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -45,6 +45,12 @@ public class DcoreParser {
 	
 	boolean full = true;
 	
+	/* Due the input syntax of some benchmarks where prefix is not indicated,
+	 * a default prefix needs to be provided 
+	 * Here we use the first prefix occurring in the ontology as the default prefix
+	 */
+	String default_prefix = "";
+	
 	public DcoreParser() {
 		vMap = new HashMap<>();
 	}
@@ -145,7 +151,16 @@ public class DcoreParser {
 	private class AtomVisitor extends EDLGBaseVisitor<Atom> {
 		@Override
 		public Atom visitAtom(AtomContext ctx) {
-			String iri = ctx.predicate().DESCRIPTION().getText();
+			String iri;
+			
+			if(ctx.predicate().DESCRIPTION() != null) iri = ctx.predicate().DESCRIPTION().getText();
+			else {					
+				String bracketed = ctx.predicate().BRACKETED().getText();
+				iri = bracketed.substring(1, bracketed.length() - 1);
+			}
+			
+			if(default_prefix == "") default_prefix = Utils.getPrefix(iri);
+			
 			iri = full ? iri : Utils.getShortIRI(iri);
 			
 			if(iri == "!") return null;
@@ -155,7 +170,14 @@ public class DcoreParser {
 			TermsContext _terms = ctx.terms();
 			
 			while(_terms != null) {
-				String ts = _terms.term().DESCRIPTION().getText();
+				String ts;
+				
+				if(_terms.term().DESCRIPTION() != null) ts = _terms.term().DESCRIPTION().getText();
+				else if(_terms.term().STRING() != null) ts = _terms.term().STRING().getText();
+				else {					
+					String bracketed = _terms.term().BRACKETED().getText();
+					ts = bracketed.substring(1, bracketed.length() - 1);
+				}
 				Term t;
 				
 				if(Character.isUpperCase(ts.charAt(0))) {
@@ -176,5 +198,9 @@ public class DcoreParser {
 					
 			return new Atom(predicate, terms);
 		}
+	}
+	
+	public String getDefaultPrefix() {
+		return default_prefix;
 	}
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.gu.dcore.abduction.NormalQueryAbduction;
-import org.gu.dcore.abduction.QueryAbduction;
+import org.gu.dcore.abduction.AbstactQueryAbduction;
 import org.gu.dcore.abduction.SupportedAbduction;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.model.AtomSet;
