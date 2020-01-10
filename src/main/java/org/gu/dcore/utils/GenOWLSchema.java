@@ -28,7 +28,7 @@ import org.gu.dcore.parsing.QueryParser;
 
 public class GenOWLSchema {
 	public static void main(String[] args) throws Exception {
-		String chasebench = "/home/sharpen/projects/evaluations/benchmarks/owl/";
+		String chasebench = "/home/peng/projects/evaluations/benchmarks/owl/";
 		String[] owls = {"Reactome", "Uniprot"};
 		
 		for(String owl : owls) {			
@@ -67,12 +67,12 @@ public class GenOWLSchema {
 				
 				if(ts.length == 2) {
 					arity = 1;
-					 p = Utils.getShortIRI(ts[1]);
+					 p = "<" + ts[1] + ">";
 					 v = "\"" + Utils.getShortIRI(ts[0]) +  "\"";				
 				}
 				else {
 					arity = 2;
-					p = Utils.getShortIRI(ts[1]);
+					p = "<" + ts[1] + ">";
 					v = "\"" + Utils.getShortIRI(ts[0]) +  "\"" + "," + "\"" +Utils.getShortIRI(ts[2]) +  "\"";					
 				}
 				

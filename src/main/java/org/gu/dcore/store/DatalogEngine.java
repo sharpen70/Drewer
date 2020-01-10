@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -28,7 +30,7 @@ public class DatalogEngine {
 	public DatalogEngine() throws ParsingException {
 		configureLogging(Level.OFF);
 		
-		kb = RuleParser.parse("");
+		kb = new KnowledgeBase();
 	}
 	
 	public void addRules(List<Rule> rules) throws ParsingException {
@@ -39,7 +41,6 @@ public class DatalogEngine {
 				import_str += r.toVLog() + ". \n";
 			}
 		}
-		
 		RuleParser.parseInto(kb, import_str);
 	}
 	
@@ -101,11 +102,6 @@ public class DatalogEngine {
 		for(File csv : dir.listFiles()) addSourceFromCSV(csv);
 	}
 	
-	public void addSourceFromRDFDir(String fileDir) throws FileNotFoundException, ParsingException {
-		File dir = new File(fileDir);
-		for(File csv : dir.listFiles()) addSourceFromRDF(csv);
-	}
-	
 	public void addSourceFromCSV(File csv) throws ParsingException, FileNotFoundException {
 		String fname = csv.getName();
 		String pname = fname.substring(0, fname.indexOf("."));
@@ -113,32 +109,21 @@ public class DatalogEngine {
 		
 		String line;
 		int arity = 0;
-		
+	
 		if(scanner.hasNextLine()) {
 			line = scanner.nextLine();
-			arity = line.split(",").length;
-			scanner.close();
+			
+			Pattern p = Pattern.compile("\"([^\"]*)\"");
+			Matcher m = p.matcher(line);
+			
+			if(m.find()) {
+				arity++;
+			}
 		}
+		
+		scanner.close();
 		
 		String import_str = "@source <" + pname + ">(" + arity + ") : load-csv(\"" + csv.getAbsolutePath() + "\") .";
-		RuleParser.parseInto(kb, import_str);
-	}
-	
-	public void addSourceFromRDF(File rdf) throws ParsingException, FileNotFoundException {
-		String fname = rdf.getName();
-		String pname = fname.substring(0, fname.indexOf("."));
-		Scanner scanner = new Scanner(rdf);
-		
-		String line;
-		int arity = 0;
-		
-		if(scanner.hasNextLine()) {
-			line = scanner.nextLine();
-			arity = line.split(" ").length - 1;
-			scanner.close();
-		}
-		
-		String import_str = "@source " + pname + "(" + arity + ") : load-rdf(\"" + rdf.getAbsolutePath() + "\") .";
 		RuleParser.parseInto(kb, import_str);
 	}
 	
