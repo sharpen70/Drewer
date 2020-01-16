@@ -132,6 +132,8 @@ public class ModularizedRewriting {
 					List<Unifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
 			
 					if(!unifiers.isEmpty()) {
+						boolean ex_rew = hr.isExRule();
+						
 						AtomSet current_target = new AtomSet();
 						
 						AtomSet tails = new AtomSet();
@@ -152,7 +154,7 @@ public class ModularizedRewriting {
 						}
 						tails.addAll(hr.getNormalAtoms());					
 
-						if(!hr.isExRule() && selected.add(hr.getRuleIndex())) {
+						if(!ex_rew && selected.add(hr.getRuleIndex())) {
 							if(hr.getMblocks().isEmpty()) result.add(hr);
 							else {
 								Rule n_rule = RuleFactory.instance().
@@ -163,13 +165,13 @@ public class ModularizedRewriting {
 						
 						for(Unifier u : unifiers) {
 						    AtomSet rewriting = u.getImageOf(t.c, false);		
-							current_target = u.getImageOf(current_target, true);	
+							AtomSet rew_body = u.getImageOf(current_target, true);	
 							AtomSet up = u.getImageOfPiece();
 						
 							rewriting = HomoUtils.minus(rewriting, up);
-							rewriting = HomoUtils.simple_union(rewriting, current_target);
+							rewriting = HomoUtils.simple_union(rewriting, rew_body);
 							
-							if(hr.isExRule())  {
+							if(ex_rew)  {
 								boolean subsumed = false;
 								//Remove redundant rewritings
 								Iterator<AtomSet> it = rewrited.iterator();
@@ -207,7 +209,7 @@ public class ModularizedRewriting {
 							
 							uc.addAll(t.d);
 							
-							if(hr.isExRule()) {
+							if(ex_rew) {
 								if(!t.e.isEmpty()) {
 									boolean all_hit = true;
 									for(Atom a : t.e) {
@@ -224,8 +226,12 @@ public class ModularizedRewriting {
 							}
 								
 							if(!current_target.isEmpty()) {
-								AtomSet rewrited_target = new AtomSet(t.e);
-								rewrited_target.addAll(current_target);
+								AtomSet rewrited_target;
+								if(ex_rew) rewrited_target = new AtomSet();
+								else {
+									rewrited_target = new AtomSet(t.e);
+									rewrited_target.addAll(rew_body);
+								}
 								queue.add(new Tuple5<>(rw_t, o_rewriting, rewriting, uc, rewrited_target));
 							}	
 						}	
