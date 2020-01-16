@@ -90,8 +90,9 @@ public class BaseMarking {
 		List<Block> blocks = new LinkedList<>();
 		
 		if(rbm == null) return new BlockRule(r, blocks);
-			
-		for(Block b : rbm.getConBlocks()) {
+		
+		List<Block> conblocks = rbm.getConBlocks();
+		for(Block b : conblocks) {
 			Block merge = null;
 			Iterator<Block> it = blocks.iterator();
 			while(it.hasNext()) {

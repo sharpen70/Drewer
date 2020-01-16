@@ -181,7 +181,7 @@ public class TestModularRewriting extends TestCase
 //    	}
 //	    assertTrue( true );
 //	}
-	
+//	
 //	public void testApp6()
 //	{
 //    	DcoreParser parser = new DcoreParser();
@@ -211,7 +211,7 @@ public class TestModularRewriting extends TestCase
 	{
     	DcoreParser parser = new DcoreParser();
     	
-    	Program P = parser.parse("p(X, Y) :- b(X).");
+    	Program P = parser.parse("p(X, Y) :- b(X). p(X,Y) :- a(Y).");
     	
     	ConjunctiveQuery query = new QueryParser().parse("?() :- r(U,V),r(V,W),p(U,Z),p(V,Z),p(V,T),p(W,T),p1(U),p2(W).");
     	

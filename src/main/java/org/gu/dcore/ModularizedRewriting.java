@@ -14,6 +14,7 @@ import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.factories.TermFactory;
 import org.gu.dcore.grd.IndexedBlockRuleSet;
+import org.gu.dcore.homomorphism.HomoUtils;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
@@ -115,56 +116,22 @@ public class ModularizedRewriting {
 			Rule init_rule = RuleFactory.instance().createRule(new AtomSet(blockAtom), na);
 			result.add(init_rule);
 			
-			Queue<Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, Set<Integer>>> queue = new LinkedList<>();
-			queue.add(new Tuple5<>(blockAtom.getTerms(), br.getBody(), na, new AtomSet(), new HashSet<>()));
-//			Queue<Tuple4<ArrayList<Term>, AtomSet, AtomSet, AtomSet>> queue = new LinkedList<>();
-//			queue.add(new Tuple4<>(blockAtom.getTerms(), br.getBody(), na, new AtomSet()));
-
+			Queue<Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, AtomSet>> queue = new LinkedList<>();
+			queue.add(new Tuple5<>(blockAtom.getTerms(), br.getBody(), na, new AtomSet(), new AtomSet()));
 			
 			List<AtomSet> rewrited = new LinkedList<>();
-			rewrited.add(br.getBody());
 			
 			while(!queue.isEmpty()) {
-				Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, Set<Integer>> t = queue.poll();	
-//				Tuple4<ArrayList<Term>, AtomSet, AtomSet, AtomSet> t = queue.poll();	
+				Tuple5<ArrayList<Term>, AtomSet, AtomSet, AtomSet, AtomSet> t = queue.poll();	
 				
 				AtomSet rewrite_target = t.c;
 				Set<BlockRule> rs = this.ibr.getRules(rewrite_target);
 				
 				for(BlockRule hr : rs) {
-					Set<Integer> processed = new HashSet<>(t.e);
 					Set<Variable> restricted_var = br_b.c ? blockRule.getFrontierVariables() : new HashSet<>();
 					List<Unifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
-					List<Pair<Unifier, AtomSet>> available_unifiers = new LinkedList<>();
-						
-					for(Unifier u : unifiers) {
-						AtomSet rewriting = Utils.rewrite(t.b, hr.getBody(), u);
-//						System.out.println(rewriting);
-//						AtomSet rewriting = new AtomSet();
-
-						if(hr.isExRule())  {
-							boolean subsumed = false;
-							//Remove redundant rewritings
-							Iterator<AtomSet> it = rewrited.iterator();
-							while(it.hasNext()) {
-								AtomSet rew = it.next();
-								
-								if(Utils.isMoreGeneral(rew, rewriting, true)) {
-									subsumed = true; break;
-								}
-								if(Utils.isMoreGeneral(rewriting, rew, true)) {
-									it.remove();
-								}
-							}
-							if(!subsumed) {
-								available_unifiers.add(new Pair<>(u, rewriting));
-								rewrited.add(rewriting);
-							}
-						}
-						else available_unifiers.add(new Pair<>(u, rewriting));
-					}	
 			
-					if(!available_unifiers.isEmpty()) {
+					if(!unifiers.isEmpty()) {
 						AtomSet current_target = new AtomSet();
 						
 						AtomSet tails = new AtomSet();
@@ -183,26 +150,47 @@ public class ModularizedRewriting {
 							if(brs != null) rewQueue.addAll(brs);
 	
 						}
-						tails.addAll(hr.getNormalAtoms());		
-						
-						if(!hr.isExRule() ) {
-							if(processed.add(hr.getRuleIndex())) {
-								if(selected.add(hr.getRuleIndex())) {
-									if(hr.getMblocks().isEmpty()) result.add(hr);
-									else {
-										Rule n_rule = RuleFactory.instance().
-											createRule(hr.getHead(), current_target, tails);
-										result.add(n_rule);
-									}
-								}
+						tails.addAll(hr.getNormalAtoms());					
+
+						if(!hr.isExRule() && selected.add(hr.getRuleIndex())) {
+							if(hr.getMblocks().isEmpty()) result.add(hr);
+							else {
+								Rule n_rule = RuleFactory.instance().
+									createRule(hr.getHead(), current_target, tails);
+								result.add(n_rule);
 							}
-							else continue;
 						}
 						
-						for(Pair<Unifier, AtomSet> p : available_unifiers) {
-							Unifier u = p.a;
-							AtomSet rewriting = Utils.rewrite(t.c, current_target, u);
+						for(Unifier u : unifiers) {
+						    AtomSet rewriting = u.getImageOf(t.c, false);		
+							current_target = u.getImageOf(current_target, true);	
+							AtomSet up = u.getImageOfPiece();
 						
+							rewriting = HomoUtils.minus(rewriting, up);
+							rewriting = HomoUtils.simple_union(rewriting, current_target);
+							
+							if(hr.isExRule())  {
+								boolean subsumed = false;
+								//Remove redundant rewritings
+								Iterator<AtomSet> it = rewrited.iterator();
+								while(it.hasNext()) {
+									AtomSet rew = it.next();
+									
+									if(Utils.isMoreGeneral(rew, rewriting, true)) {
+										subsumed = true; break;
+									}
+									if(Utils.isMoreGeneral(rewriting, rew, true)) {
+										it.remove();
+									}
+								}
+								if(!subsumed) {
+									rewrited.add(rewriting);
+								}
+								else continue;
+							}
+							
+							AtomSet o_rewriting = Utils.rewrite(t.b, hr.getBody(), u);
+							
 							Set<Term> eliminated = new HashSet<>();
 							for(Variable v : hr.getExistentials()) {
 								eliminated.add(u.getImageOf(v, true));
@@ -220,13 +208,25 @@ public class ModularizedRewriting {
 							uc.addAll(t.d);
 							
 							if(hr.isExRule()) {
+								if(!t.e.isEmpty()) {
+									boolean all_hit = true;
+									for(Atom a : t.e) {
+										if(!u.getB().contains(a)) {
+											all_hit = false;
+											break;
+										}
+									}
+									if(!all_hit) continue;
+								}
 								Atom newhead =  AtomFactory.instance().createAtom(blockAtom.getPredicate(), rw_t);
 								Rule rw_rule = RuleFactory.instance().createRule(new AtomSet(newhead), rewriting, uc);
 								result.add(rw_rule);
 							}
 								
 							if(!current_target.isEmpty()) {
-								queue.add(new Tuple5<>(rw_t, p.b, rewriting, uc, processed));
+								AtomSet rewrited_target = new AtomSet(t.e);
+								rewrited_target.addAll(current_target);
+								queue.add(new Tuple5<>(rw_t, o_rewriting, rewriting, uc, rewrited_target));
 							}	
 						}	
 					}

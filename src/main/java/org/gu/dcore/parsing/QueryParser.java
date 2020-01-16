@@ -118,8 +118,9 @@ public class QueryParser {
 			}
 			
 			if(full) {
-				if(iri.indexOf("#") == -1) iri = default_prefix + "#" + iri;
+				if(iri.indexOf("#") == -1 && default_prefix != "") iri = default_prefix + "#" + iri;
 			}
+			
 			else iri = Utils.getShortIRI(iri);
 			
 			TermsContext _terms = ctx.terms();
