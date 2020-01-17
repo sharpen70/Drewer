@@ -18,7 +18,7 @@ public class Variable implements Term {
 	
 	@Override
 	public String toRDFox() {
-		return "?" + this.value;
+		return "?V" + this.value;
 	}
 	
 	@Override

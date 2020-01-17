@@ -37,10 +37,9 @@ public class DatalogEngine {
 		String import_str = "";
 		
 		for(Rule r :rules) {
-			if(!r.isExRule()) {
-				import_str += r.toVLog() + ". \n";
-			}
-		}
+			import_str += r.toVLog() + "\n";
+		}		
+		
 		RuleParser.parseInto(kb, import_str);
 	}
 	
@@ -116,7 +115,7 @@ public class DatalogEngine {
 			Pattern p = Pattern.compile("\"([^\"]*)\"");
 			Matcher m = p.matcher(line);
 			
-			if(m.find()) {
+			while(m.find()) {
 				arity++;
 			}
 		}

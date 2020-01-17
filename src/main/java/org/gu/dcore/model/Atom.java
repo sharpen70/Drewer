@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.gu.dcore.utils.Utils;
+
 /**
  * Atom class, without functional terms
  * @author sharpen
@@ -127,13 +129,50 @@ public class Atom {
 		return out;
 	}
 	
+	public String toShort() {
+		String out = Utils.getShortIRI(p.toString());
+		out = out + "(";
+		
+		for(int i = 0; i < terms.size(); i++) {
+			Term t = terms.get(i);
+			out = out + t;
+			if(i != terms.size() - 1) {
+				out = out + ", ";
+			}
+		}
+		
+		out = out + ")";
+		
+		return out;
+	}
+	
+	public String toVlog(Set<Variable> ex) {
+		String out = Utils.getShortIRI(p.toString());
+		out = out + "(";
+		
+		for(int i = 0; i < terms.size(); i++) {
+			Term t = terms.get(i);
+			if(ex.contains(t))
+				out = out + "!X" + ((Variable)t).getValue();
+			else out = out + t.toVlog();
+			if(i != terms.size() - 1) {
+				out = out + ", ";
+			}
+		}
+		
+		out = out + ")";
+		
+		return out;
+	}
+	
 	public String toVlog() {
-		String out = "<" + p.shortIri() + ">";
+		String out = Utils.getShortIRI(p.toString());
 		out = out + "(";
 		
 		for(int i = 0; i < terms.size(); i++) {
 			Term t = terms.get(i);
 			out = out + t.toVlog();
+			
 			if(i != terms.size() - 1) {
 				out = out + ", ";
 			}
