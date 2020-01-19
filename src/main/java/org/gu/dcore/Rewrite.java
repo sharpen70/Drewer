@@ -16,6 +16,7 @@ import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
+import org.gu.dcore.rewriting.ModularizedRewriting;
 
 public class Rewrite {
 	public static void main(String[] args) throws Exception {

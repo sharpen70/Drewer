@@ -21,7 +21,7 @@ import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
-import org.gu.dcore.reasoning.Unifier;
+import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.tuple.Pair;
 
@@ -62,7 +62,7 @@ public class Utils {
 	 * b the set of atoms to replace
 	 * u the unifier for replacing
 	 */
-	public static AtomSet rewrite(AtomSet f, AtomSet b, Unifier u) {	
+	public static AtomSet rewrite(AtomSet f, AtomSet b, SinglePieceUnifier u) {	
 		Column c = null;
 		
 		if(f instanceof LiftedAtomSet || b instanceof LiftedAtomSet) {
@@ -107,7 +107,7 @@ public class Utils {
 	/*
 	 * rhs denote whether atomset belongs to the rule for unification
 	 */
-	private static void adjust_column_with_unifier(AtomSet atomset, Unifier u, boolean rhs) {
+	private static void adjust_column_with_unifier(AtomSet atomset, SinglePieceUnifier u, boolean rhs) {
 		if(!(atomset instanceof LiftedAtomSet)) return;
 		LiftedAtomSet liftedAtomset = (LiftedAtomSet)atomset;
 		Column column = liftedAtomset.getColumn();

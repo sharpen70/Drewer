@@ -12,7 +12,6 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.gu.dcore.ModularizedRewriting;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.Atom;
@@ -25,6 +24,7 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
+import org.gu.dcore.rewriting.ModularizedRewriting;
 
 public class GenOWLSchema {
 	public static void main(String[] args) throws Exception {

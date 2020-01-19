@@ -209,4 +209,15 @@ public class AtomSet implements Iterable<Atom> {
 		
 		return s;
 	}
+	
+	public String toVLog() {
+		String s = "";
+		
+		for(int i = 0; i < atoms.size(); i++) {
+			s += atoms.get(i).toVlog();
+			if(i != atoms.size() - 1) s += ", ";
+		}
+		
+		return s;
+	}
 }

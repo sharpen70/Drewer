@@ -16,7 +16,7 @@ import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.reasoning.FreshIndividualSubstitution;
-import org.gu.dcore.reasoning.Unifier;
+import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.tuple.Pair;

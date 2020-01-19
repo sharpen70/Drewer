@@ -7,6 +7,7 @@ import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
+import org.gu.dcore.rewriting.ModularizedRewriting;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

@@ -13,7 +13,7 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
-public class Unifier {
+public class SinglePieceUnifier {
 	private Partition partition;
 	private Set<Atom> B;
 	private Set<Atom> H;
@@ -24,7 +24,7 @@ public class Unifier {
 	private boolean valid;
 	private boolean analyzed = false;
 	
-	public Unifier(Set<Atom> B, Set<Atom> H, AtomSet body, Rule hr, Partition partition) {
+	public SinglePieceUnifier(Set<Atom> B, Set<Atom> H, AtomSet body, Rule hr, Partition partition) {
 		this.B = B;
 		this.H = H;
 		this.body = body;
@@ -75,7 +75,7 @@ public class Unifier {
 //		return this.partition.getSubstitution().getImageOf(vars);
 //	}
 	
-	public Unifier extend(Unifier u) {
+	public SinglePieceUnifier extend(SinglePieceUnifier u) {
 		Set<Atom> newpB = new HashSet<>();
 		Set<Atom> newH = new HashSet<>();
 		
@@ -86,7 +86,7 @@ public class Unifier {
 		
 		Partition newP = this.partition.join(u.partition);
 		
-		return new Unifier(newpB, newH, this.body, this.hr, newP);
+		return new SinglePieceUnifier(newpB, newH, this.body, this.hr, newP);
 	}
 	
 	public boolean isPartitionValid() {

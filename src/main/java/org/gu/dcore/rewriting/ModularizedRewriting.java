@@ -1,4 +1,4 @@
-package org.gu.dcore;
+package org.gu.dcore.rewriting;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +28,7 @@ import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
 import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
-import org.gu.dcore.reasoning.Unifier;
+import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.tuple.Tuple;
@@ -129,7 +129,7 @@ public class ModularizedRewriting {
 				
 				for(BlockRule hr : rs) {
 					Set<Variable> restricted_var = br_b.c ? blockRule.getFrontierVariables() : new HashSet<>();
-					List<Unifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
+					List<SinglePieceUnifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
 			
 					if(!unifiers.isEmpty()) {
 						boolean ex_rew = hr.isExRule();
@@ -163,7 +163,7 @@ public class ModularizedRewriting {
 							}
 						}
 						
-						for(Unifier u : unifiers) {
+						for(SinglePieceUnifier u : unifiers) {
 						    AtomSet rewriting = u.getImageOf(t.c, false);		
 							AtomSet rew_body = u.getImageOf(current_target, true);	
 							AtomSet up = u.getImageOfPiece();

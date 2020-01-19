@@ -19,13 +19,13 @@ import org.gu.dcore.model.Variable;
 
 public class Unify {
 	
-	public static List<Unifier> getSinglePieceUnifiers(AtomSet body, Rule hr) {
+	public static List<SinglePieceUnifier> getSinglePieceUnifiers(AtomSet body, Rule hr) {
 		return getSinglePieceUnifiers(body, body, hr, new HashSet<>());
 	}
 	
-	public static List<Unifier> getSinglePieceUnifiers(AtomSet block, AtomSet _rbody, Rule hr, Set<Variable> restricted_var) {
-		List<Unifier> singlePieceUnifiers = new LinkedList<>();
-		Map<Atom, List<Unifier>> preUnifiers = new HashMap<>();
+	public static List<SinglePieceUnifier> getSinglePieceUnifiers(AtomSet block, AtomSet _rbody, Rule hr, Set<Variable> restricted_var) {
+		List<SinglePieceUnifier> singlePieceUnifiers = new LinkedList<>();
+		Map<Atom, List<SinglePieceUnifier>> preUnifiers = new HashMap<>();
 		
 		AtomSet rbody = new AtomSet(_rbody);
 		
@@ -49,12 +49,12 @@ public class Unify {
 					Set<Atom> B = new HashSet<>(); B.add(a);
 					Set<Atom> H = new HashSet<>(); H.add(b);
 					
-					Unifier u = new Unifier(B, H, rbody, hr, partition);
+					SinglePieceUnifier u = new SinglePieceUnifier(B, H, rbody, hr, partition);
 					
 					if(u.isPartitionValid()) {
 						if(u.isPieceUnifier()) singlePieceUnifiers.add(u);
 						else {
-							List<Unifier> unifiers = preUnifiers.get(a);
+							List<SinglePieceUnifier> unifiers = preUnifiers.get(a);
 							if(unifiers == null) {
 								unifiers = new LinkedList<>();
 								unifiers.add(u);
@@ -67,8 +67,8 @@ public class Unify {
 			}
 		}
 		
-		for(Entry<Atom, List<Unifier>> entry : preUnifiers.entrySet()) {
-			Iterator<Unifier> it = entry.getValue().iterator();
+		for(Entry<Atom, List<SinglePieceUnifier>> entry : preUnifiers.entrySet()) {
+			Iterator<SinglePieceUnifier> it = entry.getValue().iterator();
 			while(it.hasNext()) {
 				singlePieceUnifiers.addAll(extend(it.next(), preUnifiers));
 				it.remove();
@@ -116,24 +116,24 @@ public class Unify {
 //		}
 //	}
 	
-	private static List<Unifier> extend(Unifier unifier, Map<Atom, List<Unifier>> preUnifiers) {
-		List<Unifier> result = new LinkedList<>();
+	private static List<SinglePieceUnifier> extend(SinglePieceUnifier unifier, Map<Atom, List<SinglePieceUnifier>> preUnifiers) {
+		List<SinglePieceUnifier> result = new LinkedList<>();
 		
 		Set<Atom> stickyAtoms = unifier.getStickyAtoms();
 		
-		List<Unifier> preq = new LinkedList<>();
+		List<SinglePieceUnifier> preq = new LinkedList<>();
 		preq.add(unifier);
 			
 		for(Atom a : stickyAtoms) {
-			List<Unifier> temp_preq = new LinkedList<>();
+			List<SinglePieceUnifier> temp_preq = new LinkedList<>();
 			
-			for(Unifier pu : preq) {
-				List<Unifier> us = preUnifiers.get(a);
+			for(SinglePieceUnifier pu : preq) {
+				List<SinglePieceUnifier> us = preUnifiers.get(a);
 				
 				if(us == null || us.isEmpty()) continue;
 				
-				for(Unifier u : us) {
-					Unifier extended = pu.extend(u);
+				for(SinglePieceUnifier u : us) {
+					SinglePieceUnifier extended = pu.extend(u);
 					if(extended != null) temp_preq.add(extended);
 				}
 			}
@@ -141,7 +141,7 @@ public class Unify {
 			preq = temp_preq;
 		}
 		
-		for(Unifier pu : preq) {
+		for(SinglePieceUnifier pu : preq) {
 			if(pu.isPieceUnifier()) result.add(pu);
 			else if (pu.isPartitionValid()) result.addAll(extend(pu, preUnifiers));
 		}

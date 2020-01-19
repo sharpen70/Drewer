@@ -10,6 +10,7 @@ import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
+import org.gu.dcore.rewriting.ModularizedRewriting;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
 import org.semanticweb.vlog4j.parser.ParsingException;

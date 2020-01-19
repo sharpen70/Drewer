@@ -40,9 +40,12 @@ public class DatalogEngine {
 			import_str += r.toVLog() + "\n";
 		}		
 		
-		RuleParser.parseInto(kb, import_str);
+		addRules(import_str);
 	}
 	
+	public void addRules(String rules) throws ParsingException {
+		RuleParser.parseInto(kb, rules);
+	}
 	
 	public void materialize() throws IOException {
 		if(reasoner == null) {

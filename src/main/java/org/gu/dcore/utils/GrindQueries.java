@@ -5,13 +5,13 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Scanner;
 
-import org.gu.dcore.ModularizedRewriting;
 import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
+import org.gu.dcore.rewriting.ModularizedRewriting;
 
 public class GrindQueries {
 	public static void main(String[] args) throws Exception {

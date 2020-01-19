@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.gu.dcore.ModularizedRewriting;
 import org.gu.dcore.factories.AtomFactory;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.grd.GraphOfPredicateDependencies;
@@ -17,8 +16,9 @@ import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.reasoning.Unifier;
+import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.reasoning.Unify;
+import org.gu.dcore.rewriting.ModularizedRewriting;
 import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.utils.Utils;

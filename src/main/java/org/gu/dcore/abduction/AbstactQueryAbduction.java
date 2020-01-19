@@ -22,7 +22,7 @@ import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
-import org.gu.dcore.reasoning.Unifier;
+import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
@@ -197,9 +197,9 @@ public abstract class AbstactQueryAbduction implements QueryAbduction {
 					rules_to_rewrite.isEmpty()) return new LinkedList<>();
 			
 			for(Rule r : rules_to_rewrite) {
-				List<Unifier> unifiers = Unify.getSinglePieceUnifiers(atomset, r);
+				List<SinglePieceUnifier> unifiers = Unify.getSinglePieceUnifiers(atomset, r);
 				
-				for(Unifier u : unifiers) {
+				for(SinglePieceUnifier u : unifiers) {
 					 rewritings.add(Utils.rewrite(atomset, r.getBody(), u));
 				}
 			}	

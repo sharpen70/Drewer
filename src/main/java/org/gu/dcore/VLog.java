@@ -2,12 +2,11 @@ package org.gu.dcore;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Scanner;
 
+import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
-import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.store.Column;
@@ -58,17 +57,21 @@ public class VLog {
     		
     	   	ConjunctiveQuery query = new QueryParser().parse(line);
         	
+        	String qatom = getQueryAtom(query.getAnsVar().size());
+        	String qr = qatom + " :- " + query.getBody().toVLog() + ".";
+        	
     	   	System.out.println("Querying on: " + query.toString());      	   	        	
         	
         	start = System.currentTimeMillis();
         	engine.addRules(P.getRuleSet());
+        	engine.addRules(qr);
         	engine.materialize();
         	end = System.currentTimeMillis();
         	
-        	System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");
+        	System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");       	
         	
         	start = System.currentTimeMillis();
-        	Column answers = engine.answerAtomicQuery(getQueryAtom(query.getAnsVar().size()));
+        	Column answers = engine.answerAtomicQuery(qatom);
         	end = System.currentTimeMillis();
         	
         	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (end - start) + " ms");
