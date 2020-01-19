@@ -10,7 +10,13 @@ public class AggregateUnifier {
 		this.spus = new LinkedList<>();
 	}
 	
-	public void add(SinglePieceUnifier spu) {
+	public boolean aggregate(SinglePieceUnifier spu) {
 		this.spus.add(spu);
+		
+		return true;
+	}
+	
+	public boolean isCompatible(SinglePieceUnifier spu) {
+		return true;
 	}
 }

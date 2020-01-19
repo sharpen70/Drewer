@@ -146,14 +146,14 @@ public class Atom {
 		return out;
 	}
 	
-	public String toVlog(Set<Variable> ex) {
-		String out = Utils.getShortIRI(p.toString());
+	public String toVLog(Set<Variable> ex) {
+		String out = "<" + Utils.getShortIRI(p.toString()) + ">";
 		out = out + "(";
 		
 		for(int i = 0; i < terms.size(); i++) {
 			Term t = terms.get(i);
 			if(ex.contains(t))
-				out = out + "!X" + ((Variable)t).getValue();
+				out = out + "!V" + ((Variable)t).getValue();
 			else out = out + t.toVlog();
 			if(i != terms.size() - 1) {
 				out = out + ", ";
@@ -165,8 +165,8 @@ public class Atom {
 		return out;
 	}
 	
-	public String toVlog() {
-		String out = Utils.getShortIRI(p.toString());
+	public String toVLog() {
+		String out = "<" + Utils.getShortIRI(p.toString()) + ">";
 		out = out + "(";
 		
 		for(int i = 0; i < terms.size(); i++) {

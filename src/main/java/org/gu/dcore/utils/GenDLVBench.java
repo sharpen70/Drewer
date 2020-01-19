@@ -17,10 +17,10 @@ import org.gu.dcore.parsing.QueryParser;
 public class GenDLVBench {
 	public static void main(String[] args) throws IOException {
 //		String chasebench = "/home/peng/projects/evaluations/benchmarks/owl/";
-//		String[] owls = {"Reactome", "Uniprot"};
+//		String[] owls = {"LUBM", "Reactome", "Uniprot"};
 		
 		String chasebench = "/home/peng/projects/evaluations/benchmarks/existential_rules/";
-		String[] owls = {"deep200", "deep300", "LUBM", "ONT-256", "STB-128"};
+		String[] owls = {"deep200", "deep300", "ONT-256", "STB-128"};
 		
 		for(String owl : owls) {
 //			Scanner data = new Scanner(new File(chasebench, owl + "/data.nt"));
@@ -52,41 +52,78 @@ public class GenDLVBench {
 //			writer.close();
 //			data.close();
 			
-			String ontologyfile = chasebench + owl + "/" + owl + ".dlp";
-			DcoreParser parser = new DcoreParser();    	
-	    	Program P = parser.parseFile(ontologyfile);
-	    	PrintWriter writer = new PrintWriter(new File(chasebench + owl + "/" + owl + ".v"));
-	    	for(Rule r : P.getRuleSet()) {
-	    		writer.println(r.toDLV());
-	    	}
-	    	writer.close();
-	    	String queriesfile = chasebench + owl + "/queries.dlp";
-	    	Scanner scn = new Scanner(new File(queriesfile));
-	    	File qdir = new File(chasebench + owl + "/dlv_queries");
-	    	qdir.mkdir();
-	    	int i = 0;
-	    	while(scn.hasNextLine()) {
-	    		String line = scn.nextLine();
-	    		ConjunctiveQuery query = new QueryParser().parse(line);
-	    		PrintWriter qwriter = new PrintWriter(new File(qdir, "q" + (i++)));
-	    		Set<Variable> exvar = new HashSet<>(query.getBody().getVariables());
-	    		exvar.removeAll(query.getAnsVar());
-				String s = "";
-				if(!exvar.isEmpty()) {
-					s += "#exists{";
-					boolean first = true;
-					for(Variable v : exvar) {
-						if(!first) s += ",";
-						else first = false;
-						
-						s += v.toString();
-					}
-					s += "} ";
+//			String ontologyfile = chasebench + owl + "/" + owl + ".dlp";
+//			DcoreParser parser = new DcoreParser();    	
+//	    	Program P = parser.parseFile(ontologyfile);
+//	    	PrintWriter writer = new PrintWriter(new File(chasebench + owl + "/" + owl + ".v"));
+//	    	for(Rule r : P.getRuleSet()) {
+//	    		writer.println(r.toDLV());
+//	    	}
+//	    	writer.close();
+//	    	String queriesfile = chasebench + owl + "/qa_queries.dlp";
+//	    	Scanner scn = new Scanner(new File(queriesfile));
+//	    	File qdir = new File(chasebench + owl + "/dlv_queries");
+//	    	qdir.mkdir();
+//	    	int i = 1;
+//	    	while(scn.hasNextLine()) {
+//	    		String line = scn.nextLine();
+//	    		ConjunctiveQuery query = new QueryParser().parse(line);
+//	    		PrintWriter qwriter = new PrintWriter(new File(qdir, "Q" + (i++)) + ".txt");
+//	    		Set<Variable> exvar = new HashSet<>(query.getBody().getVariables());
+//	    		exvar.removeAll(query.getAnsVar());
+//				String s = "";
+//				if(!exvar.isEmpty()) {
+//					s += "#exists{";
+//					boolean first = true;
+//					for(Variable v : exvar) {
+//						if(!first) s += ",";
+//						else first = false;
+//						
+//						s += v.toString();
+//					}
+//					s += "} ";
+//				}
+//	    		qwriter.print(s + query.getBody().toShort() + "?");
+//	    		qwriter.close();
+//	    	}
+//	    	scn.close();
+//		}
+		
+		String ontologyfile = chasebench + owl + "/" + owl + ".dlp";
+		DcoreParser parser = new DcoreParser();    	
+    	Program P = parser.parseFile(ontologyfile);
+    	PrintWriter writer = new PrintWriter(new File(chasebench + owl + "/" + owl + ".vlog"));
+    	for(Rule r : P.getRuleSet()) {
+    		writer.println(r.toVLog());
+    	}
+    	writer.close();
+    	String queriesfile = chasebench + owl + "/qa_queries.dlp";
+    	Scanner scn = new Scanner(new File(queriesfile));
+    	File qdir = new File(chasebench + owl + "/dlv_queries");
+    	qdir.mkdir();
+    	int i = 1;
+    	while(scn.hasNextLine()) {
+    		String line = scn.nextLine();
+    		ConjunctiveQuery query = new QueryParser().parse(line);
+    		PrintWriter qwriter = new PrintWriter(new File(qdir, "Q" + (i++)) + ".txt");
+    		Set<Variable> exvar = new HashSet<>(query.getBody().getVariables());
+    		exvar.removeAll(query.getAnsVar());
+			String s = "";
+			if(!exvar.isEmpty()) {
+				s += "#exists{";
+				boolean first = true;
+				for(Variable v : exvar) {
+					if(!first) s += ",";
+					else first = false;
+					
+					s += v.toString();
 				}
-	    		qwriter.print(s + query.getBody().toShort() + "?");
-	    		qwriter.close();
-	    	}
-	    	scn.close();
-		}
+				s += "} ";
+			}
+    		qwriter.print(s + query.getBody().toShort() + "?");
+    		qwriter.close();
+    	}
+    	scn.close();
+	}
 	}
 }

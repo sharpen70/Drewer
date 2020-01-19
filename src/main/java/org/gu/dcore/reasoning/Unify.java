@@ -78,43 +78,53 @@ public class Unify {
 		return singlePieceUnifiers;	
 	}
 	
-//	public static List<Unifier> getAggregatedPieceUnifier(AtomSet block, Rule br, Rule hr) {
-//		List<Unifier> singlePieceUnifiers = getSinglePieceUnifier(block, br, hr);
-//		
-//		LinkedList<Unifier> unifAggregated = new LinkedList<Unifier>();
-//		
-//		if (!singlePieceUnifiers.isEmpty()) {
-//			LinkedList<Unifier> restOfUnifToAggregate = new LinkedList<>(singlePieceUnifiers);
-//			
-//			while(!restOfUnifToAggregate.isEmpty()) {
-//				Unifier u = restOfUnifToAggregate.poll();
-//				
-//				for(Unifier _u : aggregate(u, restOfUnifToAggregate)) {
-//					unifAggregated.add(_u);
-//				}
-//			}
-//		}
-//		
-//		return unifAggregated;			
-//	}
-//	
-//	private static LinkedList<Unifier> aggregate(Unifier u,
-//			LinkedList<Unifier> l) {
-//		LinkedList<Unifier> lu = new LinkedList<>(l);
-//		// if there is no more unifier to aggregate
-//		if (lu.isEmpty()) {
-//			LinkedList<Unifier> res = new LinkedList<>();
-//			res.add(u);
-//			return res;
-//		} else { 
-//			Unifier first = lu.poll(); 
-//			LinkedList<Unifier> res = aggregate(u, lu);
-//			if (u.isCompatible(first)) {
-//				res.addAll(aggregate(u.aggregate(first), lu));
-//			}
-//			return res;
-//		}
-//	}
+	public static List<AggregateUnifier> getAggregatedPieceUnifier(AtomSet block, AtomSet rbody, Rule hr, Set<Variable> restricted_var) {
+		List<SinglePieceUnifier> singlePieceUnifiers = getSinglePieceUnifiers(block, rbody, hr, restricted_var);
+		
+		LinkedList<AggregateUnifier> unifAggregated = new LinkedList<AggregateUnifier>();
+		
+		if (!singlePieceUnifiers.isEmpty()) {
+			LinkedList<SinglePieceUnifier> restOfUnifToAggregate = new LinkedList<>(singlePieceUnifiers);
+			
+			while(!restOfUnifToAggregate.isEmpty()) {
+				SinglePieceUnifier u = restOfUnifToAggregate.poll();
+				
+				for(AggregateUnifier _u : aggregate(u, restOfUnifToAggregate)) {
+					unifAggregated.add(_u);
+				}
+			}
+		}
+		
+		return unifAggregated;			
+	}
+	
+	private static LinkedList<AggregateUnifier> aggregate(SinglePieceUnifier u,
+			LinkedList<SinglePieceUnifier> l) {
+		AggregateUnifier aggregateUnifier = new AggregateUnifier();
+		aggregateUnifier.aggregate(u);
+		
+		return aggregate(aggregateUnifier, l);
+	}
+	
+	private static LinkedList<AggregateUnifier> aggregate(AggregateUnifier u,
+			LinkedList<SinglePieceUnifier> l) {
+		LinkedList<SinglePieceUnifier> lu = new LinkedList<>(l);
+		// if there is no more unifier to aggregate
+		if (lu.isEmpty()) {
+			LinkedList<AggregateUnifier> res = new LinkedList<>();
+			res.add(u);
+			return res;
+		} else { 
+			SinglePieceUnifier first = lu.poll(); 
+			LinkedList<AggregateUnifier> res = aggregate(u, lu);
+			
+			
+			if (u.aggregate(first)) {
+				res.addAll(aggregate(u, lu));
+			}
+			return res;
+		}
+	}
 	
 	private static List<SinglePieceUnifier> extend(SinglePieceUnifier unifier, Map<Atom, List<SinglePieceUnifier>> preUnifiers) {
 		List<SinglePieceUnifier> result = new LinkedList<>();

@@ -25,7 +25,7 @@ import org.semanticweb.vlog4j.parser.RuleParser;
 
 public class DatalogEngine {
 	private KnowledgeBase kb = null;
-	private Reasoner reasoner = null;
+	private VLogReasoner reasoner = null;
 	
 	public DatalogEngine() throws ParsingException {
 		configureLogging(Level.OFF);
@@ -40,11 +40,19 @@ public class DatalogEngine {
 			import_str += r.toVLog() + "\n";
 		}		
 		
+//		System.out.print(import_str);
 		addRules(import_str);
 	}
 	
 	public void addRules(String rules) throws ParsingException {
 		RuleParser.parseInto(kb, rules);
+	}
+	
+	public void load() throws IOException {
+		if(reasoner == null) {
+			reasoner = new VLogReasoner(kb);
+		}
+		reasoner.load();
 	}
 	
 	public void materialize() throws IOException {
@@ -55,7 +63,7 @@ public class DatalogEngine {
 	}
 	
 	public Column answerAtomicQuery(Atom atom, int[] mapping, int arity) throws IOException, ParsingException {
-		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVlog());
+		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVLog());
 		
 		Column result = new Column(arity, mapping);
 		
@@ -70,7 +78,7 @@ public class DatalogEngine {
 	
 	/* Answer Atomic query with specified answer variables */
 	public Column answerAtomicQuery(Atom atom, ArrayList<Integer> ansVar) throws ParsingException, IOException {
-		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVlog());
+		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVLog());
 		
 		Column result = new Column(atom.getTerms().size());
 		
@@ -88,7 +96,7 @@ public class DatalogEngine {
 	public Column answerAtomicQuery(String atomic_q) throws IOException, ParsingException {
 		PositiveLiteral query = RuleParser.parsePositiveLiteral(atomic_q);
 		
-		Column result = new Column(query.getTerms().size());
+		Column result = new Column(query.getArguments().size());
 		
 		if(reasoner == null) materialize();
 			
@@ -115,7 +123,7 @@ public class DatalogEngine {
 		if(scanner.hasNextLine()) {
 			line = scanner.nextLine();
 			
-			Pattern p = Pattern.compile("\"([^\"]*)\"");
+			Pattern p = Pattern.compile("\"([^\"]*)\"|[a-zA-Z][a-zA-Z0-9_-]*");
 			Matcher m = p.matcher(line);
 			
 			while(m.find()) {

@@ -3,10 +3,12 @@ package org.gu.dcore;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Set;
 
-import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
+import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.store.Column;
@@ -37,54 +39,58 @@ public class VLog {
 			return;
 		}
 		
+		long start, end, tstart, tend;
+		
+		tstart = System.currentTimeMillis();
 		DcoreParser parser = new DcoreParser();    	
     	Program P = parser.parseFile(ontologyfile);
     	
-    	System.out.println("Finish Parsing Files ...");
-    	
-		long start, end;
-		
-	   	start = System.currentTimeMillis();
-    	DatalogEngine engine = new DatalogEngine();
-    	engine.addSourceFromCSVDir(datafile);
-    	end = System.currentTimeMillis();
-    	System.out.println("Finish Loading data, cost " + (end - start) + " ms");
+    	System.out.println("Finish Parsing Files ...");   	   	
     	
     	Scanner scn = new Scanner(new File(queriesfile));
     	
-    	if(scn.hasNextLine()) {   		
+    	while(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
     		
     	   	ConjunctiveQuery query = new QueryParser().parse(line);
         	
-        	String qatom = getQueryAtom(query.getAnsVar().size());
+        	String qatom = getQueryAtom(query.getAnsVar());
         	String qr = qatom + " :- " + query.getBody().toVLog() + ".";
         	
-    	   	System.out.println("Querying on: " + query.toString());      	   	        	
+    	   	System.out.println("Querying: " + qr);      	   	        	
         	
-        	start = System.currentTimeMillis();
+    	   	start = System.currentTimeMillis();
+        	DatalogEngine engine = new DatalogEngine();
+        	engine.addSourceFromCSVDir(datafile);
         	engine.addRules(P.getRuleSet());
         	engine.addRules(qr);
+        	engine.load();
+        	end = System.currentTimeMillis();
+        	System.out.println("Finish Loading data, cost " + (end - start) + " ms");
+        	
+        	start = System.currentTimeMillis();
         	engine.materialize();
         	end = System.currentTimeMillis();
         	
         	System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");       	
         	
-        	start = System.currentTimeMillis();
         	Column answers = engine.answerAtomicQuery(qatom);
         	end = System.currentTimeMillis();
-        	
-        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (end - start) + " ms");
+        	tend = System.currentTimeMillis();
+        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + ", cost " + (end - start) + " ms");
+        	System.out.println("Total time cost " + (tend - tstart) + "ms");
     	}
     	
     	scn.close();		
 	}
 	
-	public static String getQueryAtom(int ansVarNumb) {
+	public static String getQueryAtom(Set<Term> ansVar) {
 		String s = "ANS(";
-		for(int i = 0; i < ansVarNumb; i++) {
-			if(i != 0) s += ", ";
-			s += "?a" + i;
+		boolean first = true;
+		for(Term v : ansVar) {
+			if(first) first = false;
+			else s += " ,";
+			s += v.toVlog();
 		}
 		s += ")";
 		return s;

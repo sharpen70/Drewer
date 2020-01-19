@@ -203,7 +203,7 @@ public class AtomSet implements Iterable<Atom> {
 		String s = "";
 		
 		for(int i = 0; i < atoms.size(); i++) {
-			s += atoms.get(i).toVlog(ex);
+			s += atoms.get(i).toVLog(ex);
 			if(i != atoms.size() - 1) s += ", ";
 		}
 		
@@ -214,7 +214,7 @@ public class AtomSet implements Iterable<Atom> {
 		String s = "";
 		
 		for(int i = 0; i < atoms.size(); i++) {
-			s += atoms.get(i).toVlog();
+			s += atoms.get(i).toVLog();
 			if(i != atoms.size() - 1) s += ", ";
 		}
 		

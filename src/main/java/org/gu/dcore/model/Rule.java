@@ -134,7 +134,7 @@ public class Rule {
 		String s = "";
 		s += head.toVLog(this.getExistentials());
 		s += " :- ";
-		s += body.toVLog(this.getExistentials());
+		s += body.toVLog();
 
 		s += " .";
 		
