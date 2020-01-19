@@ -52,7 +52,7 @@ public class DatalogEngine {
 		if(reasoner == null) {
 			reasoner = new VLogReasoner(kb);
 		}
-		reasoner.load();
+	//	reasoner.load();
 	}
 	
 	public void materialize() throws IOException {
@@ -96,7 +96,7 @@ public class DatalogEngine {
 	public Column answerAtomicQuery(String atomic_q) throws IOException, ParsingException {
 		PositiveLiteral query = RuleParser.parsePositiveLiteral(atomic_q);
 		
-		Column result = new Column(query.getArguments().size());
+		Column result = new Column(query.getTerms().size());
 		
 		if(reasoner == null) materialize();
 			

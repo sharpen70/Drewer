@@ -28,6 +28,7 @@ import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
 import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
+import org.gu.dcore.reasoning.AggregateUnifier;
 import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.tuple.Pair;
@@ -129,8 +130,9 @@ public class ModularizedRewriting {
 				
 				for(BlockRule hr : rs) {
 					Set<Variable> restricted_var = br_b.c ? blockRule.getFrontierVariables() : new HashSet<>();
-					List<SinglePieceUnifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
-			
+//					List<SinglePieceUnifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
+					List<AggregateUnifier> unifiers = Unify.getAggregatedPieceUnifier(t.c, t.b, hr, restricted_var);
+					
 					if(!unifiers.isEmpty()) {
 						boolean ex_rew = hr.isExRule();
 						

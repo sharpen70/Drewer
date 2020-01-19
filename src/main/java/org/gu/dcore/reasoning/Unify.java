@@ -100,8 +100,7 @@ public class Unify {
 	
 	private static LinkedList<AggregateUnifier> aggregate(SinglePieceUnifier u,
 			LinkedList<SinglePieceUnifier> l) {
-		AggregateUnifier aggregateUnifier = new AggregateUnifier();
-		aggregateUnifier.aggregate(u);
+		AggregateUnifier aggregateUnifier = new AggregateUnifier(u);
 		
 		return aggregate(aggregateUnifier, l);
 	}
@@ -117,11 +116,12 @@ public class Unify {
 		} else { 
 			SinglePieceUnifier first = lu.poll(); 
 			LinkedList<AggregateUnifier> res = aggregate(u, lu);
+			AggregateUnifier aggu = u.aggregate(first);
 			
-			
-			if (u.aggregate(first)) {
-				res.addAll(aggregate(u, lu));
+			if (aggu != null) {
+				res.addAll(aggregate(aggu, lu));
 			}
+			
 			return res;
 		}
 	}

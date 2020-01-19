@@ -45,6 +45,10 @@ public class SinglePieceUnifier {
 		return this.H;
 	}
 	
+	public Rule getRule() {
+		return this.hr;
+	}
+	
 	public Term getImageOf(Term t, boolean withOffset) {
 		int v_offset = withOffset ? this.partition.getVOffset() : 0;
 		int rc_offset = withOffset ? this.partition.getRCOffset() : 0;

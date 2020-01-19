@@ -50,7 +50,6 @@ public class Partition {
 	/*
 	 * @param  b: a term from the atomset
 	 * 		   h: a term from the head of existential rule
-	 * 		   eV: whether h is an existential variable
 	 */
 	public void add(Term b, Term h) {		
 		boolean b_in = false;
@@ -142,6 +141,19 @@ public class Partition {
 		}
 		
 		return re;
+	}
+	
+	public boolean isAdmissible() {
+		for(Set<Term> category : this.categories) {
+			boolean c = false;
+			for(Term t : category) {
+				if(t instanceof Constant) { 
+					if(c) return false;
+					else c = true;
+				}
+			}
+		}
+		return true;
 	}
 	
 	public NormalSubstitution getSubstitution() {
