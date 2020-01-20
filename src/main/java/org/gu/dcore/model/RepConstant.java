@@ -29,7 +29,13 @@ public class RepConstant implements Term {
 	}
 	
 	@Override
-	public String toVlog() {
+	public String toVLog() {
+		return null;
+	}
+	
+	@Override
+	public String toDLV() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

@@ -35,8 +35,13 @@ public class Constant implements Term {
 	}
 	
 	@Override
-	public String toVlog() {
+	public String toVLog() {
 		return "<" + this.name + ">";
+	}
+	
+	@Override
+	public String toDLV() {
+		return "\"" + this.name + "\"";
 	}
 	
 	@Override

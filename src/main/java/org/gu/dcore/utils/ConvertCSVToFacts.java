@@ -8,13 +8,13 @@ import java.util.regex.Pattern;
 
 public class ConvertCSVToFacts {
 	public static void main(String[] args) throws Exception {
-		String chasebench = "/home/peng/projects/evaluations/benchmarks/existential_rules/";
+		String chasebench = "/home/peng/projects/evaluations/benchmarks/owl/LUBM";
 	
 		File dir = new File(chasebench);
 			
-		for(File f : dir.listFiles()) {
-			File data = new File(f, "data");
-			File facts = new File(f, "facts");
+//		for(File f : dir.listFiles()) {
+			File data = new File(dir, "data");
+			File facts = new File(dir, "facts");
 			
 			PrintWriter writer = new PrintWriter(facts);
 			
@@ -49,5 +49,5 @@ public class ConvertCSVToFacts {
 		}
 		
 		
-	}
+//	}
 }

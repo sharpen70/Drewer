@@ -104,10 +104,6 @@ public class Utils {
 		return uf;
 	}
 	
-	public static AtomSet rewrite(AtomSet f, AtomSet b, SinglePieceUnifier u) {
-		
-	}
-	
 	/*
 	 * rhs denote whether atomset belongs to the rule for unification
 	 */

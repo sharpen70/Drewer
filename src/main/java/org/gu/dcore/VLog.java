@@ -61,6 +61,7 @@ public class VLog {
         	
     	   	start = System.currentTimeMillis();
         	DatalogEngine engine = new DatalogEngine();
+        	engine.setSkolemAlgorithm();
         	engine.addSourceFromCSVDir(datafile);
         	engine.addRules(P.getRuleSet());
         	engine.addRules(qr);
@@ -85,12 +86,12 @@ public class VLog {
 	}
 	
 	public static String getQueryAtom(Set<Term> ansVar) {
-		String s = "ANS(";
+		String s = "ans(";
 		boolean first = true;
 		for(Term v : ansVar) {
 			if(first) first = false;
 			else s += " ,";
-			s += v.toVlog();
+			s += v.toVLog();
 		}
 		s += ")";
 		return s;

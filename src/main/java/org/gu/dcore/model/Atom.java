@@ -135,7 +135,7 @@ public class Atom {
 		
 		for(int i = 0; i < terms.size(); i++) {
 			Term t = terms.get(i);
-			out = out + t;
+			out = out + t.toDLV();
 			if(i != terms.size() - 1) {
 				out = out + ", ";
 			}
@@ -154,7 +154,7 @@ public class Atom {
 			Term t = terms.get(i);
 			if(ex.contains(t))
 				out = out + "!V" + ((Variable)t).getValue();
-			else out = out + t.toVlog();
+			else out = out + t.toVLog();
 			if(i != terms.size() - 1) {
 				out = out + ", ";
 			}
@@ -171,7 +171,7 @@ public class Atom {
 		
 		for(int i = 0; i < terms.size(); i++) {
 			Term t = terms.get(i);
-			out = out + t.toVlog();
+			out = out + t.toVLog();
 			
 			if(i != terms.size() - 1) {
 				out = out + ", ";

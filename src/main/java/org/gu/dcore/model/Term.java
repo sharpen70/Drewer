@@ -9,5 +9,6 @@ public interface Term {
 	public boolean isVariable();
 	public boolean isConstant();
 	public String toRDFox();
-	public String toVlog();
+	public String toVLog();
+	public String toDLV();
 }

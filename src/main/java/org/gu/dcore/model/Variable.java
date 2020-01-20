@@ -22,8 +22,13 @@ public class Variable implements Term {
 	}
 	
 	@Override
-	public String toVlog() {
+	public String toVLog() {
 		return "?V" + this.value;
+	}
+	
+	@Override
+	public String toDLV() {
+		return "X" + this.value;
 	}
 	
 	@Override

@@ -16,9 +16,9 @@ import org.apache.log4j.PatternLayout;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
 import org.semanticweb.vlog4j.core.model.api.PositiveLiteral;
+import org.semanticweb.vlog4j.core.reasoner.Algorithm;
 import org.semanticweb.vlog4j.core.reasoner.KnowledgeBase;
 import org.semanticweb.vlog4j.core.reasoner.QueryResultIterator;
-import org.semanticweb.vlog4j.core.reasoner.Reasoner;
 import org.semanticweb.vlog4j.core.reasoner.implementation.VLogReasoner;
 import org.semanticweb.vlog4j.parser.ParsingException;
 import org.semanticweb.vlog4j.parser.RuleParser;
@@ -48,11 +48,18 @@ public class DatalogEngine {
 		RuleParser.parseInto(kb, rules);
 	}
 	
+	public void setSkolemAlgorithm() {
+		if(reasoner == null) {
+			reasoner = new VLogReasoner(kb);
+		}
+		reasoner.setAlgorithm(Algorithm.SKOLEM_CHASE);
+	}
+	
 	public void load() throws IOException {
 		if(reasoner == null) {
 			reasoner = new VLogReasoner(kb);
 		}
-	//	reasoner.load();
+		reasoner.load();
 	}
 	
 	public void materialize() throws IOException {
@@ -96,7 +103,7 @@ public class DatalogEngine {
 	public Column answerAtomicQuery(String atomic_q) throws IOException, ParsingException {
 		PositiveLiteral query = RuleParser.parsePositiveLiteral(atomic_q);
 		
-		Column result = new Column(query.getTerms().size());
+		Column result = new Column(query.getArguments().size());
 		
 		if(reasoner == null) materialize();
 			
@@ -133,7 +140,7 @@ public class DatalogEngine {
 		
 		scanner.close();
 		
-		String import_str = "@source <" + pname + ">(" + arity + ") : load-csv(\"" + csv.getAbsolutePath() + "\") .";
+		String import_str = "@source <" + pname + ">[" + arity + "] : load-csv(\"" + csv.getAbsolutePath() + "\") .";
 		RuleParser.parseInto(kb, import_str);
 	}
 	

@@ -34,7 +34,7 @@ public class Querying {
 			}
 		}
 		
-		if(ontologyfile == null || datafile == null || queriesfile == null) {
+		if(ontologyfile == null ||  queriesfile == null) {
 			System.out.println("Missing input !");
 			return;
 		}
@@ -44,17 +44,14 @@ public class Querying {
     	
     	System.out.println("Finish Parsing Files ...");
     	
-		long start, end;
+		long start, end, tstart, tend;
 		
-	   	start = System.currentTimeMillis();
-    	DatalogEngine engine = new DatalogEngine();
-    	engine.addSourceFromCSVDir(datafile);
-    	end = System.currentTimeMillis();
-    	System.out.println("Finish Loading data, cost " + (end - start) + " ms");
+		tstart = System.currentTimeMillis();
+
     	
     	Scanner scn = new Scanner(new File(queriesfile));
     	
-    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+
     	
     	while(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
@@ -63,36 +60,50 @@ public class Querying {
         	
     	   	System.out.println("Querying on: " + query.toString());   
     	   	
+//        	for(Rule r : P.getRuleSet()) {
+//        		System.out.println(r);
+//        	}
+        	
     	   	start = System.currentTimeMillis();
-        	
-        	List<Rule> datalog = mr.rewrite(query);        
-        	
+        	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+        	List<Rule> datalog = mr.rewrite(query);               	
         	end = System.currentTimeMillis();
         	
-        	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms");       	
+        	long rew_time = end - start;
+        	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + rew_time + " ms");       	
         	
-        	start = System.currentTimeMillis();
-        	engine.addRules(datalog);
-        	engine.materialize();
-        	end = System.currentTimeMillis();
-        	
-        	System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");
-        	
-        	start = System.currentTimeMillis();
-        	Column answers = engine.answerAtomicQuery(getQueryAtom(query.getAnsVar().size()));
-        	end = System.currentTimeMillis();
-        	
-        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (end - start) + " ms");
-    	}
-    	
+        	if(datafile != null) {        	
+	        	start = System.currentTimeMillis();
+	        	DatalogEngine engine = new DatalogEngine();
+	        	engine.addSourceFromCSVDir(datafile);
+	        	engine.addRules(datalog);
+	        	engine.load();
+	        	end = System.currentTimeMillis();
+	        	System.out.println("Finish Loading data, cost " + (end - start) + " ms");
+	        	
+	        	start = System.currentTimeMillis();
+	        	engine.materialize();
+	        	end = System.currentTimeMillis();
+	        	
+	        	System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");
+	        	
+	        	
+	        	Column answers = engine.answerAtomicQuery(getQueryAtom(query.getAnsVar().size()));
+	        	end = System.currentTimeMillis();
+	        	
+	        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (end - start + rew_time) + " ms");
+        	}
+        }
+    	tend = System.currentTimeMillis();
+    	System.out.println("Total time cost " + (tend - tstart) + " ms");
     	scn.close();		
 	}
 	
 	public static String getQueryAtom(int ansVarNumb) {
-		String s = "ANS(";
+		String s = "ans(";
 		for(int i = 0; i < ansVarNumb; i++) {
 			if(i != 0) s += ", ";
-			s += "?a" + i;
+			s += "?V" + i;
 		}
 		s += ")";
 		return s;

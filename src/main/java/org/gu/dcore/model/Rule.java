@@ -152,9 +152,9 @@ public class Rule {
 	}
 	
 	public String toDLV() {
-		if(this.head.size() == 1) {
-			String s = "";
-			if(!this.getExistentials().isEmpty()) {
+		if(!this.getExistentials().isEmpty()) {
+			if(this.head.size() == 1) {
+				String s = "";
 				s += "#exists{";
 				boolean first = true;
 				for(Variable v : this.getExistentials()) {
@@ -164,51 +164,66 @@ public class Rule {
 					s += v.toString();
 				}
 				s += "} ";
+
+				s += head.toShort();
+				s += " :- ";
+				s += body.toShort();
+		
+				s += " .";
+				
+				return s;
 			}
-			s += head.toShort();
-			s += " :- ";
-			s += body.toShort();
-	
-			s += " .";
-			
-			return s;
+			else {
+				String s = "#exists{";
+				boolean first = true;
+				for(Variable v : this.getExistentials()) {
+					if(!first) s += ",";
+					else first = false;
+					
+					s += v.toString();
+				}
+				s += "} ";
+				
+				Set<Variable> headvars = new HashSet<>();
+				headvars.addAll(this.getExistentials());
+				headvars.addAll(this.getFrontierVariables());
+				
+				String aux = "aux" + this.ruleIndex;
+				aux += "(";
+				
+				first = true;
+				for(Variable v : headvars) {
+					if(!first) aux += ",";
+					else first = false;
+					
+					aux += v.toString();
+				}
+				aux += ")";
+				
+				s += aux;
+				s += " :- ";
+				s += body.toShort();
+		
+				s += ".\n";
+				
+				for(Atom a : head) {
+					s += a.toShort() + " :- " + aux + ".\n";
+				}
+				
+				return s;
+			}
 		}
 		else {
-			String s = "#exists{";
-			boolean first = true;
-			for(Variable v : this.getExistentials()) {
-				if(!first) s += ",";
-				else first = false;
-				
-				s += v.toString();
-			}
-			s += "} ";
-			
-			Set<Variable> headvars = new HashSet<>();
-			headvars.addAll(this.getExistentials());
-			headvars.addAll(this.getFrontierVariables());
-			
-			String aux = "aux" + this.ruleIndex;
-			aux += "(";
-			
-			first = true;
-			for(Variable v : headvars) {
-				if(!first) aux += ",";
-				else first = false;
-				
-				aux += v.toString();
-			}
-			aux += ")";
-			
-			s += aux;
-			s += " :- ";
-			s += body.toShort();
-	
-			s += ".\n";
+			String s = "";
 			
 			for(Atom a : head) {
-				s += a.toShort() + " :- " + aux + ".\n";
+				s += a.toShort();
+				s += " :- ";
+				s += body.toShort();
+		
+				s += " .\n";
 			}
+
 			
 			return s;
 		}
