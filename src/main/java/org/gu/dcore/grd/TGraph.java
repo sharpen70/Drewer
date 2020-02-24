@@ -13,7 +13,7 @@ public class TGraph {
 	
 	private List<List<Integer>> SCCs;
 //	private List<Integer> entryNodes;	
-	private List<Integer> freeNodes;
+//	private List<Integer> freeNodes;
 	
 	private int[] DFN, LOW;
 	private int order;
@@ -71,7 +71,7 @@ public class TGraph {
 				if(DFN[i] == 0) iterative_tarjan(i);
 		}
 		
-		while(!stack.isEmpty()) freeNodes.add(stack.pop());
+//		while(!stack.isEmpty()) freeNodes.add(stack.pop());
 	}
 	
 	private void tarjan(int x) {
@@ -161,9 +161,9 @@ public class TGraph {
 		}				
 	}
 	
-	public List<Integer> getFreeNodes() {
-		return this.freeNodes;
-	}
+//	public List<Integer> getFreeNodes() {
+//		return this.freeNodes;
+//	}
 	
 //	public List<Integer> getEntryNodes() {
 //		return this.entryNodes;

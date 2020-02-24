@@ -49,15 +49,18 @@ public class SinglePieceUnifier {
 		return this.hr;
 	}
 	
-	public Term getImageOf(Term t, boolean withOffset) {
-		int v_offset = withOffset ? this.partition.getVOffset() : 0;
-		int rc_offset = withOffset ? this.partition.getRCOffset() : 0;
+//	public Term getImageOf(Term t, boolean withOffset) {
+//		int v_offset = withOffset ? this.partition.getVOffset() : 0;
+//		int rc_offset = withOffset ? this.partition.getRCOffset() : 0;
+//		
+//		return this.partition.getSubstitution().getImageOf(t, v_offset, rc_offset);
+//	}
+	
+	public Term getImageOf(Term t, int offset_num) {
+		int v_offset = offset_num * this.partition.getVOffset();
+		int rc_offset = offset_num * this.partition.getRCOffset();
 		
 		return this.partition.getSubstitution().getImageOf(t, v_offset, rc_offset);
-	}
-	
-	public Atom getImageOf(Atom a, boolean withOffset) {
-		return null;
 	}
 	
 	public AtomSet getImageOfPiece() {
@@ -68,9 +71,16 @@ public class SinglePieceUnifier {
 		return up;
 	}
 	
-	public AtomSet getImageOf(AtomSet atomset, boolean withOffset) {
-		int v_offset = withOffset ? this.partition.getVOffset() : 0;
-		int rc_offset = withOffset ? this.partition.getRCOffset() : 0;
+//	public AtomSet getImageOf(AtomSet atomset, boolean withOffset) {
+//		int v_offset = withOffset ? this.partition.getVOffset() : 0;
+//		int rc_offset = withOffset ? this.partition.getRCOffset() : 0;
+//		
+//		return this.partition.getSubstitution().getImageOf(atomset, v_offset, rc_offset);
+//	}
+	
+	public AtomSet getImageOf(AtomSet atomset, int offset_num) {
+		int v_offset = offset_num * this.partition.getVOffset();
+		int rc_offset = offset_num * this.partition.getRCOffset();
 		
 		return this.partition.getSubstitution().getImageOf(atomset, v_offset, rc_offset);
 	}
@@ -88,7 +98,7 @@ public class SinglePieceUnifier {
 		newpB.addAll(u.B);
 		newH.addAll(u.H);
 		
-		Partition newP = this.partition.join(u.partition);
+		Partition newP = this.partition.join(u.partition, false);
 		
 		return new SinglePieceUnifier(newpB, newH, this.body, this.hr, newP);
 	}

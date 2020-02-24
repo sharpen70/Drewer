@@ -11,6 +11,7 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.rewriting.ModularizedRewriting;
+import org.gu.dcore.rewriting.ModularizedRewriting2;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
 import org.semanticweb.vlog4j.parser.ParsingException;
@@ -39,21 +40,24 @@ public class Querying {
 			return;
 		}
 		
+		long start, end, tstart, tend;
+		tstart = System.currentTimeMillis();
+		
 		DcoreParser parser = new DcoreParser();    	
     	Program P = parser.parseFile(ontologyfile);
     	
     	System.out.println("Finish Parsing Files ...");
     	
-		long start, end, tstart, tend;
+
 		
-		tstart = System.currentTimeMillis();
+		
 
     	
     	Scanner scn = new Scanner(new File(queriesfile));
     	
 
     	
-    	while(scn.hasNextLine()) {   		
+    	if(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
     		
     	   	ConjunctiveQuery query = new QueryParser().parse(line);
@@ -64,13 +68,15 @@ public class Querying {
 //        		System.out.println(r);
 //        	}
         	
-    	   	start = System.currentTimeMillis();
-        	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+    	   	long estart = System.currentTimeMillis();
+        	ModularizedRewriting2 mr = new ModularizedRewriting2(P.getRuleSet());
+        	
+        	start = System.currentTimeMillis();
         	List<Rule> datalog = mr.rewrite(query);               	
         	end = System.currentTimeMillis();
         	
-        	long rew_time = end - start;
-        	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + rew_time + " ms");       	
+        	long rew_time = end - estart;
+        	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms");       	
         	
         	if(datafile != null) {        	
 	        	start = System.currentTimeMillis();

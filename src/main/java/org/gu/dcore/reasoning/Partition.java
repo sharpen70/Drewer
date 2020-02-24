@@ -105,7 +105,12 @@ public class Partition {
 		}
 	}
 	
-	public Partition join(Partition p) {
+	/*
+	 * @param   p: the partition to be joined,
+	 * 			left_rule_variable_only: Only join the variables in the rule 
+	 * 				whose body is unified, i.e., the left hand side rule
+	 */
+	public Partition join(Partition p, boolean left_rule_variable_only) {
 		Partition re = this.getCopy();
 		
 		Iterator<Set<Term>> it = p.categories.iterator();
@@ -119,6 +124,10 @@ public class Partition {
 			while(rit.hasNext()) {
 				Set<Term> tc = rit.next();
 				for(Term t : pc) {
+					if(left_rule_variable_only && t instanceof Variable &&
+							((Variable)t).getValue() >= this.var_offset)
+						break;
+					
 					if(tc.contains(t)) {
 						if(hit == null) {
 							hit = tc;

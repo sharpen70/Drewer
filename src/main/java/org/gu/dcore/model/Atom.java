@@ -130,7 +130,7 @@ public class Atom {
 	}
 	
 	public String toShort() {
-		String out = Utils.getShortIRI(p.toString());
+		String out = Utils.getShortIRI(p.toString()).replace('-', '_');
 		out = out + "(";
 		
 		for(int i = 0; i < terms.size(); i++) {

@@ -9,7 +9,7 @@ import org.gu.dcore.parsing.DcoreParser;
 
 public class CheckSeparable {
 	public static void main(String[] args) throws Exception {
-		String benchmarks = "/home/sharpen/projects/evaluations/benchmarks/owl/";
+		String benchmarks = "/home/peng/projects/evaluations/benchmarks/existential_rules/";
 		
 		File dir = new File(benchmarks);
 		
@@ -23,8 +23,10 @@ public class CheckSeparable {
 			
 			SeparableChecker checker = new SeparableChecker(modularizor);
 			
-			if(checker.check()) System.out.println(name + " is separable.");
-			else System.out.println(name + " is not separable");
+			boolean separable = checker.check();
+			boolean shy = checker.checkShy();
+			
+			System.out.println(name + " Shy: " + shy + " Separable: " + separable);
 		}
 	}
 }

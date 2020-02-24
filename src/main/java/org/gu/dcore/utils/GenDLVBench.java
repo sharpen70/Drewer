@@ -3,29 +3,27 @@ package org.gu.dcore.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
-import org.gu.dcore.model.ConjunctiveQuery;
+import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
-import org.gu.dcore.model.Variable;
 import org.gu.dcore.parsing.DcoreParser;
-import org.gu.dcore.parsing.QueryParser;
 
 public class GenDLVBench {
 	public static void main(String[] args) throws IOException {
 		String chasebench = "/home/peng/projects/evaluations/benchmarks/owl/";
-		String[] owls = {"LUBM", "Reactome", "Uniprot"};
+		String[] owls = {"LUBM"};
 		
 //		String chasebench = "/home/peng/projects/evaluations/benchmarks/existential_rules/";
 //		String[] owls = {"ONT-256"};
 		
 		for(String owl : owls) {
 //			Scanner data = new Scanner(new File(chasebench, owl + "/data.nt"));
-//			PrintWriter writer = new PrintWriter(new File(chasebench, owl + "/data.v"));
-//			
+//			PrintWriter writer = new PrintWriter(new File(chasebench, owl + "/facts"));
+			
 //			Map<Predicate, Predicate> pmap = new HashMap<>();
 //			
 //			while(data.hasNextLine()) {
@@ -37,13 +35,13 @@ public class GenDLVBench {
 //				
 //				if(ts.length == 2) {
 //					arity = 1;
-//					p = Utils.getShortIRI(ts[1]);
+//					p = Utils.getShortIRI(ts[1]).replace('-', '_');
 //					v = "\"" + Utils.getShortIRI(ts[0]) +  "\"";
 //					writer.println(p + "(" + v + ").");
 //				}
 //				else {
 //					arity = 2;
-//					p = Utils.getShortIRI(ts[1]);
+//					p = Utils.getShortIRI(ts[1]).replace('-', '_');
 //					v = "\"" + Utils.getShortIRI(ts[0]) +  "\"" + "," + "\"" +Utils.getShortIRI(ts[2]) +  "\"";
 //					writer.println(p + "(" + v + ").");
 //				}			

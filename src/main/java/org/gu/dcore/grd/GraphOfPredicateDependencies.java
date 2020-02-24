@@ -74,14 +74,14 @@ public class GraphOfPredicateDependencies {
 	/*
 	 * Get predicates not in SCCs
 	 */
-	public List<Predicate> getFreePredicates() {
-		List<Predicate> preds = new LinkedList<Predicate>();
-		List<Integer> nodes = this.gpd.getFreeNodes();
-		
-		for(Integer i : nodes) preds.add(this.pMap.get(i));
-		
-		return preds;
-	}
+//	public List<Predicate> getFreePredicates() {
+//		List<Predicate> preds = new LinkedList<Predicate>();
+//		List<Integer> nodes = this.gpd.getFreeNodes();
+//		
+//		for(Integer i : nodes) preds.add(this.pMap.get(i));
+//		
+//		return preds;
+//	}
 //	
 //	/*
 //	 * Get predicates that are the first to enter a SCC

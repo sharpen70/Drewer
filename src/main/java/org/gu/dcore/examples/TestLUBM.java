@@ -10,6 +10,7 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.rewriting.ModularizedRewriting;
+import org.gu.dcore.rewriting.ModularizedRewriting2;
 
 public class TestLUBM {
 
@@ -54,8 +55,10 @@ public class TestLUBM {
 	
 	public static void main(String[] args) throws IOException
 	{
-		String O = "/home/peng/projects/evaluations/benchmarks/owl/LUBM/LUBM.dlp";
+//		String O = "/home/peng/projects/evaluations/benchmarks/owl/LUBM/LUBM.dlp";
 //		String O = "/home/sharpen/projects/benchmarktool/benchmark/owl/U.dlp";
+		String O = "/home/peng/projects/evaluations/benchmarks/owl/Adolena/Adolena.dlp";
+		
 		
     	DcoreParser parser = new DcoreParser();
     	
@@ -65,13 +68,14 @@ public class TestLUBM {
 //    	ConjunctiveQuery query = new QueryParser().parse("? (A) :- <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor>(A, B), "
 //    			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#affiliatedOrganizationOf>(B, C).");
     	
-    	ConjunctiveQuery query = new QueryParser().parse("?(A,B) :- <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Person>(A), <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#teacherOf>(A, B), "
-    			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Course>(B).");
-    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(A,B) :- <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Person>(A), <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#teacherOf>(A, B), "
+//    			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Course>(B).");
+//    	
+    	ConjunctiveQuery query = new QueryParser().parse("?(X0) :- <file:///home/aurona/0AlleWerk/Navorsing/Ontologies/NAP/NAP#Device>(X0), <http://ksg.meraka.co.za/adolena.owl#assistsWith>(X0, X1), <file:///home/aurona/0AlleWerk/Navorsing/Ontologies/NAP/NAP#PhysicalAbility>(X1), <http://ksg.meraka.co.za/adolena.owl#affects>(X2, X1), <file:///home/aurona/0AlleWerk/Navorsing/Ontologies/NAP/NAP#Quadriplegia>(X2).");
     	System.out.println("============");   	
 
     	
-    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+    	ModularizedRewriting2 mr = new ModularizedRewriting2(P.getRuleSet());
     	
     	long start = System.currentTimeMillis();
     	

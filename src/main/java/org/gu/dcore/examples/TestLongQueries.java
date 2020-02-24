@@ -10,6 +10,7 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.rewriting.ModularizedRewriting;
+import org.gu.dcore.rewriting.ModularizedRewriting2;
 
 public class TestLongQueries {
 	 
@@ -33,7 +34,7 @@ public class TestLongQueries {
 		
     	System.out.println(Qr);
     	
-    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+    	ModularizedRewriting2 mr = new ModularizedRewriting2(P.getRuleSet());
     	
     	long start = System.currentTimeMillis();
     	

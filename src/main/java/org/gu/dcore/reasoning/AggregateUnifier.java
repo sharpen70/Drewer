@@ -34,7 +34,7 @@ public class AggregateUnifier {
 		Set<Atom> agg_piece = new HashSet<>(this.piece);
 		for(Atom a : spu.getB()) if(!agg_piece.add(a)) return null;
 		
-		Partition agg_partition = this.partition.join(spu.getPartition());
+		Partition agg_partition = this.partition.join(spu.getPartition(), true);
 		if(!agg_partition.isAdmissible()) return null;
 		
 		List<SinglePieceUnifier> agg_spus = new LinkedList<>(spus);

@@ -2,6 +2,7 @@ package org.gu.dcore.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -120,11 +121,11 @@ public class AtomSet implements Iterable<Atom> {
 		for(int i = 1; i < this.size(); i++) {
 			Atom ai = this.atoms.get(i);
 			Set<Variable> ivs = ai.getVariables();
-			if(Utils.vars_disjoint(vs, ivs)) {
+			if(Collections.disjoint(vs, ivs)) {
 				for(int j = i + 1; j < this.size(); j++) {
 					Atom aj = this.atoms.get(j);
 					Set<Variable> jvs = aj.getVariables();
-					if(!Utils.vars_disjoint(vs, jvs)) {
+					if(!Collections.disjoint(vs, jvs)) {
 						this.atoms.set(i, aj);
 						this.atoms.set(j, ai);
 						ivs = jvs;

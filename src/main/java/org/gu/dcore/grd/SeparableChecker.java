@@ -18,8 +18,8 @@ public class SeparableChecker {
 	
 	private int size;
 	
-	public SeparableChecker(Modularizor moduarizor) {
-		this.m = moduarizor;
+	public SeparableChecker(Modularizor modularizor) {
+		this.m = modularizor;
 	}
 	
 	private void buildBlockGraph() {
@@ -66,6 +66,17 @@ public class SeparableChecker {
 		for(List<Integer> loop : loops) {
 			for(Integer i : loop) {
 				Block b = this.blockMap.get(i);
+				if(b.getBricks().size() > 1) return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public boolean checkShy() {
+		List<BlockRule> blockonto = this.m.getBlockOnto();
+		for(BlockRule r : blockonto) {
+			for(Block b : r.getBlocks()) {
 				if(b.getBricks().size() > 1) return false;
 			}
 		}
