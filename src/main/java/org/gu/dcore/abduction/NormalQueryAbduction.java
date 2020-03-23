@@ -21,6 +21,7 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 import org.gu.dcore.reasoning.FreshIndividualSubstitution;
+import org.gu.dcore.rewriting.RewriteUtils;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.utils.Utils;
@@ -125,11 +126,11 @@ public class NormalQueryAbduction extends AbstactQueryAbduction {
 				}
 			}
 			Column nc = c.join(answers, jk1, jk2, l).a;
-			ur = Utils.substitute(ur, vr_map);
+			ur = RewriteUtils.substitute(ur, vr_map);
 			ur = new LiftedAtomSet(ur, nc);
 		}
 		else {
-			ur = Utils.substitute(ur, vr_map);
+			ur = RewriteUtils.substitute(ur, vr_map);
 			ur = new LiftedAtomSet(ur, answers);
 		}
 			

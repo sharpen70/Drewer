@@ -1,18 +1,26 @@
 package org.gu.dcore.rewriting;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.gu.dcore.factories.AtomFactory;
+import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.homomorphism.HomoUtils;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.Constant;
 import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.RepConstant;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
+import org.gu.dcore.model.Variable;
 import org.gu.dcore.reasoning.AggregateUnifier;
 import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.store.Column;
@@ -136,6 +144,61 @@ public class RewriteUtils {
 	public static AtomSet substitute(AtomSet as, Map<Term, Term> submap) {
 		AtomSet result = new AtomSet();
 		for(Atom a : as) result.add(substitute(a, submap));
+		return result;
+	}
+	
+	public static List<Rule> compute_single_rules(List<Rule> rs) {
+		List<Rule> result = new LinkedList<>();
+		
+		for(Rule r : rs) {
+			Set<Variable> ex_vars = r.getExistentials();
+			
+			if(r.getHead().size() == 1) {
+				result.add(r);
+				continue;
+			}
+			
+			LinkedList<Atom> eatom = new LinkedList<>();
+			for(Atom a : r.getHead()) eatom.add(a);
+			
+			while(!eatom.isEmpty()) {
+				Set<Term> join_ev = new HashSet<>();
+				Atom p = eatom.poll();
+				AtomSet piece = new AtomSet(p);
+				
+				for(Term t : p.getTerms()) {
+					if(ex_vars.contains(t)) {
+						join_ev.add(t);
+					}
+				}
+				
+				if(join_ev.isEmpty()) {
+					result.add(RuleFactory.instance().createRule(piece, r.getBody()));
+					continue;
+				}
+				
+				Iterator<Atom> it = eatom.iterator();
+				while(it.hasNext()) {
+					Atom cp = it.next();
+					Set<Term> ev = new HashSet<>();
+					for(Term t : cp.getTerms()) {
+						if(ex_vars.contains(t)) {
+							ev.add(t);
+						}
+					}
+					if(!Collections.disjoint(join_ev, ev)) {
+						join_ev.addAll(ev);
+						piece.add(cp);
+						it.remove();
+					}
+				}
+				
+				if(piece.size() == r.getHead().size()) result.add(r);
+				else {
+					result.add(RuleFactory.instance().createRule(piece, r.getBody()));
+				}
+			}			
+		}
 		return result;
 	}
 }

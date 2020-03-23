@@ -45,7 +45,7 @@ public class ModularizedRewriting {
 	private Set<Integer> selected;
 	
 	public ModularizedRewriting(List<Rule> onto) {
-		List<Rule> single_piece_rules = compute_single_rules(onto);
+		List<Rule> single_piece_rules = RewriteUtils.compute_single_rules(onto);
 		this.modularizor = new Modularizor(single_piece_rules);
 //		this.modularizor = new Modularizor(onto);
 		this.modularizor.modularize();
@@ -410,17 +410,17 @@ public class ModularizedRewriting {
 						
 							Set<Term> eliminated = new HashSet<>();
 							for(Variable v : hr.getExistentials()) {
-								eliminated.add(u.getImageOf(v, true));
+								eliminated.add(u.getImageOf(v, 1));
 							}
 							
 							ArrayList<Term> rw_t = new ArrayList<>();
 							for(int i = 0; i < t.a.size(); i++) {
 								Term _t = t.a.get(i);
 								if(eliminated.contains(_t)) rw_t.add(blank);
-								else rw_t.add(u.getImageOf(_t, false));
+								else rw_t.add(u.getImageOf(_t, 0));
 							}
 	
-							AtomSet uc = u.getImageOf(tails, true);
+							AtomSet uc = u.getImageOf(tails, 1);
 							
 							uc.addAll(t.d);
 							
@@ -438,61 +438,6 @@ public class ModularizedRewriting {
 				}
 			}
 		}
-	}
-	
-	private List<Rule> compute_single_rules(List<Rule> rs) {
-		List<Rule> result = new LinkedList<>();
-		
-		for(Rule r : rs) {
-			Set<Variable> ex_vars = r.getExistentials();
-			
-			if(r.getHead().size() == 1) {
-				result.add(r);
-				continue;
-			}
-			
-			LinkedList<Atom> eatom = new LinkedList<>();
-			for(Atom a : r.getHead()) eatom.add(a);
-			
-			while(!eatom.isEmpty()) {
-				Set<Term> join_ev = new HashSet<>();
-				Atom p = eatom.poll();
-				AtomSet piece = new AtomSet(p);
-				
-				for(Term t : p.getTerms()) {
-					if(ex_vars.contains(t)) {
-						join_ev.add(t);
-					}
-				}
-				
-				if(join_ev.isEmpty()) {
-					result.add(RuleFactory.instance().createRule(piece, r.getBody()));
-					continue;
-				}
-				
-				Iterator<Atom> it = eatom.iterator();
-				while(it.hasNext()) {
-					Atom cp = it.next();
-					Set<Term> ev = new HashSet<>();
-					for(Term t : cp.getTerms()) {
-						if(ex_vars.contains(t)) {
-							ev.add(t);
-						}
-					}
-					if(!Collections.disjoint(join_ev, ev)) {
-						join_ev.addAll(ev);
-						piece.add(cp);
-						it.remove();
-					}
-				}
-				
-				if(piece.size() == r.getHead().size()) result.add(r);
-				else {
-					result.add(RuleFactory.instance().createRule(piece, r.getBody()));
-				}
-			}			
-		}
-		return result;
 	}
 	
 	private Atom createBlockAtom(Block b) {

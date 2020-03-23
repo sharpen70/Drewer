@@ -24,11 +24,11 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.reasoning.Unify;
+import org.gu.dcore.rewriting.RewriteUtils;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
 import org.gu.dcore.tuple.Pair;
 import org.gu.dcore.tuple.Tuple;
-import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
 public abstract class AbstactQueryAbduction implements QueryAbduction {
@@ -126,7 +126,7 @@ public abstract class AbstactQueryAbduction implements QueryAbduction {
 		List<Pair<LiftedAtomSet, Map<Term, Term>>> liftedAtomset = atomset_reduce(r.getBody());
 		
 		for(Pair<LiftedAtomSet, Map<Term, Term>> la : liftedAtomset) {
-			AtomSet nhead = Utils.substitute(r.getHead(), la.b);
+			AtomSet nhead = RewriteUtils.substitute(r.getHead(), la.b);
 			Rule nr = RuleFactory.instance().createRule(nhead, la.a);
 			
 			result.add(new LiftedRule(nr, la.a.getColumn()));
@@ -200,7 +200,7 @@ public abstract class AbstactQueryAbduction implements QueryAbduction {
 				List<SinglePieceUnifier> unifiers = Unify.getSinglePieceUnifiers(atomset, r);
 				
 				for(SinglePieceUnifier u : unifiers) {
-					 rewritings.add(Utils.rewrite(atomset, r.getBody(), u));
+					 rewritings.add(RewriteUtils.rewrite(atomset, r.getBody(), u));
 				}
 			}	
 		}
