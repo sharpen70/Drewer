@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.gu.dcore.abduction.NormalQueryAbduction;
 import org.gu.dcore.abduction.AbstactQueryAbduction;
-import org.gu.dcore.abduction.SupportedAbduction;
+import org.gu.dcore.abduction.ConcreteAbduction;
 import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;

@@ -1,10 +1,12 @@
-package org.gu.dcore.grd;
+package org.gu.dcore.checker;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gu.dcore.grd.IndexedBlockRuleSet;
+import org.gu.dcore.grd.TGraph;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;

@@ -354,10 +354,10 @@ public class ModularizedRewriting {
 							while(it.hasNext()) {
 								AtomSet rew = it.next();
 								
-								if(Utils.isMoreGeneral(rew, rewriting, true)) {
+								if(Utils.isMoreGeneral(rew, rewriting)) {
 									subsumed = true; break;
 								}
-								if(Utils.isMoreGeneral(rewriting, rew, true)) {
+								if(Utils.isMoreGeneral(rewriting, rew)) {
 									it.remove();
 								}
 							}

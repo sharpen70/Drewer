@@ -26,8 +26,8 @@ public class TestAbduction {
     	
     	Program P = parser.parseFile(onto_file);
     	
- //   	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
-    	ConjunctiveQuery query = new QueryParser().parse("?() :- Account(<http://www.owl-ontologies.com/unnamed.owl#po31987>).");
+    	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
+ //   	ConjunctiveQuery query = new QueryParser().parse("?() :- Account(<http://www.owl-ontologies.com/unnamed.owl#po31987>).");
     	
     	DatalogEngine engine = new DatalogEngine();
     	

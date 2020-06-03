@@ -8,6 +8,8 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.rewriting.ModularizedRewriting;
+import org.gu.dcore.rewriting.ModularizedRewriting2;
+import org.gu.dcore.rewriting.ModularizedRewriting3;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -208,13 +210,59 @@ public class TestModularRewriting extends TestCase
 //	    assertTrue( true );
 //	}
 //	
-//	public void testApp7()
+	public void testApp7()
+	{
+    	DcoreParser parser = new DcoreParser();
+    	
+    	Program P = parser.parse("p(X, Y) :- b(X). p(X,Y) :- a(Y).");
+    	
+    	ConjunctiveQuery query = new QueryParser().parse("?() :- r(U,V),r(V,W),p(U,Z),p(V,Z),p(V,T),p(W,T),p1(U),p2(W).");
+    	
+    	System.out.println("============");
+    	System.out.println(P);
+    	System.out.println(query);
+    	
+    	ModularizedRewriting3 mr = new ModularizedRewriting3(P.getRuleSet());
+    	
+    	List<Rule> datalog = mr.rewrite(query);
+    	
+    	System.out.println("\nRewritings:\n");
+    	for(Rule r : datalog) {
+    		System.out.println(r);
+    	}
+	    assertTrue( true );
+	}
+	
+//	public void testApp8()
 //	{
 //    	DcoreParser parser = new DcoreParser();
 //    	
-//    	Program P = parser.parse("p(X, Y) :- b(X). p(X,Y) :- a(Y).");
+//    	Program P = parser.parse("p(X, Y) :- b(X). a(X, Y, Z, T) :- p(X, Y), p(Z, T).");
 //    	
-//    	ConjunctiveQuery query = new QueryParser().parse("?() :- r(U,V),r(V,W),p(U,Z),p(V,Z),p(V,T),p(W,T),p1(U),p2(W).");
+//    	ConjunctiveQuery query = new QueryParser().parse("?() :- a(X, Y, Z, T).");
+//    	
+//    	System.out.println("============");
+//    	System.out.println(P);
+//    	System.out.println(query);
+//    	
+//    	ModularizedRewriting3 mr = new ModularizedRewriting3(P.getRuleSet());
+//    	
+//    	List<Rule> datalog = mr.rewrite(query);
+//    	
+//    	System.out.println("\nRewritings:\n");
+//    	for(Rule r : datalog) {
+//    		System.out.println(r.toVLog());
+//    	}
+//	    assertTrue( true );
+//	}	
+	
+//	public void testApp9()
+//	{
+//    	DcoreParser parser = new DcoreParser();
+//    	
+//    	Program P = parser.parse("grass_vnm_46_nl0_ce0(X0, X1, X2, X3), poison_vnm_46_nl0_ce1(X4, X5, X6, X7), office_vnm_46_nl0_ce2(X3, X7) :- wax_vnm_46_nl0_ce0(X0, X1, X2, X3, X4, X5) .");
+//    	
+//    	ConjunctiveQuery query = new QueryParser().parse("?(X0,X1,X2,X3,X4) :- grass_vnm_46_nl0_ce0(X3, X0, X2, X1), set_ad_13_nl0_ce0(X5, X0, X4, X6, X7), father_vh_14_nl0_ce1(X0, X8, X9, X10), contain_vh_15_nl0_ce0(X0, X11, X12), day_vh_43_nl0_ce1(X13, X8, X14, X15), prove_ad_43_nl0_ce0(X5, X16, X17, X18, X19), run_ad_15_nl0_ce0(X0, X20, X21, X22), yellow_vnm_33_nl0_ce2(X13, X23) .\n");
 //    	
 //    	System.out.println("============");
 //    	System.out.println(P);
@@ -230,50 +278,4 @@ public class TestModularRewriting extends TestCase
 //    	}
 //	    assertTrue( true );
 //	}
-//	
-//	public void testApp8()
-//	{
-//    	DcoreParser parser = new DcoreParser();
-//    	
-//    	Program P = parser.parse("p(X, Y) :- b(X). a(X, Y, Z, T) :- p(X, Y), p(Z, T).");
-//    	
-//    	ConjunctiveQuery query = new QueryParser().parse("?() :- a(X, Y, Z, T).");
-//    	
-//    	System.out.println("============");
-//    	System.out.println(P);
-//    	System.out.println(query);
-//    	
-//    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
-//    	
-//    	List<Rule> datalog = mr.rewrite(query);
-//    	
-//    	System.out.println("\nRewritings:\n");
-//    	for(Rule r : datalog) {
-//    		System.out.println(r);
-//    	}
-//	    assertTrue( true );
-//	}	
-	
-	public void testApp9()
-	{
-    	DcoreParser parser = new DcoreParser();
-    	
-    	Program P = parser.parse("grass_vnm_46_nl0_ce0(X0, X1, X2, X3), poison_vnm_46_nl0_ce1(X4, X5, X6, X7), office_vnm_46_nl0_ce2(X3, X7) :- wax_vnm_46_nl0_ce0(X0, X1, X2, X3, X4, X5) .");
-    	
-    	ConjunctiveQuery query = new QueryParser().parse("?(X0,X1,X2,X3,X4) :- grass_vnm_46_nl0_ce0(X3, X0, X2, X1), set_ad_13_nl0_ce0(X5, X0, X4, X6, X7), father_vh_14_nl0_ce1(X0, X8, X9, X10), contain_vh_15_nl0_ce0(X0, X11, X12), day_vh_43_nl0_ce1(X13, X8, X14, X15), prove_ad_43_nl0_ce0(X5, X16, X17, X18, X19), run_ad_15_nl0_ce0(X0, X20, X21, X22), yellow_vnm_33_nl0_ce2(X13, X23) .\n");
-    	
-    	System.out.println("============");
-    	System.out.println(P);
-    	System.out.println(query);
-    	
-    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
-    	
-    	List<Rule> datalog = mr.rewrite(query);
-    	
-    	System.out.println("\nRewritings:\n");
-    	for(Rule r : datalog) {
-    		System.out.println(r);
-    	}
-	    assertTrue( true );
-	}
 }

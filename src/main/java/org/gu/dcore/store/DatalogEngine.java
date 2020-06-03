@@ -72,13 +72,13 @@ public class DatalogEngine {
 	public Column answerAtomicQuery(Atom atom, int[] mapping, int arity) throws IOException, ParsingException {
 		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVLog());
 		
-		Column result = new Column(arity, mapping);
+		Column result = new Column(arity);
 		
 		if(reasoner == null) materialize();
 		
 		final QueryResultIterator answers = reasoner.answerQuery(query, false);
 		
-		answers.forEachRemaining(answer -> result.add(answer));
+		answers.forEachRemaining(answer -> result.add(answer, mapping));
 		
 		return result;
 	}

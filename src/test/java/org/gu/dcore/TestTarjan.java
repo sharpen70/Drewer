@@ -27,19 +27,35 @@ public class TestTarjan extends TestCase {
 	    return new TestSuite( TestTarjan.class );
 	}
 	
-	public void test() {
-		TGraph g = new TGraph(7);
+//	public void test() {
+//		TGraph g = new TGraph(7);
+//		
+//		g.addEdge(1, 2);
+//		g.addEdge(2, 3);
+//		g.addEdge(2, 4);
+//		g.addEdge(4, 3);
+//		g.addEdge(4, 1);
+//		g.addEdge(1, 5);
+//		g.addEdge(5, 6);
+//		g.addEdge(6, 4);
+//		g.addEdge(3, 3);
+//		g.addEdge(0, 0);
+//		
+//		List<List<Integer>> loops = g.getSCCs();
+//		
+//		for(List<Integer> loop : loops) System.out.println(loop);
+//	}
+	
+	public void test1() {
+		TGraph g = new TGraph(4);
 		
 		g.addEdge(1, 2);
-		g.addEdge(2, 3);
-		g.addEdge(2, 4);
-		g.addEdge(4, 3);
-		g.addEdge(4, 1);
-		g.addEdge(1, 5);
-		g.addEdge(5, 6);
-		g.addEdge(6, 4);
-		g.addEdge(3, 3);
-		g.addEdge(0, 0);
+		g.addEdge(1, 3);
+
+		g.addEdge(2, 1);
+		g.addEdge(3, 1);
+		
+		g.addEdge(2, 0);
 		
 		List<List<Integer>> loops = g.getSCCs();
 		

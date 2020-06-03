@@ -74,8 +74,7 @@ public class BlockRule extends Rule {
 		return this.blocks.isEmpty();
 	}
 	
-	@Override
-	public String toString() {
+	public String print() {
 		String s = "[" + this.getRuleIndex() + "] "; 
 		s += head.toString();
 		s += " <- ";

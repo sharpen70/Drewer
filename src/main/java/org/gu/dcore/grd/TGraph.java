@@ -17,7 +17,7 @@ public class TGraph {
 	
 	private int[] DFN, LOW;
 	private int order;
-	private boolean[] visit;
+	private boolean[] instack;
 	private Stack<Integer> stack;
 	
 	public TGraph(int size) {
@@ -58,7 +58,7 @@ public class TGraph {
 		
 		DFN = new int[size];
 		LOW = new int[size];
-		visit = new boolean[size];
+		instack = new boolean[size];
 		
 		stack = new Stack<>();
 		
@@ -77,7 +77,7 @@ public class TGraph {
 	private void tarjan(int x) {
 		DFN[x] = LOW[x] = ++order;
 		stack.add(x);
-		visit[x] = true;
+		instack[x] = true;
 		
 		List<Integer> nextNodes = graph.get(x);
 		
@@ -86,7 +86,7 @@ public class TGraph {
 				tarjan(i);
 				LOW[x] = Integer.min(LOW[x], LOW[i]);
 			}
-			else if(visit[i]) {
+			else if(instack[i]) {
 				LOW[x] = Integer.min(LOW[x], DFN[i]);
 			}
 		}
@@ -96,6 +96,8 @@ public class TGraph {
 			List<Integer> scc = new LinkedList<>();
 			while(!stack.isEmpty()) {
 				int c = stack.pop();
+				instack[c] = false;
+				
 				scc.add(c);
 				if(c == x) break;
 			}
@@ -118,7 +120,7 @@ public class TGraph {
 			if(p.b == 0) {
 				DFN[x] = LOW[x] = ++order;
 				stack.add(x);
-				visit[x] = true;
+				instack[x] = true;
 			}
 			
 			List<Integer> nextNodes = graph.get(x);
@@ -133,7 +135,7 @@ public class TGraph {
 					t.push(new Pair<>(i, 0));
 					break;
 				}
-				else if(visit[i]) {
+				else if(instack[i]) {
 					LOW[x] = Integer.min(LOW[x], DFN[i]);
 				}
 			}
@@ -145,6 +147,7 @@ public class TGraph {
 				List<Integer> scc = new LinkedList<>();
 				while(!stack.isEmpty()) {
 					int c = stack.pop();
+					instack[c] = false;
 					scc.add(c);
 					if(c == x) break;
 				}

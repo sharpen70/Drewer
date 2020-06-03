@@ -11,19 +11,16 @@ import org.gu.dcore.reasoning.NormalSubstitution;
 
 public class Homomorphism {
 	private AtomSet source;
-	private AtomSet target;
-	
-	private boolean normal = true;
+	private AtomSet target;	
 	
 	private int level_size;
 	private ArrayList<ArrayList<NormalSubstitution>> substitutionsPerLv;
 	private NormalSubstitution[] subsCurrentPath;
 	private int[] directions;
 			
-	public Homomorphism(AtomSet source, AtomSet target, boolean normal) {
+	public Homomorphism(AtomSet source, AtomSet target) {
 		this.source = source;
 		this.target = target;
-		this.normal = normal;
 		
 		this.level_size = source.size();
 		this.substitutionsPerLv = new ArrayList<>(this.level_size);
@@ -55,7 +52,7 @@ public class Homomorphism {
 			int i = dir + 1;
 			for(; i < subs.size(); i++) {
 				NormalSubstitution lv_sub = subs.get(i);
-				NormalSubstitution merged_sub = cur_sub.add(lv_sub);
+				NormalSubstitution merged_sub = cur_sub.add(lv_sub, false);
 				if(merged_sub != null) {
 					cur_sub = merged_sub;
 					break;
@@ -76,7 +73,7 @@ public class Homomorphism {
 	}
 	
 	/* normal:  normal homomorphism or homomorphism with extended renaming */
-	private NormalSubstitution homo(Atom source, Atom target, boolean normal) {
+	private NormalSubstitution homo(Atom source, Atom target) {
 		if(!source.getPredicate().equals(target.getPredicate())) return null;
 		
 		NormalSubstitution sub = new NormalSubstitution();
@@ -85,11 +82,11 @@ public class Homomorphism {
 			Term st = source.getTerm(i);
 			Term tt = target.getTerm(i);
 			
-			if(st instanceof Constant && (normal || st instanceof Constant)) {
+			if(st instanceof Constant) {
 				if(!st.equals(tt)) return null;
 			}
 			else {
-				if(!sub.add(st, tt)) return null;
+				if(!sub.add(st, tt, false)) return null;
 			}
 		}
 		
@@ -102,7 +99,7 @@ public class Homomorphism {
 			for(int j = 0; j < target.size(); j++) {
 				Atom sa = source.getAtom(i);
 				Atom sb = target.getAtom(j);
-				NormalSubstitution sub = homo(sa, sb, this.normal);
+				NormalSubstitution sub = homo(sa, sb);
 				if(sub != null) subs.add(sub);
 			}
 			if(subs.isEmpty()) return false;

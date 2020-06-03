@@ -33,35 +33,35 @@ public class RewriteUtils {
 	 * u the unifier for replacing
 	 */
 	public static AtomSet rewrite(AtomSet f, AtomSet b, SinglePieceUnifier u) {	
-		Column c = null;
-		
-		if(f instanceof LiftedAtomSet || b instanceof LiftedAtomSet) {
-			adjust_column_with_unifier(f, u, false);
-			adjust_column_with_unifier(b, u, true);
-			
-			if(f instanceof LiftedAtomSet && b instanceof LiftedAtomSet) {
-				Column fc = ((LiftedAtomSet)f).getColumn();
-				Column bc = ((LiftedAtomSet)b).getColumn();
-				
-				int rc_size = b.getRepConstants().size();
-				int[] jka, jkb;
-				jka = new int[rc_size]; jkb = new int[rc_size];
-				int ji = 0;
-				for(RepConstant rc : b.getRepConstants()) {
-					Term t = u.getImageOf(rc, 1);
-					if(t != null && t instanceof RepConstant) {
-						jka[ji] = ((RepConstant)t).getValue();
-						jkb[ji] = rc.getValue();
-						ji++;
-					}
-				}
-				Pair<Column, Map<Term, Term>> result = fc.join(bc, jka, jkb, rc_size);
-				c = result.a;
-				b = substitute(b, result.b);
-			}
-			else if(f instanceof LiftedAtomSet) c = ((LiftedAtomSet)f).getColumn();
-			else c = ((LiftedAtomSet)b).getColumn();
-		}
+//		Column c = null;
+//		
+//		if(f instanceof LiftedAtomSet || b instanceof LiftedAtomSet) {
+//			adjust_column_with_unifier(f, u, false);
+//			adjust_column_with_unifier(b, u, true);
+//			
+//			if(f instanceof LiftedAtomSet && b instanceof LiftedAtomSet) {
+//				Column fc = ((LiftedAtomSet)f).getColumn();
+//				Column bc = ((LiftedAtomSet)b).getColumn();
+//				
+//				int rc_size = b.getRepConstants().size();
+//				int[] jka, jkb;
+//				jka = new int[rc_size]; jkb = new int[rc_size];
+//				int ji = 0;
+//				for(RepConstant rc : b.getRepConstants()) {
+//					Term t = u.getImageOf(rc, 1);
+//					if(t != null && t instanceof RepConstant) {
+//						jka[ji] = ((RepConstant)t).getValue();
+//						jkb[ji] = rc.getValue();
+//						ji++;
+//					}
+//				}
+//				Pair<Column, Map<Term, Term>> result = fc.join(bc, jka, jkb, rc_size);
+//				c = result.a;
+//				b = substitute(b, result.b);
+//			}
+//			else if(f instanceof LiftedAtomSet) c = ((LiftedAtomSet)f).getColumn();
+//			else c = ((LiftedAtomSet)b).getColumn();
+//		}
 		
 		AtomSet uf = u.getImageOf(f, 0);		
 		AtomSet ub = u.getImageOf(b, 1);	
@@ -70,35 +70,17 @@ public class RewriteUtils {
 		uf = HomoUtils.minus(uf, up);
 		uf = HomoUtils.simple_union(uf, ub);		
 		
-		if(c != null) uf = new LiftedAtomSet(uf, c);
+//		if(c != null) uf = new LiftedAtomSet(uf, c);
 		return uf;
 	}
 	
 	public static AtomSet aggreRewrite(AtomSet f, AtomSet b, AggregateUnifier u) {
-		AtomSet uf = null;
-		boolean first = true;
+		AtomSet uf = u.getImageOfLeftAtomSet(f);
+		AtomSet up = u.getImageOfPiece();
+		AtomSet ub = u.getImageOfRightAtomSet(b);
 		
-		List<SinglePieceUnifier> spus = u.getSPUs();
-		
-		for(SinglePieceUnifier spu : spus) {
-			if(first) {
-				uf = spu.getImageOf(f, 0); 
-				first = false;
-			}
-			else uf = spu.getImageOf(uf, 0);
-		}
-		
-		for(SinglePieceUnifier spu : spus) {
-			AtomSet up = spu.getImageOfPiece();
-			uf = HomoUtils.minus(uf, up);
-		}
-		
-		int agg = 0;
-		
-		for(SinglePieceUnifier spu : spus) {
-			AtomSet ub = spu.getImageOf(b, agg++);
-			uf = HomoUtils.simple_union(uf, ub);
-		}
+		uf = HomoUtils.minus(uf, up);
+		uf = HomoUtils.simple_union(uf, ub);
 		
 		return uf;
 	}

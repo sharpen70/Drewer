@@ -17,23 +17,15 @@ import org.semanticweb.vlog4j.core.model.api.QueryResult;
 
 
 public class Column {
-	List<String[]> tuples;
-	int[] columnMap = null;
-	boolean[] position_blank;
-	int arity = 0;
+	private List<String[]> tuples;
+	private boolean[] position_blank = null;
+	private int arity = 0;
+	
+	private ArrayList<Integer> repMap = null;
 	
 	public Column(int arity) {
 		this.arity = arity;
 		this.tuples = new LinkedList<>();
-		this.position_blank = new boolean[arity];
-	}
-	
-	/* unsafe, arity must not smaller than the maximum value in columnMap */
-	public Column(int arity, int[] columnMap) {
-		this(arity);
-		
-		this.columnMap = columnMap;		
-		for(int i = 0; i < columnMap.length; i++) this.position_blank[i] = true;
 	}
 	
 	public int getArity() {
@@ -48,13 +40,47 @@ public class Column {
 		return this.position_blank;
 	}
 	
+	public void setRepMap(ArrayList<Integer> repMap) {
+		this.repMap = repMap;
+	}
+	
+	public ArrayList<Integer> getRepMap() {
+		return this.repMap;
+	}
+	
 	public void add(String[] t) {
-		if(t.length == this.arity) this.tuples.add(t);
+		if(t.length == this.arity) {
+			if(this.position_blank == null) {
+				this.position_blank = new boolean[arity];
+				for(int i = 0; i < t.length; i++) {
+					if(t[i] != null) this.position_blank[i] = true;
+				}
+			}
+			this.tuples.add(t);
+		}
 	}
 	
 	public void add(QueryResult answer) {
 		String[] tuple = new String[this.arity];
+		
 		int i = 0;
+		
+		for(org.semanticweb.vlog4j.core.model.api.Term t : answer.getTerms()) {
+			tuple[i++] = t.toString(); 
+		}
+		this.tuples.add(tuple);
+	}
+	
+	public void add(QueryResult answer, int[] columnMap) {
+		String[] tuple = new String[this.arity];
+		
+		if(this.position_blank == null) {
+			this.position_blank = new boolean[arity];
+			for(int i = 0; i < columnMap.length; i++) this.position_blank[i] = true;
+		}
+		
+		int i = 0;
+		
 		for(org.semanticweb.vlog4j.core.model.api.Term t : answer.getTerms()) {
 			if(columnMap != null) tuple[columnMap[i++]] = t.toString();
 			else tuple[i++] = t.toString(); 
@@ -71,16 +97,16 @@ public class Column {
 		this.tuples.add(tuple);
 	}
 	
-	public void remap(ArrayList<Integer> map) {
-		List<String[]> nts = new LinkedList<>();
-		for(String[] t : this.tuples) {
-			String[] nt = new String[map.size()];
-			for(int i = 0; i < map.size(); i++) 
-				nt[i] = t[map.get(i)];
-			nts.add(nt);
-		}
-		this.tuples = nts;
-	}
+//	public void remap(ArrayList<Integer> map) {
+//		List<String[]> nts = new LinkedList<>();
+//		for(String[] t : this.tuples) {
+//			String[] nt = new String[map.size()];
+//			for(int i = 0; i < map.size(); i++) 
+//				nt[i] = t[map.get(i)];
+//			nts.add(nt);
+//		}
+//		this.tuples = nts;
+//	}
 	
 	public List<String[]> getTuples() {
 		return this.tuples;
@@ -120,13 +146,47 @@ public class Column {
 		}
 	}
 	
-	public Pair<Column, Map<Term, Term>> join(Column b, int[] jka, int[] jkb, int jk_length) {
+	public void outerJoin(Column b, int[] jk, int jk_length) {
+		if(this.arity != b.arity) return;
+		outerJoin(b, jk, jk, jk_length);
+	}
+	
+	public void outerJoin(Column b, int[] jka, int[] jkb, int jk_length) {		
+		if(jk_length == 0) return;
+
+		/* build index map */
+		Set<String[]> index = new HashSet<>();
+		
+		for(String[] t : b.tuples) {
+			String[] jk = new String[jk_length];
+			for(int i = 0; i < jk_length; i++) {
+				jk[i] = t[jkb[i]];
+			}
+			index.add(jk);
+		}
+		
+		/* Probe */
+		Iterator<String[]> it = this.tuples.iterator();
+		
+		while(it.hasNext()) {
+			String[] t = it.next();
+			String[] jk = new String[jk_length];
+			for(int i = 0; i < jk_length; i++) {
+				jk[i] = t[jka[i]];
+			}
+			if(index.contains(jk)) {
+				it.remove();
+			}
+		}
+	}
+	
+	public Column join(Column b, int[] jka, int[] jkb, int jk_length) {
 		int aty = this.arity + b.arity - jka.length;
 		Column result = new Column(aty);
 		Map<Term, Term> tune = new HashMap<>();
 		
 		if(jk_length == 0) {
-			
+			return result;
 		}
 		
 		List<String[]> left, right;
@@ -201,7 +261,7 @@ public class Column {
 			}
 		}
 		
-		return new Pair<>(result, tune);
+		return result;
 	}
 	
 	/* Column b is assumed to having the same arity as this
@@ -222,7 +282,7 @@ public class Column {
 			return b;
 		}
 		
-		Column result = new Column(this.arity, this.columnMap);
+		Column result = new Column(this.arity);
 		Map<String[], List<String[]>> index = new HashMap<>();
 		Set<String[]> hit_key = new HashSet<>();
 		

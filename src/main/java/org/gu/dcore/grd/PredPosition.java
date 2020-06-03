@@ -1,5 +1,6 @@
 package org.gu.dcore.grd;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.gu.dcore.model.Predicate;
@@ -13,6 +14,12 @@ public class PredPosition {
 		this.indice = indice;
 	}
 	
+	public PredPosition(Predicate p, int index) {
+		this.predicate = p;
+		this.indice = new HashSet<>();
+		this.indice.add(index);
+	}
+	
 	public Predicate getPredicate() {
 		return this.predicate;
 	}
@@ -24,6 +31,11 @@ public class PredPosition {
 	@Override
 	public String toString() {
 		return "" + this.predicate + this.indice;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.predicate.hashCode() + this.indice.hashCode();
 	}
 	
 	@Override

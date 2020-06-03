@@ -13,7 +13,7 @@ import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
-public class FreshIndividualSubstitution implements Substitution {
+public class FreshIndividualSubstitution {
 	private int fresh_id = 0;
 	private Map<Variable, Constant> varMap;
 	

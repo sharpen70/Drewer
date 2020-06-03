@@ -10,7 +10,7 @@ import java.util.Set;
 import org.gu.dcore.abduction.NormalQueryAbduction;
 import org.gu.dcore.abduction.PatternAbduction;
 import org.gu.dcore.abduction.QueryAbduction;
-import org.gu.dcore.abduction.SupportedAbduction;
+import org.gu.dcore.abduction.ConcreteAbduction;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
@@ -84,7 +84,7 @@ public class Abduction {
         	Set<Predicate> abdu = new HashSet<>();
         	
         	switch(abdu_mode) {
-        	case 1  : abduction = new SupportedAbduction(ruleset, query, engine, abdu);break;        
+        	case 1  : abduction = new ConcreteAbduction(ruleset, query, engine, abdu);break;        
         	case 2  : abduction = new PatternAbduction(ruleset, query, engine, abdu);break;
         	default : abduction = new NormalQueryAbduction(ruleset, query, engine, abdu);break;        	
         	}

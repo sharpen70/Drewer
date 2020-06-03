@@ -25,27 +25,39 @@ import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
 public class PatternAbduction extends AbstactQueryAbduction {
-
-	public PatternAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
-		super(onto, q, D, abdu);
+	
+	public PatternAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D) {
+		super(onto, q, D);
 	}
 	
-	public List<PatternExplanation> getPatternExplanations() throws IOException, ParsingException {
-		List<PatternExplanation> result = new LinkedList<PatternExplanation>();
-		
-		/* Compute datalog rewriting of the abduction problem */
-		ModularizedRewriting mr = new ModularizedRewriting(this.ontology);
-		List<Rule> rewriting = mr.rewrite(query);
-		
-		this.store.addRules(rewriting);
-		
-		
-		return result; 
-	}
-
-	@Override
+	public PatternAbduction(List<Rule> onto, ConjunctiveQuery q, DatalogEngine D, Set<Predicate> abdu) {
+		super(onto, q, D, abdu);
+	}	
+	
 	public List<AtomSet> getExplanations() throws IOException, ParsingException {
-		// TODO Auto-generated method stub
-		return null;
+		List<AtomSet> rewriting_set = new LinkedList<>();
+		
+		LinkedList<AtomSet> exploration_set = new LinkedList<>();
+		
+		exploration_set.add(this.query.getBody());
+		
+		while(!exploration_set.isEmpty()) {
+			AtomSet current = exploration_set.poll();
+			
+			if(allAbducibles(current)) rewriting_set.add(current);
+		
+			List<AtomSet> rewritings = new LinkedList<>();
+			
+			rewritings.addAll(rewrite(current));
+			
+			Utils.removeSubsumed(rewritings, rewriting_set);
+			Utils.removeSubsumed(rewritings, exploration_set);
+			Utils.removeSubsumed(exploration_set, rewritings);
+			Utils.removeSubsumed(rewriting_set, rewritings);
+			
+			exploration_set.addAll(rewritings);
+		}
+		
+		return rewriting_set;
 	}
 }

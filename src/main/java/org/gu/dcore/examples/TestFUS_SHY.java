@@ -2,12 +2,12 @@ package org.gu.dcore.examples;
 
 import java.io.File;
 
-import org.gu.dcore.grd.SeparableChecker;
+import org.gu.dcore.checker.SeparableChecker;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.parsing.DcoreParser;
 
-public class CheckSeparable {
+public class TestFUS_SHY {
 	public static void main(String[] args) throws Exception {
 		String benchmarks = "/home/peng/projects/evaluations/benchmarks/existential_rules/";
 		

@@ -47,7 +47,7 @@ public class Rewrite {
         	System.out.println("---------------------");
         	List<Rule> datalog = mr.rewrite(query);
         	
-        	for(Rule r : datalog) System.out.println(r.toRDFox());
+        	for(Rule r : datalog) System.out.println(r.toString());
         	
         	long end = System.currentTimeMillis();
         	

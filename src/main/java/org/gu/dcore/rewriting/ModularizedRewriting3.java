@@ -30,21 +30,21 @@ import org.gu.dcore.modularization.Block;
 import org.gu.dcore.modularization.BlockRule;
 import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.modularization.RuleBasedMark;
+import org.gu.dcore.reasoning.AggregateUnifier;
 import org.gu.dcore.reasoning.SinglePieceUnifier;
 import org.gu.dcore.reasoning.Unify;
 import org.gu.dcore.tuple.Tuple;
-import org.gu.dcore.tuple.Tuple5;
 import org.gu.dcore.tuple.Tuple6;
 import org.gu.dcore.utils.Utils;
 
-public class ModularizedRewriting2 {
+public class ModularizedRewriting3 {
 	private Modularizor modularizor;
 	private IndexedBlockRuleSet ibr;
 	
 	private final Constant blank = TermFactory.instance().createConstant("blank");
 	private Set<Integer> selected;
 	
-	public ModularizedRewriting2(List<Rule> onto) {
+	public ModularizedRewriting3(List<Rule> onto) {
 		List<Rule> single_piece_rules = compute_single_rules(onto);
 		this.modularizor = new Modularizor(single_piece_rules);
 //		this.modularizor = new Modularizor(onto);
@@ -131,12 +131,14 @@ public class ModularizedRewriting2 {
 				Tuple6<ArrayList<Term>, AtomSet, AtomSet, AtomSet, AtomSet, Map<Atom, Set<Integer>>> t = queue.poll();	
 				
 				AtomSet rewrite_target = t.c;
+				AtomSet rewrite_rule_body = t.b;
+				
 				Set<BlockRule> rs = this.ibr.getRules(rewrite_target);
 				
 				for(BlockRule hr : rs) {
 					Set<Variable> restricted_var = br_b.c ? blockRule.getFrontierVariables() : new HashSet<>();
-					List<SinglePieceUnifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
-	//				List<AggregateUnifier> unifiers = Unify.getAggregatedPieceUnifier(t.c, t.b, hr, restricted_var);
+	//				List<SinglePieceUnifier> unifiers = Unify.getSinglePieceUnifiers(t.c, t.b, hr, restricted_var);
+					List<AggregateUnifier> unifiers = Unify.getAggregatedPieceUnifier(rewrite_target, rewrite_rule_body, hr, restricted_var);
 					
 					if(!unifiers.isEmpty()) {
 						boolean ex_rew = hr.isExRule();
@@ -170,7 +172,7 @@ public class ModularizedRewriting2 {
 							}
 						}
 						
-						for(SinglePieceUnifier u : unifiers) {
+						for(AggregateUnifier u : unifiers) {
 							Map<Atom, Set<Integer>> trace_used_nonex_rules = new HashMap<>(t.f);
 							
 							if(!ex_rew) {
@@ -180,10 +182,10 @@ public class ModularizedRewriting2 {
 								if(used_rules != null && used_rules.contains(hr.getRuleIndex())) continue;
 							}
 							
-						    AtomSet rew_bbody = u.getImageOf(t.c, 0);
+						    AtomSet rew_bbody = u.getImageOfLeftAtomSet(t.c);
 						    
-						    AtomSet rew_hbody = u.getImageOf(hr.getBody(), 1);
-							AtomSet rew_current_target = u.getImageOf(next_target, 1);
+						    AtomSet rew_hbody = u.getImageOfRightAtomSet(hr.getBody());
+							AtomSet rew_current_target = u.getImageOfRightAtomSet(next_target);
 				
 							AtomSet up = u.getImageOfPiece();
 						
@@ -191,7 +193,7 @@ public class ModularizedRewriting2 {
 							AtomSet a_rewriting = HomoUtils.simple_union(rew_bbody, rew_hbody);
 							AtomSet rewriting = HomoUtils.simple_union(rew_bbody, rew_current_target);
 							
-							AtomSet o_rewriting = RewriteUtils.rewrite(t.b, hr.getBody(), u);
+							AtomSet o_rewriting = RewriteUtils.aggreRewrite(rewrite_rule_body, hr.getBody(), u);
 							
 							if(ex_rew)  {
 								boolean subsumed = false;
@@ -215,17 +217,17 @@ public class ModularizedRewriting2 {
 							
 							Set<Term> eliminated = new HashSet<>();
 							for(Variable v : hr.getExistentials()) {
-								eliminated.add(u.getImageOf(v, 1));
+								eliminated.addAll(u.getImageOfExistential(v));
 							}
 							
 							ArrayList<Term> rw_t = new ArrayList<>();
 							for(int i = 0; i < t.a.size(); i++) {
 								Term _t = t.a.get(i);
 								if(eliminated.contains(_t)) rw_t.add(blank);
-								else rw_t.add(u.getImageOf(_t, 0));
+								else rw_t.add(u.getImageOf(_t));
 							}
 	
-							AtomSet uc = u.getImageOf(tails, 1);
+							AtomSet uc = u.getImageOfRightAtomSet(tails);
 							
 							uc.addAll(t.d);
 							

@@ -35,7 +35,7 @@ public class Querying {
 			}
 		}
 		
-		if(ontologyfile == null ||  queriesfile == null) {
+		if(ontologyfile == null || queriesfile == null) {
 			System.out.println("Missing input !");
 			return;
 		}
@@ -47,26 +47,15 @@ public class Querying {
     	Program P = parser.parseFile(ontologyfile);
     	
     	System.out.println("Finish Parsing Files ...");
-    	
-
-		
-		
-
-    	
+     	
     	Scanner scn = new Scanner(new File(queriesfile));
     	
-
-    	
-    	if(scn.hasNextLine()) {   		
+    	while(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
     		
     	   	ConjunctiveQuery query = new QueryParser().parse(line);
         	
-    	   	System.out.println("Querying on: " + query.toString());   
-    	   	
-//        	for(Rule r : P.getRuleSet()) {
-//        		System.out.println(r);
-//        	}
+    	   	System.out.println("Querying on: " + query.toString());      	   	
         	
     	   	long estart = System.currentTimeMillis();
         	ModularizedRewriting2 mr = new ModularizedRewriting2(P.getRuleSet());
@@ -76,9 +65,10 @@ public class Querying {
         	end = System.currentTimeMillis();
         	
         	long rew_time = end - estart;
-        	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms");       	
-        	
-        	if(datafile != null) {        	
+      	     	
+        	if(datafile != null) {      
+            	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms"); 
+            	
 	        	start = System.currentTimeMillis();
 	        	DatalogEngine engine = new DatalogEngine();
 	        	engine.addSourceFromCSVDir(datafile);
@@ -99,7 +89,14 @@ public class Querying {
 	        	
 	        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (end - start + rew_time) + " ms");
         	}
+        	else {
+            	for(Rule r : P.getRuleSet()) {
+	        		System.out.println(r);
+	        	}
+            	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms"); 
+        	}
         }
+    	
     	tend = System.currentTimeMillis();
     	System.out.println("Total time cost " + (tend - tstart) + " ms");
     	scn.close();		

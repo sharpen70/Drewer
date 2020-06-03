@@ -57,16 +57,16 @@ public class SinglePieceUnifier {
 //	}
 	
 	public Term getImageOf(Term t, int offset_num) {
-		int v_offset = offset_num * this.partition.getVOffset();
-		int rc_offset = offset_num * this.partition.getRCOffset();
+		int v_offset = this.partition.getVOffset();
+		int rc_offset = this.partition.getRCOffset();
 		
-		return this.partition.getSubstitution().getImageOf(t, v_offset, rc_offset);
+		return this.partition.getSubstitution().getImageOf(t, v_offset, rc_offset, offset_num);
 	}
 	
 	public AtomSet getImageOfPiece() {
 		AtomSet up = new AtomSet();
 		for(Atom a : this.B) {
-			up.add(this.partition.getSubstitution().getImageOf(a, 0, 0));
+			up.add(this.partition.getSubstitution().getImageOf(a, 0, 0, 0));
 		}
 		return up;
 	}
@@ -79,10 +79,10 @@ public class SinglePieceUnifier {
 //	}
 	
 	public AtomSet getImageOf(AtomSet atomset, int offset_num) {
-		int v_offset = offset_num * this.partition.getVOffset();
-		int rc_offset = offset_num * this.partition.getRCOffset();
+		int v_offset = this.partition.getVOffset();
+		int rc_offset = this.partition.getRCOffset();
 		
-		return this.partition.getSubstitution().getImageOf(atomset, v_offset, rc_offset);
+		return this.partition.getSubstitution().getImageOf(atomset, v_offset, rc_offset, offset_num);
 	}
 	
 //	public Set<Term> getImageOf(Set<Variable> vars) {

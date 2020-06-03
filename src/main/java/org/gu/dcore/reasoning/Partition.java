@@ -126,12 +126,16 @@ public class Partition {
 				for(Term t : pc) {
 					if(left_rule_variable_only && t instanceof Variable &&
 							((Variable)t).getValue() >= this.var_offset)
-						break;
+						continue;
 					
 					if(tc.contains(t)) {
 						if(hit == null) {
 							hit = tc;
 							tc.addAll(pc);
+//							for(Term tt : pc) {
+//								if(((Variable)tt).getValue() < this.var_offset)
+//									tc.add(tt);
+//							}
 						}
 						else {
 							hit.addAll(tc);
@@ -196,7 +200,7 @@ public class Partition {
 				
 				for(Term t : category) {
 					if(!t.equals(mapto)) {
-						this.substitution.add(t, mapto);
+						this.substitution.add(t, mapto, false);
 					}
 				}
 			}
