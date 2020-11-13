@@ -26,7 +26,7 @@ public class LiftedAtomSet extends AtomSet {
 	public String toString() {
 		String s = "";
 		s += super.toString() + "\n";
-		for(int i = 0; i < column.getArity() - 1; i++) {
+		for(int i = 0; i < column.getArity(); i++) {
 			s += "rc_" + i + " ";
 		}
 		s += "\n";

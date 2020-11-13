@@ -101,6 +101,22 @@ public class AtomSet implements Iterable<Atom> {
 		return this.vars;
 	}
 	
+	public Set<Variable> getJoinVariables() {
+		Set<Variable> joinVars = new HashSet<>();
+		for(int i = 0; i < this.size(); i++) {
+			Set<Variable> vars = this.getAtom(i).getVariables();
+			for(Variable var : vars) {
+				if(!joinVars.contains(var)) {
+					for(int j = i + 1; j < this.size(); j++) {
+						if(this.getAtom(j).getVariables().contains(var))
+							joinVars.add(var);
+					}
+				}
+			}
+		}
+		return joinVars;
+	}
+	
 	public Set<RepConstant> getRepConstants() {
 		if(this.rcs != null) return this.rcs;
 		

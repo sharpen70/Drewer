@@ -30,7 +30,7 @@ public class Partition {
 	}
 	
 	public Partition getCopy() {
-		Partition p = new Partition(this.var_offset);
+		Partition p = new Partition(this.var_offset, this.rc_offset);
 		
 		for(Set<Term> c : this.categories) {
 			Set<Term> nc = new HashSet<>(c);

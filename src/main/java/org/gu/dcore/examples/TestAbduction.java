@@ -2,16 +2,18 @@ package org.gu.dcore.examples;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Scanner;
 
+import org.gu.dcore.abduction.ConcreteAbduction;
 import org.gu.dcore.abduction.NormalQueryAbduction;
-import org.gu.dcore.factories.PredicateFactory;
+import org.gu.dcore.abduction.PatternAbduction;
+import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
-import org.gu.dcore.model.Predicate;
+import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Program;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.store.DatalogEngine;
@@ -19,29 +21,79 @@ import org.semanticweb.vlog4j.parser.ParsingException;
 
 public class TestAbduction {
 	public static void main(String[] args) throws ParsingException, IOException {
-		String onto_file = "/home/peng/projects/tractable-abd/tboxfiles_dlp/semintec-tbox.dlp";
-		String data_file = "/home/peng/projects/abdu_eval/data/SEMINTEC";
+//		String onto_file = "/home/sharpen/projects/evaluations/benchmarks/owl/LUBM/LUBM.dlp";
+//		String data_file = "/home/sharpen/projects/evaluations/benchmarks/owl/LUBM/data001";
+//		String q_file = "/home/sharpen/projects/evaluations/benchmarks/owl/LUBM/obs_queries.dlp";
+		
+//		String onto_file = "/home/sharpen/projects/evaluations/benchmarks/abdu/semintec/semintec.dlp";
+//		String data_file = "/home/sharpen/projects/evaluations/benchmarks/abdu/semintec/data";
+//		String q_file = "/home/sharpen/projects/evaluations/benchmarks/abdu/semintec/obs_queries.dlp";
+		
+		String onto_file = "/home/sharpen/projects/evaluations/benchmarks/abdu/vicodi/vicodi.dlp";
+		String data_file = "/home/sharpen/projects/evaluations/benchmarks/abdu/vicodi/data";
+		String q_file = "/home/sharpen/projects/evaluations/benchmarks/abdu/vicodi/obs_queries.dlp";
+		
+//		String onto_file = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/ONT-256/ONT-256.dlp";
+//		String data_file = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/ONT-256/data";
+//		String q_file = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/ONT-256/obs_queries.dlp";
+		
+//		String onto_file = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/STB-128/STB-128.dlp";
+//		String data_file = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/STB-128/data";
+//		String q_file = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/STB-128/obs_queries.dlp";
+		
 		
 		DcoreParser parser = new DcoreParser();
     	
     	Program P = parser.parseFile(onto_file);
     	
-    	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
- //   	ConjunctiveQuery query = new QueryParser().parse("?() :- Account(<http://www.owl-ontologies.com/unnamed.owl#po31987>).");
+    	Scanner scanner = new Scanner(new File(q_file));
+    	
+    	int i = 0;
     	
     	DatalogEngine engine = new DatalogEngine();
     	
 //    	engine.addRules(P.getRuleSet());
     	engine.addSourceFromCSVDir(data_file);
+//    	engine.load();
     	
-    	Set<Predicate> abdu = new HashSet<>();
-    	
- //   	SupportedAbduction abduction = new SupportedAbduction(P.getRuleSet(), query, engine, abdu);
-    	NormalQueryAbduction abduction = new NormalQueryAbduction(P.getRuleSet(), query, engine, abdu);
-    	
-  //  	System.out.println(engine.answerAtomicQuery("A(a, ?b) ."));
-    	List<AtomSet> expl = abduction.getExplanations();
-    	
-    	for(AtomSet atomset : expl) System.out.println(atomset);
+    	while(scanner.hasNextLine()) {
+    		String q = scanner.nextLine();   		
+    		
+    		i++;
+//    		if(i != 3) continue;
+    		
+	    	ConjunctiveQuery query = new QueryParser().parse(q);
+
+	 //   	ConjunctiveQuery query = new QueryParser().parse("?() :- Account(<http://www.owl-ontologies.com/unnamed.owl#po31987>).");
+	    	
+        	Rule qr = RuleFactory.instance().createQueryRule(query);
+        	AtomSet obs = qr.getBody();
+        	
+//	    	ConcreteAbduction abduction = new ConcreteAbduction(P.getRuleSet(), obs, engine);
+//	    	PatternAbduction abduction = new PatternAbduction(P.getRuleSet(), obs, engine);
+	    	NormalQueryAbduction abduction = new NormalQueryAbduction(P.getRuleSet(), obs, engine);
+	    	
+	  //  	System.out.println(engine.answerAtomicQuery("A(a, ?b) ."));
+	    	long start = System.currentTimeMillis();
+	    	List<AtomSet> expl = abduction.getExplanations();
+	    	long end = System.currentTimeMillis();
+	    	
+	    	if(expl == null) {
+	    		System.out.println("The observation is already satisfied");
+	    	}
+	    	else {
+	    		int full_number = 0;
+	    		for(AtomSet atomset : expl) {
+	    			if(atomset instanceof LiftedAtomSet) {
+	    				full_number += ((LiftedAtomSet)atomset).getColumn().size();
+	    			}
+	    			else full_number++;
+	    		}
+	    		System.out.println("Number of Explanations: (Compact) " + expl.size() + " (Full) " + full_number + " cost: " + (end - start) + " ms");
+//	    		for(AtomSet atomset : expl) System.out.println(atomset);
+	    	
+	    	}  
+    	}
+    	scanner.close();
 	}
 }

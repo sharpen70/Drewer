@@ -12,8 +12,8 @@ import java.util.Set;
 
 import org.gu.dcore.model.RepConstant;
 import org.gu.dcore.model.Term;
-import org.gu.dcore.tuple.Pair;
 import org.semanticweb.vlog4j.core.model.api.QueryResult;
+import org.semanticweb.vlog4j.core.reasoner.QueryResultIterator;
 
 
 public class Column {
@@ -26,6 +26,51 @@ public class Column {
 	public Column(int arity) {
 		this.arity = arity;
 		this.tuples = new LinkedList<>();
+	}
+	
+	public Column(int arity, QueryResultIterator iterator, int[] columnMap) {
+		this(arity);
+		
+		if(this.arity == 0 && iterator.hasNext()) {
+			String[] true_tuple = {"True"};
+			this.tuples.add(true_tuple);
+			return;
+		}
+		
+		/* all terms are answer variables */
+		boolean complete = true;
+		position_blank = new boolean[arity];
+		for(int i = 0; i < columnMap.length; i++) {
+			int p = columnMap[i];
+			if(p != -1) position_blank[p] = true;
+			else complete = false;
+		}
+		
+		Set<ArrayList<String>> distinct_set = new HashSet<>();
+		
+		while(iterator.hasNext()) {
+			QueryResult result = iterator.next();
+			String[] tuple = new String[arity];
+			ArrayList<String> key = new ArrayList<>();
+			for(int i = 0; i < columnMap.length; i++) {
+				int p = columnMap[i];
+				if(p != -1) {
+					String ts = result.getTerms().get(i).toString();
+					tuple[p] = ts;
+					key.add(ts);
+				}
+			}
+			if(!complete && distinct_set.add(key)) this.tuples.add(tuple);
+			else this.tuples.add(tuple);
+		}
+	}
+	
+	public Column getCopy() {
+		Column column = new Column(this.arity);
+		column.position_blank = this.position_blank;
+		column.tuples.addAll(this.tuples);
+		
+		return column;
 	}
 	
 	public int getArity() {
@@ -72,6 +117,12 @@ public class Column {
 	}
 	
 	public void add(QueryResult answer, int[] columnMap) {
+		if(this.arity == 0) {
+			String[] true_tuple = {"True"};
+			this.tuples.add(true_tuple);
+			return;
+		}
+		
 		String[] tuple = new String[this.arity];
 		
 		if(this.position_blank == null) {
@@ -82,11 +133,18 @@ public class Column {
 		int i = 0;
 		
 		for(org.semanticweb.vlog4j.core.model.api.Term t : answer.getTerms()) {
-			if(columnMap != null) tuple[columnMap[i++]] = t.toString();
-			else tuple[i++] = t.toString(); 
-		}
+			int var_p = columnMap[i++];
+			if(var_p != -1) {
+				tuple[var_p] = t.toString();
+			}
+		}	
+		
 		this.tuples.add(tuple);
 	}
+	
+//	public boolean isFactColumn() {
+//		return this.isFact && this.size() != 0;
+//	}
 	
 	public void addwithFilter(QueryResult answer, ArrayList<Integer> filter) {
 		String[] tuple = new String[filter.size()];
@@ -112,16 +170,40 @@ public class Column {
 		return this.tuples;
 	}
 	
-	public void distinct() {
-		Set<String[]> distinct_set = new HashSet<>();
+	public void distinct(boolean[] actual_occupy) {
+		boolean need_distinct = false;
+		ArrayList<Integer> distinct_key = new ArrayList<>();
+		
+		for(int i = 0; i < this.arity; i++) {
+			if(this.position_blank[i] && !actual_occupy[i]) need_distinct = true;
+			if(actual_occupy[i]) distinct_key.add(i);
+		}
+		
+		if(!need_distinct) return;
+		
+		Set<ArrayList<String>> distinct_set = new HashSet<>();
 		
 		Iterator<String[]> it = this.tuples.iterator();
 		
 		while(it.hasNext()) {
 			String[] t = it.next();
-			if(!distinct_set.add(t)) it.remove();
+			ArrayList<String> key = new ArrayList<>(distinct_key.size());
+			for(int i = 0; i < distinct_key.size(); i++)
+				key.add(t[distinct_key.get(i)]);
+			if(!distinct_set.add(key)) it.remove();
 		}
 	}
+	
+//	public void distinct() {
+//		Set<String[]> distinct_set = new HashSet<>();
+//		
+//		Iterator<String[]> it = this.tuples.iterator();
+//		
+//		while(it.hasNext()) {
+//			String[] t = it.next();
+//			if(!distinct_set.add(t)) it.remove();
+//		}
+//	}
 	
 	public void filter(Map<Integer, Object> eqs) {
 		Iterator<String[]> it = this.tuples.iterator();
@@ -146,6 +228,17 @@ public class Column {
 		}
 	}
 	
+	public void outerJoin(Column b) {
+		if(this.arity != b.arity) return;
+		int[] jk = new int[this.arity];
+		int jk_length = 0;
+		for(int i = 0; i < this.arity; i++) {
+			if(this.position_blank[i] && b.position_blank[i])
+				jk[jk_length++] = i;
+		}
+		outerJoin(b, jk, jk, jk_length);
+	}
+	
 	public void outerJoin(Column b, int[] jk, int jk_length) {
 		if(this.arity != b.arity) return;
 		outerJoin(b, jk, jk, jk_length);
@@ -155,12 +248,12 @@ public class Column {
 		if(jk_length == 0) return;
 
 		/* build index map */
-		Set<String[]> index = new HashSet<>();
+		Set<ArrayList<String>> index = new HashSet<>();
 		
 		for(String[] t : b.tuples) {
-			String[] jk = new String[jk_length];
+			ArrayList<String> jk = new ArrayList<>(jk_length);
 			for(int i = 0; i < jk_length; i++) {
-				jk[i] = t[jkb[i]];
+				jk.add(t[jkb[i]]);
 			}
 			index.add(jk);
 		}
@@ -170,9 +263,9 @@ public class Column {
 		
 		while(it.hasNext()) {
 			String[] t = it.next();
-			String[] jk = new String[jk_length];
+			ArrayList<String> jk = new ArrayList<>(jk_length);
 			for(int i = 0; i < jk_length; i++) {
-				jk[i] = t[jka[i]];
+				jk.add(t[jka[i]]);
 			}
 			if(index.contains(jk)) {
 				it.remove();
@@ -283,17 +376,17 @@ public class Column {
 		}
 		
 		Column result = new Column(this.arity);
-		Map<String[], List<String[]>> index = new HashMap<>();
-		Set<String[]> hit_key = new HashSet<>();
+		Map<ArrayList<String>, List<String[]>> index = new HashMap<>();
+		Set<ArrayList<String>> hit_key = new HashSet<>();
 		
 		Column left, right;
 		if(this.tuples.size() < b.tuples.size()) { left = this; right = b; }
 		else { left = b; right = this;}
-		
+		 
 		/* build hash index */
 		for(String[] tuple : left.tuples) {
-			String[] keys = new String[join_key.size()];
-			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key.get(i)];
+			ArrayList<String> keys = new ArrayList<>(join_key.size());
+			for(int i = 0; i < join_key.size(); i++) keys.add(tuple[join_key.get(i)]);
 			List<String[]> rows = index.get(keys);
 			if(rows == null) {
 				rows = new LinkedList<>();
@@ -306,8 +399,8 @@ public class Column {
 		Iterator<String[]> it = right.tuples.iterator();
 		while(it.hasNext()) {
 			String[] b_tuple = it.next();
-			String[] keys = new String[join_key.size()];
-			for(int i = 0; i < keys.length; i++) keys[i] = b_tuple[join_key.get(i)];
+			ArrayList<String> keys = new ArrayList<>(join_key.size());
+			for(int i = 0; i < join_key.size(); i++) keys.add(b_tuple[join_key.get(i)]);
 			
 			List<String[]> rows = index.get(keys);
 			if(rows != null) {
@@ -320,16 +413,16 @@ public class Column {
 					}
 					result.add(merge);
 				}
+				it.remove();
 			}
-			it.remove();
 		}
 		
 		it = left.tuples.iterator();
 		
 		while(it.hasNext()) {
 			String[] tuple = it.next();
-			String[] keys = new String[join_key.size()];
-			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key.get(i)];
+			ArrayList<String> keys = new ArrayList<>(join_key.size());
+			for(int i = 0; i < join_key.size(); i++) keys.add(tuple[join_key.get(i)]);
 			if(hit_key.contains(keys)) it.remove();
 		}
 		
@@ -342,8 +435,9 @@ public class Column {
 		for(String[] t : this.tuples) {
 			String ts = "";
 			for(int i = 0; i < t.length; i++) {
-				if(i != 0) ts += ", ";
-				ts += t[i];
+				if(i != 0) ts += " , ";
+				if(t[i] == null) ts += "-";
+				else ts += t[i];
 			}
 			s += ts + "\n";
 		}

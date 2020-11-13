@@ -1,17 +1,11 @@
 package org.gu.dcore;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.gu.dcore.abduction.NormalQueryAbduction;
-import org.gu.dcore.abduction.AbstactQueryAbduction;
 import org.gu.dcore.abduction.ConcreteAbduction;
-import org.gu.dcore.factories.PredicateFactory;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
-import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
@@ -44,27 +38,28 @@ public class TestAbduction extends TestCase {
 	public void test() throws ParsingException, IOException {
     	DcoreParser parser = new DcoreParser();
     	
-    	Program P = parser.parse("A(X, Y) :- B(X, Y), C(Y).\n"
-    			+ "A(X, Y) :- R(X, Y). \n"
-    			+ "D(X) :- E(X, Y).");
+    	Program P = parser.parse("");
     	
- //   	ConjunctiveQuery query = new QueryParser().parse("?(Y) :- D(X), A(X,Y).");
-    	ConjunctiveQuery query = new QueryParser().parse("?() :- D(Y), A(X,Y), C(Y).");
+    	ConjunctiveQuery query = new QueryParser().parse("?() :- A(X), B(X), C(X).");
+ //   	ConjunctiveQuery query = new QueryParser().parse("?() :- D(Y), A(X,Y), C(Y).");
     	
     	DatalogEngine engine = new DatalogEngine();
+ //   	engine.answerAtomicQuery("B(?a,?b)");
     	
-    	engine.addFacts("A(a, b) . B(a, c) . C(c) .");
+ //   	engine.addFacts("A(a, b) . B(a, c) . C(b) .");
+    	engine.addFacts("B(a) . B(c) . C(c) . C(b) . A(a) .");
     	
-    	Set<Predicate> abdu = new HashSet<>();
-    	abdu.add(PredicateFactory.instance().getPredicate("D"));
-    	abdu.add(PredicateFactory.instance().getPredicate("R"));
+//    	Set<Predicate> abdu = new HashSet<>();
+//    	abdu.add(PredicateFactory.instance().getPredicate("D"));
+//    	abdu.add(PredicateFactory.instance().getPredicate("R"));
     	
- //   	SupportedAbduction abduction = new SupportedAbduction(P.getRuleSet(), query, engine, abdu);
-    	NormalQueryAbduction abduction = new NormalQueryAbduction(P.getRuleSet(), query, engine, abdu);
+    	ConcreteAbduction abduction = new ConcreteAbduction(P.getRuleSet(), query.getBody(), engine);
+//    	NormalQueryAbduction abduction = new NormalQueryAbduction(P.getRuleSet(), query, engine);
     	
   //  	System.out.println(engine.answerAtomicQuery("A(a, ?b) ."));
     	List<AtomSet> expl = abduction.getExplanations();
     	
-    	for(AtomSet atomset : expl) System.out.println(atomset);
+    	if(expl == null) System.out.println("Trivial Abduction");
+    	else for(AtomSet atomset : expl) System.out.println(atomset);
 	}
 }

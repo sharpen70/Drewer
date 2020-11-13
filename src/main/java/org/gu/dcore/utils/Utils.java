@@ -79,6 +79,21 @@ public class Utils {
 		}
 	}
 	
+	public static void computeCoverSet(List<AtomSet> rewritings) {
+		Iterator<AtomSet> it1 = rewritings.iterator();
+		while(it1.hasNext()) {
+			AtomSet rewriting1 = it1.next();
+			Iterator<AtomSet> it2 = rewritings.iterator();
+			while(it2.hasNext()) {				
+				AtomSet rewriting2 = it2.next();
+				if(!rewriting1.equals(rewriting2))
+					if(Utils.isMoreGeneral(rewriting2, rewriting1)) {
+						it1.remove();
+						break;
+					}
+			}
+		}
+	}
 	
 	public static Column innerJoinColumn(Column a, Column b) {
 		int arity = a.getArity();
@@ -94,9 +109,21 @@ public class Utils {
 				join_key.add(i);
 		}
 		
-		if(join_key.size() == 0) return null;
+		if(join_key.size() == 0) {
+			for(String[] tuple_a : a.getTuples()) {
+				for(String[] tuple_b : b.getTuples()) {
+					String[] tuple = new String[arity];
+					for(int i = 0; i < arity; i++) {
+						if(tuple_a[i] != null) tuple[i] = tuple_a[i];
+						if(tuple_b[i] != null) tuple[i] = tuple_b[i];
+					}
+					result.add(tuple);
+				}
+			}			
+			return result;
+		}
 		
-		Map<String[], List<String[]>> index = new HashMap<>();
+		Map<ArrayList<String>, List<String[]>> index = new HashMap<>();
 		
 		Column left, right;
 		if(a.size() < b.size()) { left = a; right = b; }
@@ -104,8 +131,8 @@ public class Utils {
 		
 		/* build hash index */
 		for(String[] tuple : left.getTuples()) {
-			String[] keys = new String[join_key.size()];
-			for(int i = 0; i < keys.length; i++) keys[i] = tuple[join_key.get(i)];
+			ArrayList<String> keys = new ArrayList<>(join_key.size());
+			for(int i = 0; i < join_key.size(); i++) keys.add(tuple[join_key.get(i)]);
 			List<String[]> rows = index.get(keys);
 			if(rows == null) {
 				rows = new LinkedList<>();
@@ -118,8 +145,8 @@ public class Utils {
 		Iterator<String[]> it = right.getTuples().iterator();
 		while(it.hasNext()) {
 			String[] right_tuple = it.next();
-			String[] keys = new String[join_key.size()];
-			for(int i = 0; i < keys.length; i++) keys[i] = right_tuple[join_key.get(i)];
+			ArrayList<String> keys = new ArrayList<>(join_key.size());
+			for(int i = 0; i < join_key.size(); i++) keys.add(right_tuple[join_key.get(i)]);
 			
 			List<String[]> rows = index.get(keys);
 			if(rows != null) {

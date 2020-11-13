@@ -33,9 +33,8 @@ public class CompactComparator {
 		List<Partition> prePartitions = getPrePartitions();
 		
 		for(Partition part : prePartitions) {
-			int v_offset = part.getVOffset();
 			int rc_offset = part.getRCOffset();
-			AtomSet m_source = part.getSubstitution().getImageOf(source, v_offset, rc_offset, 1);
+			AtomSet m_source = part.getSubstitution().getImageOf(source, 0, rc_offset, 1);
 			AtomSet m_target = part.getSubstitution().getImageOf(target);
 			
 			if(comparator.compare(m_source, m_target)) result.add(part);
@@ -76,7 +75,7 @@ public class CompactComparator {
 			for(int j = 0; j < this.target.size(); j++) {
 				Atom target_atom = this.target.getAtom(j);
 				if(source_atom.getPredicate().equals(target_atom.getPredicate())) {
-					Partition part = new Partition(source_atom.getVariables().size(),source_atom.getRepConstants().size());
+					Partition part = new Partition(0, source.getMaxRCValue() + 1);
 					NormalSubstitution sub = new NormalSubstitution();
 					boolean valid = true;
 					for(int p = 0; p < source_atom.getTerms().size(); p++) {

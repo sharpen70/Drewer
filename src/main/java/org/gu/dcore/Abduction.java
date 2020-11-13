@@ -10,9 +10,11 @@ import java.util.Set;
 import org.gu.dcore.abduction.NormalQueryAbduction;
 import org.gu.dcore.abduction.PatternAbduction;
 import org.gu.dcore.abduction.QueryAbduction;
+import org.gu.dcore.factories.RuleFactory;
 import org.gu.dcore.abduction.ConcreteAbduction;
 import org.gu.dcore.model.AtomSet;
 import org.gu.dcore.model.ConjunctiveQuery;
+import org.gu.dcore.model.LiftedAtomSet;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
@@ -65,15 +67,15 @@ public class Abduction {
     	
     	List<Rule> ruleset = P.getRuleSet();
     	
-    	if(abdu_mode == 0) {
-    		start = System.currentTimeMillis();
-    		engine.materialize();
-    		end = System.currentTimeMillis();
-    		System.out.println("Finish initializing Vlog, cost " + (end - start) + " ms");
-    	}
-    	else {
-    		
-    	}
+//    	if(abdu_mode == 0) {
+//    		start = System.currentTimeMillis();
+//    		engine.materialize();
+//    		end = System.currentTimeMillis();
+//    		System.out.println("Finish initializing Vlog, cost " + (end - start) + " ms");
+//    	}
+//    	else {
+//    		
+//    	}
     	
     	while(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
@@ -81,12 +83,13 @@ public class Abduction {
     	   	ConjunctiveQuery query = new QueryParser(parser.getDefaultPrefix()).parse(line);
         	QueryAbduction abduction;
         	
-        	Set<Predicate> abdu = new HashSet<>();
+        	Rule qr = RuleFactory.instance().createQueryRule(query);
+        	AtomSet obs = qr.getBody();
         	
         	switch(abdu_mode) {
-        	case 1  : abduction = new ConcreteAbduction(ruleset, query, engine, abdu);break;        
-        	case 2  : abduction = new PatternAbduction(ruleset, query, engine, abdu);break;
-        	default : abduction = new NormalQueryAbduction(ruleset, query, engine, abdu);break;        	
+        	case 1  : abduction = new ConcreteAbduction(ruleset, obs, engine);break;        
+        	case 2  : abduction = new PatternAbduction(ruleset, obs, engine);break;
+        	default : abduction = new NormalQueryAbduction(ruleset, obs, engine);break;        	
         	}
         	
     	   	System.out.println("Abduction on query: " + query.toString());   
@@ -95,9 +98,19 @@ public class Abduction {
         	List<AtomSet> expl = abduction.getExplanations();
         	end = System.currentTimeMillis();
         	
-        	for(AtomSet atomset : expl) System.out.println(atomset);
-    	
-        	System.out.println("Explanations number " + expl.size() + " cost " + (end - start) + " ms");
+        	if(expl == null) {
+        		System.out.print("The observation is already satisfied");
+        	}
+        	else {
+        		int full_number = 0;
+        		for(AtomSet atomset : expl) {
+        			if(atomset instanceof LiftedAtomSet) {
+        				full_number += ((LiftedAtomSet)atomset).getColumn().size();
+        			}
+        			else full_number++;
+        		}
+        		System.out.println("Number of Explanations: (Compact) " + expl.size() + " (Full) " + full_number + " cost: " + (end - start) + " ms");
+        	}   	       	
     	}
     	
     	scn.close();

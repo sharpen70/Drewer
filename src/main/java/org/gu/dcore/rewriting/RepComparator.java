@@ -17,13 +17,12 @@ public class RepComparator implements Comparator {
 	public boolean compare(AtomSet source, AtomSet target) {
 		ArrayList<ArrayList<NormalSubstitution>> substitutions = getSubsitutionsForSourceAtoms(source, target);
 		if(substitutions == null) return false;
-		if(!backtrack(source, target, substitutions)) return false;
-		substitutions = getSubsitutionsForSourceAtoms(target, source);
-		if(substitutions == null) return true;
-		return !backtrack(source, target, substitutions);
+		return backtrack(source, target, substitutions);
+//		substitutions = getSubsitutionsForSourceAtoms(target, source);
+//		if(substitutions == null) return true;
+//		return !backtrack(source, target, substitutions);
 	}
 	
-	/* renaming: whether the substitution for comparison is a renaming */
 	private boolean backtrack(AtomSet source, AtomSet target, 
 			ArrayList<ArrayList<NormalSubstitution>> substitutionsPerLv) {
 		int level_size = source.size();

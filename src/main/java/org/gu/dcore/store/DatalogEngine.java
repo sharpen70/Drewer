@@ -71,16 +71,12 @@ public class DatalogEngine {
 	
 	public Column answerAtomicQuery(Atom atom, int[] mapping, int arity) throws IOException, ParsingException {
 		PositiveLiteral query = RuleParser.parsePositiveLiteral(atom.toVLog());
-		
-		Column result = new Column(arity);
-		
+			
 		if(reasoner == null) materialize();
 		
-		final QueryResultIterator answers = reasoner.answerQuery(query, false);
+		final QueryResultIterator answers = reasoner.answerQuery(query, false);	
 		
-		answers.forEachRemaining(answer -> result.add(answer, mapping));
-		
-		return result;
+		return new Column(arity, answers, mapping);
 	}
 	
 	/* Answer Atomic query with specified answer variables */
@@ -95,7 +91,7 @@ public class DatalogEngine {
 		
 		answers.forEachRemaining(answer -> result.addwithFilter(answer, ansVar));
 		
-		result.distinct();
+//		result.distinct();
 		
 		return result;
 	}
@@ -108,7 +104,7 @@ public class DatalogEngine {
 		if(reasoner == null) materialize();
 			
 		final QueryResultIterator answers = reasoner.answerQuery(query, false);
-		
+
 		answers.forEachRemaining(answer -> result.add(answer));
 		
 		return result;
@@ -130,7 +126,8 @@ public class DatalogEngine {
 		if(scanner.hasNextLine()) {
 			line = scanner.nextLine();
 			
-			Pattern p = Pattern.compile("\"([^\"]*)\"|[a-zA-Z][a-zA-Z0-9_-]*");
+//			Pattern p = Pattern.compile("\"([^\"]*)\"|[a-zA-Z][a-zA-Z0-9_-]*");
+			Pattern p = Pattern.compile("\"([^\"]*)\"|[^,]+");
 			Matcher m = p.matcher(line);
 			
 			while(m.find()) {
