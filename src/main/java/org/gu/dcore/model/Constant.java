@@ -1,5 +1,8 @@
 package org.gu.dcore.model;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Constant class
  * @author sharpen
@@ -36,7 +39,15 @@ public class Constant implements Term {
 	
 	@Override
 	public String toVLog() {
-		return "<" + this.name + ">";
+		Pattern p = Pattern.compile("\"([^\"]*)\"");
+		Matcher m = p.matcher(this.name);
+		
+		if(m.find()) {
+			return this.name;
+		}
+		else {
+			return "\"" + this.name + "\"";
+		}
 	}
 	
 	@Override

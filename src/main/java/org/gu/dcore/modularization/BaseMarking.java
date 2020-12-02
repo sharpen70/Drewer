@@ -14,6 +14,7 @@ import org.gu.dcore.grd.PredPosition;
 import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Variable;
+import org.gu.dcore.tuple.Tuple;
 
 public class BaseMarking {
 	private Map<Rule, RuleBasedMark> marking; 
@@ -37,6 +38,57 @@ public class BaseMarking {
 		}
 		
 		for(Variable v : source.getExistentials()) {
+			LinkedList<Tuple<Rule, Rule, PredPosition>> queue = new LinkedList<>();
+			
+			for(PredPosition pp : source.getHeadPositions(v)) {
+				Set<Rule> affected = this.onto.get(pp.getPredicate());
+				
+				if(affected != null) {
+					for(Rule r : affected) {
+						queue.add(new Tuple<>(r, source, pp));
+					}
+				}
+			}
+			
+			while(!queue.isEmpty()) {
+				Tuple<Rule, Rule, PredPosition> markpair = queue.poll();
+				Rule r = markpair.a;
+				Rule _source = markpair.b;
+				PredPosition pp = markpair.c;
+				
+				RuleBasedMark rbm = this.marking.get(r);
+				
+				if(rbm == null) {
+					rbm = new RuleBasedMark(r);
+					this.marking.put(r, rbm);
+				}
+				
+				for(PredPosition npp : rbm.add(_source, pp)) {
+					Set<Rule> affected = this.onto.get(pp.getPredicate());
+					if(affected != null) {
+						for(Rule ar : affected) {
+							queue.add(new Tuple<>(ar, _source, npp));
+						}
+					}
+				}				
+			}
+		}
+	}
+	
+	/*
+	 * Recursive implementation of marking, make incur stack overflow
+	 */
+	public void _mark(Rule source) {		
+		if(!source.getExistentials().isEmpty()) {
+			RuleBasedMark rbm = this.marking.get(source);
+			if(rbm == null) {
+				rbm = new RuleBasedMark(source);
+				this.marking.put(source, rbm);
+			}
+			rbm.markedHeadVars.put(source, source.getExistentials());
+		}
+		
+		for(Variable v : source.getExistentials()) {
 			for(PredPosition pp : source.getHeadPositions(v)) {
 				mark(source, pp);
 			}
@@ -44,7 +96,7 @@ public class BaseMarking {
 	}
 	
 	public void mark(Rule source, PredPosition pp) {
-		List<Rule> affected = this.onto.get(pp.getPredicate());
+		Set<Rule> affected = this.onto.get(pp.getPredicate());
 		
 		if(affected == null) return;
 		

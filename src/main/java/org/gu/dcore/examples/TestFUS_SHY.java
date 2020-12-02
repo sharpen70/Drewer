@@ -5,11 +5,12 @@ import java.io.File;
 import org.gu.dcore.checker.SeparableChecker;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.modularization.Modularizor;
+import org.gu.dcore.parsing.DcoreOWL2Parser;
 import org.gu.dcore.parsing.DcoreParser;
 
 public class TestFUS_SHY {
 	public static void main(String[] args) throws Exception {
-		String benchmarks = "/home/peng/projects/evaluations/benchmarks/existential_rules/";
+		String benchmarks = "/home/sharpen/projects/evaluations/benchmarks/test/";
 		
 		File dir = new File(benchmarks);
 		
@@ -17,7 +18,8 @@ public class TestFUS_SHY {
 			String name = o.getName();
 			String dlp = benchmarks + name + "/" + name + ".dlp";
 		
-			Program P = new DcoreParser().parseFile(dlp);
+			Program P = new DcoreOWL2Parser().parseFile(dlp);
+//			Program P = new DcoreParser().parseFile(dlp);
 			
 			Modularizor modularizor = new Modularizor(P.getRuleSet());
 			

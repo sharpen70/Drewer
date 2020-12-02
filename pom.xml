@@ -42,7 +42,7 @@
 	<dependency>
       <groupId>net.sourceforge.owlapi</groupId>
       <artifactId>owlapi-distribution</artifactId>
-      <version>5.0.5</version>
+      <version>5.1.17</version>
       <scope>compile</scope>
     </dependency>
 	<dependency> 

@@ -22,6 +22,10 @@ public class ConjunctiveQuery {
 		return this.querybody;
 	}
 	
+	public void setBody(AtomSet body) {
+		this.querybody = body;
+	}
+	
 	@Override
 	public String toString() {
 		String s = "?(";

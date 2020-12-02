@@ -10,10 +10,12 @@ import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
+import org.gu.dcore.preprocessing.QueryElimination;
 import org.gu.dcore.rewriting.ModularizedRewriting;
 import org.gu.dcore.rewriting.ModularizedRewriting2;
 import org.gu.dcore.store.Column;
 import org.gu.dcore.store.DatalogEngine;
+import org.gu.dcore.utils.Utils;
 import org.semanticweb.vlog4j.parser.ParsingException;
 
 public class Querying {
@@ -50,25 +52,30 @@ public class Querying {
      	
     	Scanner scn = new Scanner(new File(queriesfile));
     	
+    	List<Rule> ruleset = Utils.compute_single_rules(P.getRuleSet());
+    	
     	while(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
     		
-    	   	ConjunctiveQuery query = new QueryParser().parse(line);
-        	
+    	   	ConjunctiveQuery query = new QueryParser().parse(line);       	
     	   	System.out.println("Querying on: " + query.toString());      	   	
         	
-    	   	long estart = System.currentTimeMillis();
-        	ModularizedRewriting2 mr = new ModularizedRewriting2(P.getRuleSet());
-        	
-        	start = System.currentTimeMillis();
-        	List<Rule> datalog = mr.rewrite(query);               	
+    	   	start = System.currentTimeMillis();
+    	   	QueryElimination qe = new QueryElimination(ruleset);
+    	   	qe.eliminate(query);
+    	   	end = System.currentTimeMillis();  	   	
+    	   	long eliminate_time = end - start;
+    	   	System.out.println("Finish query optimizaiton, taking " + eliminate_time + " ms");
+    	   	
+        	ModularizedRewriting2 mr = new ModularizedRewriting2(ruleset, query);
+        	List<Rule> datalog = mr.rewrite();               	
         	end = System.currentTimeMillis();
         	
-        	long rew_time = end - estart;
-      	     	
-        	if(datafile != null) {      
+        	long rew_time = end - start;      	     
+     	
+        	if(datafile != null) {   
             	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms"); 
-            	
+            	   
 	        	start = System.currentTimeMillis();
 	        	DatalogEngine engine = new DatalogEngine();
 	        	engine.addSourceFromCSVDir(datafile);
@@ -90,9 +97,9 @@ public class Querying {
 	        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (end - start + rew_time) + " ms");
         	}
         	else {
-            	for(Rule r : P.getRuleSet()) {
-	        		System.out.println(r);
-	        	}
+//            	for(Rule r : P.getRuleSet()) {
+//	        		System.out.println(r);
+//	        	}
             	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms"); 
         	}
         }

@@ -107,6 +107,10 @@ public class Rule {
 		return this.query;
 	}
 	
+	public boolean isLinear() {
+		return this.body.size() == 1;
+	}
+	
 	@Override
 	public int hashCode() {
 		return this.ruleIndex;

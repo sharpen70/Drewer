@@ -2,13 +2,20 @@ package org.gu.dcore;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.gu.dcore.grd.IndexedByHeadPredRuleSet;
+import org.gu.dcore.model.Atom;
 import org.gu.dcore.model.ConjunctiveQuery;
+import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
+import org.gu.dcore.model.Rule;
 import org.gu.dcore.model.Term;
-import org.gu.dcore.model.Variable;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.store.Column;
@@ -63,7 +70,7 @@ public class VLog {
         	DatalogEngine engine = new DatalogEngine();
         	engine.setSkolemAlgorithm();
         	engine.addSourceFromCSVDir(datafile);
-        	engine.addRules(P.getRuleSet());
+        	engine.addRules(getQueryRelatedRuleSet(P.getRuleSet(), query));
         	engine.addRules(qr);
         	engine.load();
         	end = System.currentTimeMillis();
@@ -85,7 +92,33 @@ public class VLog {
     	scn.close();		
 	}
 	
-	public static String getQueryAtom(Set<Term> ansVar) {
+	private static List<Rule> getQueryRelatedRuleSet(List<Rule> rules, ConjunctiveQuery q) {
+		IndexedByHeadPredRuleSet ihrs = new IndexedByHeadPredRuleSet(rules);
+		List<Rule> related_rules = new LinkedList<Rule>();
+		Set<Rule> selected = new HashSet<>();
+		Queue<Predicate> queue = new LinkedList<>();
+		for(Atom a : q.getBody()) {
+			queue.add(a.getPredicate());
+		}
+		while(!queue.isEmpty()) {
+			Predicate p = queue.poll();
+			Set<Rule> rs = ihrs.getRulesByPredicate(p);
+			if(rs != null) {
+				for(Rule r : rs) {
+					if(selected.add(r)) {
+						related_rules.add(r);
+						for(Atom a : r.getBody()) {
+							queue.add(a.getPredicate());
+						}
+					}
+				}
+			}
+		}
+		
+		return related_rules;
+	}
+	
+	private static String getQueryAtom(Set<Term> ansVar) {
 		String s = "ans(";
 		boolean first = true;
 		for(Term v : ansVar) {

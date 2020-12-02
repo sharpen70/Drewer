@@ -35,6 +35,8 @@ import org.semanticweb.owlapi.model.OWLDisjointObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
@@ -88,6 +90,16 @@ public class DcoreOWL2Filter implements Predicate<OWLAxiom> {
 		public Boolean visit(OWLDisjointObjectPropertiesAxiom axiom) {
 			return false;
 		};
+		
+		public Boolean visit(OWLObjectPropertyDomainAxiom axiom) {
+			OWLClassExpression exp1 = axiom.getDomain();
+			return isDGLPClassExp(exp1);
+		}
+		
+		public Boolean visit(OWLObjectPropertyRangeAxiom axiom) {
+			OWLClassExpression exp1 = axiom.getRange();
+			return isDGLPClassExp(exp1);
+		}
 		
 		public Boolean visit(OWLEquivalentClassesAxiom axiom) {
 			List<OWLClassExpression> exps = axiom.classExpressions().collect(Collectors.toList());

@@ -55,15 +55,20 @@ public class RuleBasedMark {
 			for(Integer i : pp.getIndice()) {
 				Term t = a.getTerm(i);
 				
-				if(t instanceof Variable) 
-					if(indice.add(i)) newMarked.add((Variable)t);
+				if(t instanceof Variable) {
+					if(indice.add(i)) {
+						newMarked.add((Variable)t);
+					}
+				}
 			}
 		}
 		
 		List<PredPosition> pass = new LinkedList<>();
 		
-		for(Atom a : this.rule.getHead()) {
-			for(Variable v : newMarked) {
+//		System.out.println(newMarked);
+		
+		for(Variable v : newMarked) {
+			for(Atom a : this.rule.getHead()) {			
 				if(a.contains(v)) {
 					if(mhv.add(v)) pass.addAll(this.rule.getHeadPositions(v));
 				}

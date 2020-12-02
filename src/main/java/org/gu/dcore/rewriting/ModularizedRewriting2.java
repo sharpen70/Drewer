@@ -1,5 +1,25 @@
 package org.gu.dcore.rewriting;
-
+/*
+ * Copyright (C) 2018 - 2020 Artificial Intelligence and Semantic Technology, 
+ * Griffith University
+ * 
+ * Contributors:
+ * Peng Xiao (sharpen70@gmail.com)
+ * Zhe wang
+ * Kewen Wang
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,30 +58,29 @@ import org.gu.dcore.tuple.Tuple6;
 import org.gu.dcore.utils.Utils;
 
 public class ModularizedRewriting2 {
-	private Modularizor modularizor;
+//	private Modularizor modularizor;
 	private IndexedBlockRuleSet ibr;
-	
+	private BlockRule bQr;
 	private final Constant blank = TermFactory.instance().createConstant("blank");
 	private Set<Integer> selected;
 	
-	public ModularizedRewriting2(List<Rule> onto) {
-		List<Rule> single_piece_rules = compute_single_rules(onto);
-		this.modularizor = new Modularizor(single_piece_rules);
+	public ModularizedRewriting2(List<Rule> onto, ConjunctiveQuery q) {
+		Modularizor modularizor = new Modularizor(onto);
 //		this.modularizor = new Modularizor(onto);
-		this.modularizor.modularize();
-		this.ibr = this.modularizor.getIndexedBlockOnto();		
-	}	
-	
-	public List<Rule> rewrite(ConjunctiveQuery q) {
-		this.selected = new HashSet<>();
-		PredicateFactory.instance().rewrite_reset();
+		modularizor.modularize();
+		this.ibr = modularizor.getIndexedBlockOnto();	
 		
-		Rule Qr = RuleFactory.instance().createQueryRule(q);
-		
-		BaseMarking marking = this.modularizor.getMarking();
+				
+		Rule Qr = RuleFactory.instance().createQueryRule(q);		
+		BaseMarking marking = modularizor.getMarking();
 		RuleBasedMark rbm = marking.markQueryRule(Qr);
 		
-		BlockRule bQr = marking.getBlockRule(Qr, rbm);
+		this.bQr = marking.getBlockRule(Qr, rbm);
+	}	
+	
+	public List<Rule> rewrite() {
+		this.selected = new HashSet<>();
+		PredicateFactory.instance().rewrite_reset();
 		
 //		System.out.println(bQr);
 		
@@ -277,61 +296,6 @@ public class ModularizedRewriting2 {
 				}
 			}
 		}
-	}
-	
-	private List<Rule> compute_single_rules(List<Rule> rs) {
-		List<Rule> result = new LinkedList<>();
-		
-		for(Rule r : rs) {
-			Set<Variable> ex_vars = r.getExistentials();
-			
-			if(r.getHead().size() == 1) {
-				result.add(r);
-				continue;
-			}
-			
-			LinkedList<Atom> eatom = new LinkedList<>();
-			for(Atom a : r.getHead()) eatom.add(a);
-			
-			while(!eatom.isEmpty()) {
-				Set<Term> join_ev = new HashSet<>();
-				Atom p = eatom.poll();
-				AtomSet piece = new AtomSet(p);
-				
-				for(Term t : p.getTerms()) {
-					if(ex_vars.contains(t)) {
-						join_ev.add(t);
-					}
-				}
-				
-				if(join_ev.isEmpty()) {
-					result.add(RuleFactory.instance().createRule(piece, r.getBody()));
-					continue;
-				}
-				
-				Iterator<Atom> it = eatom.iterator();
-				while(it.hasNext()) {
-					Atom cp = it.next();
-					Set<Term> ev = new HashSet<>();
-					for(Term t : cp.getTerms()) {
-						if(ex_vars.contains(t)) {
-							ev.add(t);
-						}
-					}
-					if(!Collections.disjoint(join_ev, ev)) {
-						join_ev.addAll(ev);
-						piece.add(cp);
-						it.remove();
-					}
-				}
-				
-				if(piece.size() == r.getHead().size()) result.add(r);
-				else {
-					result.add(RuleFactory.instance().createRule(piece, r.getBody()));
-				}
-			}			
-		}
-		return result;
 	}
 	
 	private Atom createBlockAtom(Block b) {

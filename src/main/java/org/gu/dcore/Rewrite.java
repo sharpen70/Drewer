@@ -17,6 +17,7 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.rewriting.ModularizedRewriting;
+import org.gu.dcore.rewriting.ModularizedRewriting2;
 
 public class Rewrite {
 	public static void main(String[] args) throws Exception {
@@ -29,7 +30,7 @@ public class Rewrite {
     	DcoreParser parser = new DcoreParser();
     	
     	Program P = parser.parseFile(dlp, false);
-    	ModularizedRewriting mr = new ModularizedRewriting(P.getRuleSet());
+ 
     	
     	System.out.println("Rewriting " + args[0]);
     	
@@ -37,6 +38,8 @@ public class Rewrite {
     		String qs = scanner.nextLine();
         	ConjunctiveQuery query = new QueryParser().parse(qs, false);
         	
+           	ModularizedRewriting2 mr = new ModularizedRewriting2(P.getRuleSet(), query);
+           	
         	System.out.println("====================");
 
         	System.out.println("Rewriting query " + qs);  		
@@ -45,7 +48,7 @@ public class Rewrite {
         	long start = System.currentTimeMillis();
         	
         	System.out.println("---------------------");
-        	List<Rule> datalog = mr.rewrite(query);
+        	List<Rule> datalog = mr.rewrite();
         	
         	for(Rule r : datalog) System.out.println(r.toString());
         	

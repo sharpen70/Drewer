@@ -20,51 +20,42 @@ package org.gu.dcore.grd;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import java.util.HashSet;
-import java.util.Set;
-
 import org.gu.dcore.model.Predicate;
 
-public class PredPosition {
+public class NPredPosition {
 	private Predicate predicate;
-	private Set<Integer> indice;
+	private int index;
 	
-	public PredPosition(Predicate p, Set<Integer> indice) {
+	public NPredPosition(Predicate p, int index) {
 		this.predicate = p;
-		this.indice = indice;
-	}
-	
-	public PredPosition(Predicate p, int index) {
-		this.predicate = p;
-		this.indice = new HashSet<>();
-		this.indice.add(index);
+		this.index = index;
 	}
 	
 	public Predicate getPredicate() {
 		return this.predicate;
 	}
 	
-	public Set<Integer> getIndice() {
-		return this.indice;
+	public int getIndex() {
+		return this.index;
 	}
 	
 	@Override
 	public String toString() {
-		return "" + this.predicate + this.indice;
+		return "" + this.predicate + this.index;
 	}
 	
 	@Override
 	public int hashCode() {
-		return this.predicate.hashCode() + this.indice.hashCode();
+		return this.predicate.hashCode() + this.index;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(!(obj instanceof PredPosition)) return false;
-		PredPosition _obj = (PredPosition)obj;
+		if(!(obj instanceof NPredPosition)) return false;
+		NPredPosition _obj = (NPredPosition)obj;
 		
 		if(this.predicate.equals(_obj.predicate)) 
-			return this.indice.equals(_obj.indice);
+			return this.index ==_obj.index;
 		else return false;
 	}
 }
