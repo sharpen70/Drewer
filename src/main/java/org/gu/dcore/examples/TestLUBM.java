@@ -39,7 +39,8 @@ public class TestLUBM {
 	public static void main(String[] args) throws IOException
 	{
 //		String O = "/home/sharpen/projects/dwfe/AGOSUV-bench/U/U_m.dlp";
-		String O = "/home/sharpen/projects/evaluations/benchmarks/owl/LUBM/LUBM.dlp";
+//		String O = "/home/sharpen/projects/evaluations/benchmarks/owl/LUBM/LUBM.dlp";
+		String O = "/home/peng/projects/evaluations/benchmarks/owl/Uniprot/Uniprot.dlp";
 		
     	DcoreParser parser = new DcoreParser();
     	
@@ -72,15 +73,22 @@ public class TestLUBM {
     			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#University>(B), "
     			+ "<http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#hasAlumnus>(B, A).");
     	
+    	ConjunctiveQuery query6 = new QueryParser().parse("?(VAR_protein,VAR_begin,VAR_end) :- <http://purl.uniprot.org/core/Protein>(VAR_protein), "
+    			+ "<http://purl.uniprot.org/core/annotation>(VAR_protein, VAR_annotation), "
+    			+ "<http://purl.uniprot.org/core/Transmembrane_Annotation>(VAR_annotation), "
+    			+ "<http://purl.uniprot.org/core/range>(VAR_annotation, VAR_range), "
+    			+ "<http://biohackathon.org/resource/faldo#begin>(VAR_range, VAR_begin), "
+    			+ "<http://biohackathon.org/resource/faldo#end>(VAR_range, VAR_end).");
+    	
     	System.out.println("============");
     	
-    	System.out.println(query5);
+    	System.out.println(query6);
     	
     	QueryElimination qe = new QueryElimination(P.getRuleSet());
     	
-    	qe.eliminate(query5);
+    	qe.eliminate(query6);
     	
-    	System.out.println(query5);
+    	System.out.println(query6);
     	
 //		Rule Qr = RuleFactory.instance().createQueryRule(query);
 //		
