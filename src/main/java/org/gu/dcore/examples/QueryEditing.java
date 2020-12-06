@@ -10,8 +10,8 @@ import org.gu.dcore.parsing.QueryParser;
 
 public class QueryEditing {
 	public static void main(String[] args) throws FileNotFoundException {
-		String queriesfile = "/home/peng/projects/evaluations/benchmarks/existential_rules/deep200/queries.dlp";
-		String queriesdir = "/home/peng/projects/evaluations/benchmarks/existential_rules/deep200/dlp_queries";
+		String queriesfile = "/home/sharpen/projects/evaluations/benchmarks/owl/Uniprot/queries.dlp";
+		String queriesdir = "/home/sharpen/projects/evaluations/benchmarks/owl/Uniprot/dlp_queries";
 		
 		Scanner scn = new Scanner(new File(queriesfile));
 		

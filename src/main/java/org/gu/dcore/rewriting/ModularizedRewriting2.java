@@ -64,12 +64,8 @@ public class ModularizedRewriting2 {
 	private final Constant blank = TermFactory.instance().createConstant("blank");
 	private Set<Integer> selected;
 	
-	public ModularizedRewriting2(List<Rule> onto, ConjunctiveQuery q) {
-		Modularizor modularizor = new Modularizor(onto);
-//		this.modularizor = new Modularizor(onto);
-		modularizor.modularize();
-		this.ibr = modularizor.getIndexedBlockOnto();	
-		
+	public ModularizedRewriting2(Modularizor modularizor, ConjunctiveQuery q) {
+		this.ibr = modularizor.getIndexedBlockOnto();			
 				
 		Rule Qr = RuleFactory.instance().createQueryRule(q);		
 		BaseMarking marking = modularizor.getMarking();

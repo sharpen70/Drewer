@@ -8,6 +8,7 @@ import java.util.Scanner;
 import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.preprocessing.QueryElimination;
@@ -24,6 +25,8 @@ public class Querying {
 		String queriesfile = null;
 		String datafile = null;		
 		
+		boolean verbose = false;
+		
 		for(int i = 0; i < args.length; i++) {
 			if(args[i].startsWith("-")) {
 				String flag = args[i].substring(1);
@@ -34,6 +37,7 @@ public class Querying {
 				if(flag.equals("q")) {
 					queriesfile = args[++i];
 				}
+				if(flag.equals("v")) verbose = true;
 			}
 		}
 		
@@ -48,33 +52,43 @@ public class Querying {
 		DcoreParser parser = new DcoreParser();    	
     	Program P = parser.parseFile(ontologyfile);
     	
-    	System.out.println("Finish Parsing Files ...");
+    	if(verbose) System.out.println("Finish Parsing Files ...");
      	
     	Scanner scn = new Scanner(new File(queriesfile));
     	
     	List<Rule> ruleset = Utils.compute_single_rules(P.getRuleSet());
     	
-    	while(scn.hasNextLine()) {   		
+    	if(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
     		
     	   	ConjunctiveQuery query = new QueryParser().parse(line);       	
-    	   	System.out.println("Querying on: " + query.toString());      	   	
+    	   	if(verbose) System.out.println("Querying on: " + query.toString());      	   	
         	
     	   	start = System.currentTimeMillis();
     	   	QueryElimination qe = new QueryElimination(ruleset);
     	   	qe.eliminate(query);
     	   	end = System.currentTimeMillis();  	   	
     	   	long eliminate_time = end - start;
-    	   	System.out.println("Finish query optimizaiton, taking " + eliminate_time + " ms");
+    	   	if(verbose) System.out.println("Finish query optimizaiton, taking " + eliminate_time + " ms");
     	   	
-        	ModularizedRewriting2 mr = new ModularizedRewriting2(ruleset, query);
+    	   	start = System.currentTimeMillis();
+    		Modularizor modularizor = new Modularizor(ruleset);
+    		modularizor.modularize();
+    		end = System.currentTimeMillis();
+    		long mod_time = end - start;
+    		if(verbose) System.out.println("Finish modularization, taking " + mod_time + " ms");
+    		
+    		start = System.currentTimeMillis();
+        	ModularizedRewriting2 mr = new ModularizedRewriting2(modularizor, query);
         	List<Rule> datalog = mr.rewrite();               	
         	end = System.currentTimeMillis();
         	
-        	long rew_time = end - start;      	     
-     	
+        	long rew_time = eliminate_time + end - start;      	     
+        	
+        	long query_time = 0;
+        	
         	if(datafile != null) {   
-            	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms"); 
+        		if(verbose) System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + rew_time + " ms"); 
             	   
 	        	start = System.currentTimeMillis();
 	        	DatalogEngine engine = new DatalogEngine();
@@ -82,30 +96,40 @@ public class Querying {
 	        	engine.addRules(datalog);
 	        	engine.load();
 	        	end = System.currentTimeMillis();
-	        	System.out.println("Finish Loading data, cost " + (end - start) + " ms");
+	        	if(verbose) System.out.println("Finish Loading data, cost " + (end - start) + " ms");
 	        	
 	        	start = System.currentTimeMillis();
 	        	engine.materialize();
 	        	end = System.currentTimeMillis();
 	        	
-	        	System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");
+	        	long mat_time = end - start;
 	        	
-	        	
+	        	if(verbose) System.out.println("Finish Vlog materialization, cost " + mat_time + " ms");
+	        		
 	        	Column answers = engine.answerAtomicQuery(getQueryAtom(query.getAnsVar().size()));
 	        	end = System.currentTimeMillis();
 	        	
-	        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (end - start + rew_time) + " ms");
+	        	query_time = end -start;
+	        	
+	        	if(verbose) System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + " cost " + (query_time + rew_time) + " ms");
         	}
         	else {
 //            	for(Rule r : P.getRuleSet()) {
 //	        		System.out.println(r);
 //	        	}
-            	System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms"); 
+        		if(verbose) System.out.println("Finish rewriting, datalog program size " + datalog.size() + " cost " + (end - start) + " ms"); 
+        	}
+        	tend = System.currentTimeMillis();
+        	
+        	if(verbose) System.out.println("Total time cost " + (tend - tstart) + " ms");
+        	else  {
+        		if(datafile == null)
+        			System.out.println(datalog.size() + "," + rew_time);
+        		else 
+        			System.out.println(datalog.size() + "," + (query_time + rew_time) + "," + (tend - tstart));
         	}
         }
-    	
-    	tend = System.currentTimeMillis();
-    	System.out.println("Total time cost " + (tend - tstart) + " ms");
+ 
     	scn.close();		
 	}
 	

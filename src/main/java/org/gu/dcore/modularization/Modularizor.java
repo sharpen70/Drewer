@@ -38,26 +38,22 @@ public class Modularizor {
 	}
 	
 	public void modularize() {
-		System.out.println("Modularizing ontology ...");
+//		System.out.println("Modularizing ontology ...");
 		long start = System.currentTimeMillis();
 		
 		this.ibs = new IndexedBlockRuleSet();
 		this.blockonto = new LinkedList<>();
 		 
-		int i = 0;
 		for(Rule r : onto) {
-//			System.out.println(i++);
 			this.marking.mark(r);
 		}
-		
-		i = 0;
+
 		for(Rule r: onto) {
-//			System.out.println(i++);
 			BlockRule br = this.marking.getBlockRule(r);
 			this.ibs.add(br);
 			this.blockonto.add(br);
 		}
-		System.out.println("Done modularization, taking " + (System.currentTimeMillis() - start) + " ms");
+//		System.out.println("Done modularization, taking " + (System.currentTimeMillis() - start) + " ms");
 	}
 	
 	public IndexedBlockRuleSet getIndexedBlockOnto() {

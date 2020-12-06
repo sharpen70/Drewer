@@ -50,6 +50,9 @@ public class Atom {
 		return this.terms.get(i);
 	}
 	
+	public void setTerm(int i, Term t) {
+		this.terms.set(i, t);
+	}
 	/**
 	 * @param terms the terms to set
 	 */

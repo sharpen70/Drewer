@@ -14,6 +14,7 @@ import org.gu.dcore.model.ConjunctiveQuery;
 import org.gu.dcore.model.Predicate;
 import org.gu.dcore.model.Program;
 import org.gu.dcore.model.Rule;
+import org.gu.dcore.modularization.Modularizor;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.rewriting.ModularizedRewriting;
@@ -38,7 +39,8 @@ public class Rewrite {
     		String qs = scanner.nextLine();
         	ConjunctiveQuery query = new QueryParser().parse(qs, false);
         	
-           	ModularizedRewriting2 mr = new ModularizedRewriting2(P.getRuleSet(), query);
+        	Modularizor modularizor = new Modularizor(P.getRuleSet());
+           	ModularizedRewriting2 mr = new ModularizedRewriting2(modularizor, query);
            	
         	System.out.println("====================");
 
