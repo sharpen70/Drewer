@@ -49,15 +49,18 @@ public class Querying {
 		long start, end, tstart, tend;
 		tstart = System.currentTimeMillis();
 		
+		start = System.currentTimeMillis();
 		DcoreParser parser = new DcoreParser();    	
     	Program P = parser.parseFile(ontologyfile);
     	
-    	if(verbose) System.out.println("Finish Parsing Files ...");
-     	
-    	Scanner scn = new Scanner(new File(queriesfile));
-    	
+    	if(verbose) System.out.println("Finish Parsing Files ...");  	
     	List<Rule> ruleset = Utils.compute_single_rules(P.getRuleSet());
+    	end = System.currentTimeMillis();
     	
+    	long p_time = end - start;
+    	if(verbose) System.out.println("Preprocessing taking " + p_time + " ms");
+    	
+    	Scanner scn = new Scanner(new File(queriesfile));
     	if(scn.hasNextLine()) {   		
     		String line = scn.nextLine();
     		
