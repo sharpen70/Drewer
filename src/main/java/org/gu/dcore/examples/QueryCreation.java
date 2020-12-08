@@ -36,7 +36,10 @@ public class QueryCreation {
 //		genOG();
 //		genAdolena();
 //		genReactome();
-		genUniprot();
+//		genUniprot();
+//		genDeep();
+		genSTB();
+		genONT();
 	}
 	
 	public static void composeQuery(String ontology, String target, String... sources) throws FileNotFoundException {
@@ -74,6 +77,49 @@ public class QueryCreation {
 			root_query.getBody().addAll(qbody);
 			
 			if(!leftv.equals(_rightv)) rightv = _rightv;
+		}
+		
+		PrintWriter writer = new PrintWriter(new File(targetFile));		
+		writer.println(root_query.toString());
+		writer.close();
+		System.out.println("Done compose query " + target);
+	}
+	
+	public static void composeQueryWithAnsVar(String ontology, String target, String... sources) throws FileNotFoundException {
+		if(sources.length < 2) return;
+		
+		String root = sources[0];
+		
+		String queryDir = ontology + "/dlp_queries";
+		String targetFile = queryDir + "/" + target;
+		
+		Scanner scanner = new Scanner(new File(queryDir + "/" + root));
+		String s = scanner.nextLine();
+		scanner.close();
+		
+		ConjunctiveQuery root_query = new QueryParser().parse(s);
+//		System.out.println(root_query.toString());
+		Random rand = new Random();
+		Set<Term> ansVars = root_query.getAnsVar();
+		int offset = root_query.getBody().getMaxVarValue();
+		
+		for(int i = 1; i < sources.length; i++) {
+			String cur = sources[i];
+			Scanner scanner1 = new Scanner(new File(queryDir + "/" + cur));
+			String s1 = scanner1.nextLine();
+			scanner1.close();
+			ConjunctiveQuery query = new QueryParser().parse(s1);
+//			System.out.println(query.toString());
+			AtomSet qbody = query.getBody();
+			int toffset = qbody.getMaxVarValue();
+			
+			Set<Term> _ansVars = root_query.getAnsVar();
+			Variable joinV = (Variable)ansVars.toArray()[rand.nextInt(ansVars.size())];
+			Variable _joinV = (Variable)_ansVars.toArray()[rand.nextInt(_ansVars.size())];
+			
+			replaceVar(qbody, _joinV, joinV, offset + 1);
+			offset += toffset;
+			root_query.getBody().addAll(qbody);
 		}
 		
 		PrintWriter writer = new PrintWriter(new File(targetFile));		
@@ -226,5 +272,30 @@ public class QueryCreation {
 		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/owl/Uniprot";		
 		composeQuery(ontofile, "q9", "q6", "q5");
 		composeQuery(ontofile, "q10", "q4", "q8");
+	}
+	
+	private static void genDeep() throws FileNotFoundException {
+		String ontofile = "/home/peng/projects/evaluations/benchmarks/existential_rules/deep200";		
+		composeQuery(ontofile, "q12", "q1", "q3");
+		composeQuery(ontofile, "q13", "q1", "q7");
+		composeQuery(ontofile, "q14", "q6", "q8");
+		composeQuery(ontofile, "q15", "q3", "q4", "q8");
+		composeQuery(ontofile, "q16", "q9", "q10", "q5");
+	}
+	
+	private static void genSTB() throws FileNotFoundException {
+		String ontofile = "/home/peng/projects/evaluations/benchmarks/existential_rules/STB-128";		
+		composeQueryWithAnsVar(ontofile, "q13", "q12", "q3");
+		composeQueryWithAnsVar(ontofile, "q14", "q12", "q7");
+		composeQueryWithAnsVar(ontofile, "q15", "q6", "q9");
+		composeQueryWithAnsVar(ontofile, "q16", "q7", "q10");
+	}
+	
+	private static void genONT() throws FileNotFoundException {
+		String ontofile = "/home/peng/projects/evaluations/benchmarks/existential_rules/ONT-256";		
+		composeQueryWithAnsVar(ontofile, "q13", "q12", "q3");
+		composeQueryWithAnsVar(ontofile, "q14", "q12", "q7");
+		composeQueryWithAnsVar(ontofile, "q15", "q6", "q9");
+		composeQueryWithAnsVar(ontofile, "q16", "q7", "q10");
 	}
 }
