@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Scanner;
@@ -28,8 +30,11 @@ import org.gu.dcore.model.Variable;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.tuple.Pair;
+import org.gu.dcore.utils.Utils;
 
 public class QueryCreation {
+
+	
 	public static void main(String[] args) throws IOException {
 //		retrieveQueryPredicate();
 		
@@ -38,8 +43,9 @@ public class QueryCreation {
 //		genReactome();
 //		genUniprot();
 //		genDeep();
-		genSTB();
-		genONT();
+//		genSTB();
+//		genONT();
+//		showDepths();
 	}
 	
 	public static void composeQuery(String ontology, String target, String... sources) throws FileNotFoundException {
@@ -171,6 +177,72 @@ public class QueryCreation {
 			}
 		}
 	}
+	
+	public static void showDepths() throws IOException {
+		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/STB-128/STB-128.dlp";
+		
+		Program P = new DcoreParser().parseFile(ontofile);	
+		System.out.println(P.getRuleSet().size());
+		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
+		System.out.println(rules.size());
+//		IndexedByHeadPredRuleSet ihs = new IndexedByHeadPredRuleSet(rules);
+//		
+//		Map<Integer, List<ConjunctiveQuery>> basicQueries = new HashMap<>();
+//		
+//		for(Rule r : rules) {
+//			System.out.println(r.getRuleIndex());
+//			int top_max = 0;
+//			for(Atom atom : r.getBody()) {
+//				Predicate predicate = atom.getPredicate();
+//				
+//				int max_depth = 0;
+//				
+//				Queue<Pair<Predicate,Integer>> queue = new LinkedList<>();
+//				queue.add(new Pair<>(predicate, 0));
+//				
+//				Set<Rule> visited = new HashSet<>();
+//				
+//				while(!queue.isEmpty()) {
+//					Pair<Predicate,Integer> pair = queue.poll();
+//					Predicate pred = pair.a;
+//					int level = pair.b;
+//					
+//					int cur_level = level + 1;
+//					
+//					if(cur_level > max_depth) max_depth = cur_level;
+//					
+//					Set<Rule> _rules = ihs.getRulesByPredicate(pred);
+//					
+//					if(rules != null) {
+//						for(Rule _r : _rules) {
+//							if(visited.add(_r)) {
+//								for(Atom a : _r.getBody()) {
+//									queue.add(new Pair<>(a.getPredicate(), cur_level));
+//								}
+//							}
+//						}
+//					}
+//				}
+//				if(max_depth > top_max) top_max = max_depth;
+//			}
+//			top_max = top_max + 1;
+//			List<ConjunctiveQuery> queries = basicQueries.get(top_max);
+//			if(queries == null) {
+//				queries = new LinkedList<>();
+//				basicQueries.put(top_max, queries);
+//			}
+//			List<Term> vars = new LinkedList<>();
+//			vars.addAll(r.getFrontierVariables());
+//			ConjunctiveQuery basicq = new ConjunctiveQuery(vars, r.getHead());
+//			queries.add(basicq);
+//		}
+		
+		for(Entry<Integer,List<Predicate>> entry : getPredLevels(rules).entrySet()) {
+			System.out.println("Depth " + entry.getKey() + ", Nums " + entry.getValue().size());
+		}
+	}
+	
+
 	
 	public static void retrieveQueryPredicate() throws IOException {
 		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/owl/Uniprot/Uniprot.dlp";
