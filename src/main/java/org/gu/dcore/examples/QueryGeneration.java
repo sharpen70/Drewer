@@ -69,7 +69,7 @@ public class QueryGeneration {
 	}
 	
 	private static void genONT() throws IOException {
-		String ontofile = "/home/peng/projects/evaluations/benchmarks/existential_rules/ONT-256/";
+		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/ONT-256/";
 		Program P = new DcoreParser().parseFile(ontofile + "ONT-256.dlp");
 		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
 		ihs = new IndexedByHeadPredRuleSet(rules);
@@ -83,13 +83,13 @@ public class QueryGeneration {
 			System.out.println(r);
 		}
 		List<ConjunctiveQuery> queries = new LinkedList<>();
-		queries.addAll(genQuery(2, 3, 3));
-		queries.addAll(genQuery(3, 3, 3));
-		queries.addAll(genQuery(4, 3, 3));
-		queries.addAll(genQuery(5, 3, 3));
-		queries.addAll(genQuery(6, 3, 3));
-		queries.addAll(genQuery(7, 3, 3));
-		queries.addAll(genQuery(8, 3, 3));
+		queries.addAll(genQuery(2, 5, 5));
+		queries.addAll(genQuery(4, 5, 5));
+		queries.addAll(genQuery(6, 5, 5));
+		queries.addAll(genQuery(8, 5, 5));
+		queries.addAll(genQuery(10, 5, 5));
+		queries.addAll(genQuery(12, 5, 5));
+		queries.addAll(genQuery(14, 5, 5));
 		
 		for(int i = 0; i < queries.size(); i++) {
 			String qfile = longQ + "q" + (i + 1);
@@ -107,14 +107,18 @@ public class QueryGeneration {
 		    List<Term> ansVar = new LinkedList<>();
 		    Variable joinVar = null;
 			Random rand = new Random();
-
-			
+		
 			List<Predicate> preds = predLevels.get(depth);
 			if(preds == null) return null;
 			Predicate pred = preds.get(rand.nextInt(preds.size()));
 			Set<Rule> brs = ihs.getRulesByPredicate(pred);
 		    List<Rule> lrs = new LinkedList<>(brs);
-		    Rule rr = lrs.get(rand.nextInt(lrs.size()));
+		    Rule rr = null;
+		    
+		    do {
+		    	rr = lrs.get(rand.nextInt(lrs.size()));
+		    } while(rr.getFrontierVariables().isEmpty());
+		    
 		    int offset = 0;
 		    
 		    for(Atom a : rr.getHead()) {
@@ -143,7 +147,12 @@ public class QueryGeneration {
 				Predicate _pred = _preds.get(rand.nextInt(_preds.size()));
 				Set<Rule> _brs = ihs.getRulesByPredicate(_pred);
 			    List<Rule> _lrs = new LinkedList<>(_brs);
-			    Rule _rr = _lrs.get(rand.nextInt(_lrs.size()));
+			    
+			    Rule _rr = null;
+			    
+			    do {
+			    	_rr = _lrs.get(rand.nextInt(_lrs.size()));
+			    } while(_rr.getFrontierVariables().isEmpty());
 			    
 			    for(Atom a : _rr.getHead()) {
 			    	boolean found = false;
