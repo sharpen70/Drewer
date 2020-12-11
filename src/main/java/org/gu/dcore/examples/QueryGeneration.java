@@ -34,7 +34,9 @@ public class QueryGeneration {
 	
 	public static void main(String[] args) throws IOException {
 //		genDeep();
-		genONT();
+//		genONT();
+//		genSTB();
+		genOG();
 	}
 	
 	private static void genDeep() throws IOException {
@@ -44,21 +46,62 @@ public class QueryGeneration {
 		ihs = new IndexedByHeadPredRuleSet(rules);
 		predLevels = getPredLevels(rules);
 		System.out.println(predLevels.keySet());
-		String longQ = ontofile + "QueriesInLength/";
+//		String longQ = ontofile + "QueriesInLength/";
+//		File f = new File(longQ);
+//		if(!f.exists()) f.mkdir();
+//		
+//
+//		List<ConjunctiveQuery> queries = new LinkedList<>();
+//		queries.addAll(genQuery(2, 2, 3));
+//		queries.addAll(genQuery(3, 2, 3));
+//		queries.addAll(genQuery(4, 2, 3));
+//		queries.addAll(genQuery(5, 2, 3));
+//		queries.addAll(genQuery(6, 2, 3));
+//		queries.addAll(genQuery(7, 2, 3));
+//		queries.addAll(genQuery(8, 2, 3));
+		
+		String longQ = ontofile + "QueriesInDepth/";
 		File f = new File(longQ);
 		if(!f.exists()) f.mkdir();
 		
-		for(Rule r : rules) {
-			System.out.println(r);
-		}
+
 		List<ConjunctiveQuery> queries = new LinkedList<>();
-		queries.addAll(genQuery(2, 2, 3));
-		queries.addAll(genQuery(3, 2, 3));
-		queries.addAll(genQuery(4, 2, 3));
-		queries.addAll(genQuery(5, 2, 3));
-		queries.addAll(genQuery(6, 2, 3));
-		queries.addAll(genQuery(7, 2, 3));
-		queries.addAll(genQuery(8, 2, 3));
+		queries.addAll(genQuery(3, 2, 5));
+		queries.addAll(genQuery(3, 3, 5));
+		queries.addAll(genQuery(3, 4, 5));
+		queries.addAll(genQuery(3, 5, 5));
+		queries.addAll(genQuery(3, 6, 5));
+		queries.addAll(genQuery(3, 7, 5));
+		queries.addAll(genQuery(3, 8, 5));
+		
+		
+		for(int i = 0; i < queries.size(); i++) {
+			String qfile = longQ + "q" + (i + 1);
+			PrintWriter writer = new PrintWriter(new File(qfile));
+			writer.println(queries.get(i));
+			writer.close();
+		}
+	}
+	
+	private static void genOG() throws IOException {
+		String ontofile = "/home/peng/projects/evaluations/benchmarks/owl/OG/";
+		Program P = new DcoreParser().parseFile(ontofile + "OG.dlp");
+		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
+		ihs = new IndexedByHeadPredRuleSet(rules);
+		predLevels = getPredLevels(rules);
+		System.out.println(predLevels.keySet());
+		String longQ = ontofile + "QueriesInDepth/";
+		File f = new File(longQ);
+		if(!f.exists()) f.mkdir();
+		
+		List<ConjunctiveQuery> queries = new LinkedList<>();
+		queries.addAll(genQuery(1, 2, 5));
+		queries.addAll(genQuery(1, 5, 5));
+		queries.addAll(genQuery(1, 8, 5));
+		queries.addAll(genQuery(1, 11, 5));
+		queries.addAll(genQuery(1, 14, 5));
+		queries.addAll(genQuery(1, 17, 5));
+		queries.addAll(genQuery(1, 20, 5));
 		
 		for(int i = 0; i < queries.size(); i++) {
 			String qfile = longQ + "q" + (i + 1);
@@ -90,6 +133,37 @@ public class QueryGeneration {
 		queries.addAll(genQuery(10, 5, 5));
 		queries.addAll(genQuery(12, 5, 5));
 		queries.addAll(genQuery(14, 5, 5));
+		
+		for(int i = 0; i < queries.size(); i++) {
+			String qfile = longQ + "q" + (i + 1);
+			PrintWriter writer = new PrintWriter(new File(qfile));
+			writer.println(queries.get(i));
+			writer.close();
+		}
+	}
+	
+	private static void genSTB() throws IOException {
+		String ontofile = "/home/peng/projects/evaluations/benchmarks/existential_rules/STB-128/";
+		Program P = new DcoreParser().parseFile(ontofile + "STB-128.dlp");
+		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
+		ihs = new IndexedByHeadPredRuleSet(rules);
+		predLevels = getPredLevels(rules);
+		System.out.println(predLevels.keySet());
+		String longQ = ontofile + "QueriesInLength/";
+		File f = new File(longQ);
+		if(!f.exists()) f.mkdir();
+		
+		for(Rule r : rules) {
+			System.out.println(r);
+		}
+		List<ConjunctiveQuery> queries = new LinkedList<>();
+		queries.addAll(genQuery(2, 4, 5));
+		queries.addAll(genQuery(4, 4, 5));
+		queries.addAll(genQuery(6, 4, 5));
+		queries.addAll(genQuery(8, 4, 5));
+		queries.addAll(genQuery(10, 4, 5));
+		queries.addAll(genQuery(12, 4, 5));
+		queries.addAll(genQuery(14, 4, 5));
 		
 		for(int i = 0; i < queries.size(); i++) {
 			String qfile = longQ + "q" + (i + 1);
