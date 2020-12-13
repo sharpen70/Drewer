@@ -12,6 +12,23 @@ import org.gu.dcore.model.Term;
 import org.gu.dcore.model.Variable;
 
 public class TranslatorForSystems {
+	public static String toGrind(ConjunctiveQuery query) {
+		Set<Term> vars = query.getAnsVar();
+		
+		String s = "Q(";
+		s += toRapid(new LinkedList<>(vars));
+		s += ") <- ";
+		
+		boolean first = true;
+		for(Atom a : query.getBody()) {
+			if(first) first = false;
+			else s += ", ";
+			s += toGrind(a);
+		}
+		
+		return s;
+	}
+	
 	public static String toRapid(ConjunctiveQuery query) {
 		Set<Term> vars = query.getAnsVar();
 	
@@ -32,6 +49,14 @@ public class TranslatorForSystems {
 	public static String toRapid(Atom atom) {
 		Predicate p = atom.getPredicate();
 		String s = p.shortIri();
+		s += "(" + toRapid(atom.getTerms()) + ")";
+		
+		return s;
+	}
+	
+	public static String toGrind(Atom atom) {
+		Predicate p = atom.getPredicate();
+		String s = p.getName();
 		s += "(" + toRapid(atom.getTerms()) + ")";
 		
 		return s;

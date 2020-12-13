@@ -20,32 +20,62 @@ import org.gu.dcore.model.Rule;
 import org.gu.dcore.parsing.DcoreParser;
 import org.gu.dcore.parsing.QueryParser;
 import org.gu.dcore.tuple.Pair;
+import org.gu.dcore.utils.TranslatorForSystems;
 
 public class QueryEditing {
 	public static void main(String[] args) throws IOException {
-//		String ontoDir = "/home/peng/projects/evaluations/benchmarks/owl/LUBM/";
-//		String dlpqueries = ontoDir + "dlp_queries/";
-//		String rapidqueries = ontoDir + "rpd_queries/";
-//				
-//		File dir = new File(rapidqueries);
-//		if(!dir.exists()) dir.mkdir();
-//		
-//		for(File qf : new File(dlpqueries).listFiles()) {
-//			Scanner scn = new Scanner(qf);
-//
-//			while(scn.hasNextLine()) {
-//				String line = scn.nextLine();
-//				ConjunctiveQuery query = new QueryParser().parse(line);
-//				
-//				System.out.println(qf + " length " + query.getBody().size());
-//				PrintWriter writer = new PrintWriter(new File(rapidqueries + qf.getName()));
-//				writer.print(TranslatorForSystems.toRapid(query));
-//				writer.close();				
-//			}
-//			scn.close();
-//		}
-//		splitQueryFile();
-		getQueryMeta();
+//		transRapid();
+//		transGrind();
+		splitQueryFile();
+//		getQueryMeta();
+	}
+	
+	private static void transRapid() throws FileNotFoundException {
+		String ontoDir = "/home/sharpen/projects/evaluations/benchmarks/owl/OG/";
+		String dlpqueries = ontoDir + "QueriesInLength/";
+		String rapidqueries = ontoDir + "rpd_queries/";
+				
+		File dir = new File(rapidqueries);
+		if(!dir.exists()) dir.mkdir();
+		
+		for(File qf : new File(dlpqueries).listFiles()) {
+			Scanner scn = new Scanner(qf);
+
+			while(scn.hasNextLine()) {
+				String line = scn.nextLine();
+				ConjunctiveQuery query = new QueryParser().parse(line);
+				
+				System.out.println(qf + " length " + query.getBody().size());
+				PrintWriter writer = new PrintWriter(new File(rapidqueries + qf.getName()));
+				writer.print(TranslatorForSystems.toRapid(query));
+				writer.close();				
+			}
+			scn.close();
+		}
+	}
+	
+	private static void transGrind() throws FileNotFoundException {
+		String ontoDir = "/home/sharpen/projects/evaluations/benchmarks/owl/OG/";
+		String dlpqueries = ontoDir + "QueriesInLength/";
+		String rapidqueries = ontoDir + "grd_queries/";
+				
+		File dir = new File(rapidqueries);
+		if(!dir.exists()) dir.mkdir();
+		
+		for(File qf : new File(dlpqueries).listFiles()) {
+			Scanner scn = new Scanner(qf);
+
+			while(scn.hasNextLine()) {
+				String line = scn.nextLine();
+				ConjunctiveQuery query = new QueryParser().parse(line);
+				
+				System.out.println(qf + " length " + query.getBody().size());
+				PrintWriter writer = new PrintWriter(new File(rapidqueries + qf.getName()));
+				writer.print(TranslatorForSystems.toGrind(query));
+				writer.close();				
+			}
+			scn.close();
+		}
 	}
 	
 	private static void getQueryMeta() throws IOException {
@@ -98,9 +128,9 @@ public class QueryEditing {
 	}
 	
 	private static void splitQueryFile() throws FileNotFoundException {
-		String ontoDir = "/home/peng/projects/evaluations/benchmarks/existential_rules/ONT-256/";
-		String qfile = ontoDir + "rew_queries.dlp";
-		String sdir = ontoDir + "rew_dlp_queries";
+		String ontoDir = "/home/sharpen/projects/evaluations/benchmarks/existential_rules/";
+		String qfile = ontoDir + "qa_queries.dlp";
+		String sdir = ontoDir + "qa_dlp_queries";
 		
 		File dir = new File(sdir);
 		if(!dir.exists()) dir.mkdir();

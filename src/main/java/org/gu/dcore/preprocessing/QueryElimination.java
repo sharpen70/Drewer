@@ -121,6 +121,16 @@ public class QueryElimination {
 		Map<Predicate, List<Term[]>> coveredPreds = new HashMap<>();
 		Set<Rule> visited = new HashSet<>();
 		
+		//Add self coverage
+		List<Term[]> self_terms = new LinkedList<>();
+		Term[] self_term = new Term[a.getTerms().size()];
+		for(int i = 0; i < a.getTerms().size(); i++) {
+			self_term[i] = a.getTerm(i);
+		}
+		self_terms.add(self_term);
+		coveredPreds.put(a.getPredicate(), self_terms);
+		
+		//Add coverage of other predicates
 		Set<Rule> rules = this.indexed_ruleset.get(a.getPredicate());
 		
 		Queue<Tuple<Rule,Predicate,Term[]>> queue = new LinkedList<>();

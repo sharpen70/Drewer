@@ -129,7 +129,7 @@ public class Querying {
         		if(datafile == null)
         			System.out.println(datalog.size() + "," + rew_time);
         		else 
-        			System.out.println(datalog.size() + "," + (query_time + rew_time) + "," + (tend - tstart));
+        			System.out.println("Rew Size: " + datalog.size() + " Rew Time: " + rew_time + " Querying Time: " + query_time);
         	}
         }
  

@@ -59,7 +59,7 @@ public class TestQueryElimination extends TestCase {
     	
     	Program P = parser.parse("A(X, Y) :- D(Y, X). B(X) :- A(X, Y).  C(X,Z):-D(X,Y). B(X):-C(X,X).\n");
     	
-    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- D(X, Y), B(X).");
+    	ConjunctiveQuery query = new QueryParser().parse("?(X) :- D(X, Y), D(X, Z).");
     	
     	System.out.println("============");
     	System.out.println(P);

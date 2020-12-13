@@ -34,9 +34,66 @@ public class QueryGeneration {
 	
 	public static void main(String[] args) throws IOException {
 //		genDeep();
-//		genONT();
+		genONT();
 //		genSTB();
-		genOG();
+//		genOG();
+//		genOBO();
+	}
+	
+	private static void genLUBM() throws IOException {
+		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/owl/LUBM/";
+		Program P = new DcoreParser().parseFile(ontofile + "LUBM.dlp");
+		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
+		ihs = new IndexedByHeadPredRuleSet(rules);
+		predLevels = getPredLevels(rules);
+		System.out.println(predLevels.keySet());
+		String longQ = ontofile + "QueriesInLength/";
+		File f = new File(longQ);
+		if(!f.exists()) f.mkdir();
+		
+		List<ConjunctiveQuery> queries = new LinkedList<>();
+		queries.addAll(genQuery(2, 7, 5, false));
+		queries.addAll(genQuery(5, 7, 5, false));
+		queries.addAll(genQuery(8, 7, 5, false));
+		queries.addAll(genQuery(11, 7, 5, false));
+		queries.addAll(genQuery(14, 7, 5, false));
+		queries.addAll(genQuery(17, 7, 5, false));
+		queries.addAll(genQuery(20, 7, 5, false));
+		
+		for(int i = 0; i < queries.size(); i++) {
+			String qfile = longQ + "q" + (i + 1);
+			PrintWriter writer = new PrintWriter(new File(qfile));
+			writer.println(queries.get(i));
+			writer.close();
+		}
+	}
+	
+	private static void genAdolena() throws IOException {
+		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/owl/Adolena/";
+		Program P = new DcoreParser().parseFile(ontofile + "Adolena.dlp");
+		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
+		ihs = new IndexedByHeadPredRuleSet(rules);
+		predLevels = getPredLevels(rules);
+		System.out.println(predLevels.keySet());
+		String longQ = ontofile + "QueriesInLength/";
+		File f = new File(longQ);
+		if(!f.exists()) f.mkdir();
+		
+		List<ConjunctiveQuery> queries = new LinkedList<>();
+		queries.addAll(genQuery(2, 4, 5, true));
+		queries.addAll(genQuery(5, 4, 5, true));
+		queries.addAll(genQuery(8, 4, 5, true));
+		queries.addAll(genQuery(11, 4, 5, true));
+		queries.addAll(genQuery(14, 4, 5, true));
+		queries.addAll(genQuery(17, 4, 5, true));
+		queries.addAll(genQuery(20, 4, 5, true));
+		
+		for(int i = 0; i < queries.size(); i++) {
+			String qfile = longQ + "q" + (i + 1);
+			PrintWriter writer = new PrintWriter(new File(qfile));
+			writer.println(queries.get(i));
+			writer.close();
+		}
 	}
 	
 	private static void genDeep() throws IOException {
@@ -66,13 +123,13 @@ public class QueryGeneration {
 		
 
 		List<ConjunctiveQuery> queries = new LinkedList<>();
-		queries.addAll(genQuery(3, 2, 5));
-		queries.addAll(genQuery(3, 3, 5));
-		queries.addAll(genQuery(3, 4, 5));
-		queries.addAll(genQuery(3, 5, 5));
-		queries.addAll(genQuery(3, 6, 5));
-		queries.addAll(genQuery(3, 7, 5));
-		queries.addAll(genQuery(3, 8, 5));
+		queries.addAll(genQuery(3, 2, 5, true));
+		queries.addAll(genQuery(3, 3, 5, true));
+		queries.addAll(genQuery(3, 4, 5, true));
+		queries.addAll(genQuery(3, 5, 5, true));
+		queries.addAll(genQuery(3, 6, 5, true));
+		queries.addAll(genQuery(3, 7, 5, true));
+		queries.addAll(genQuery(3, 8, 5, true));
 		
 		
 		for(int i = 0; i < queries.size(); i++) {
@@ -83,25 +140,51 @@ public class QueryGeneration {
 		}
 	}
 	
+	private static void genOBO() throws IOException {
+		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/owl/OBO/";
+		Program P = new DcoreParser().parseFile(ontofile + "OBO.dlp");
+		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
+		ihs = new IndexedByHeadPredRuleSet(rules);
+		predLevels = getPredLevels(rules);
+		System.out.println(predLevels.keySet());
+		String longQ = ontofile + "QueriesInLength/";
+		File f = new File(longQ);
+		if(!f.exists()) f.mkdir();
+		
+		List<ConjunctiveQuery> queries = new LinkedList<>();
+		queries.addAll(genQuery(2, 10, 5, false));
+		queries.addAll(genQuery(4, 10, 5, false));
+		queries.addAll(genQuery(6, 10, 5, false));
+		queries.addAll(genQuery(8, 10, 5, false));
+		queries.addAll(genQuery(10, 10, 5, false));
+		queries.addAll(genQuery(12, 10, 5, false));
+		
+		for(int i = 0; i < queries.size(); i++) {
+			String qfile = longQ + "q" + (i + 1);
+			PrintWriter writer = new PrintWriter(new File(qfile));
+			writer.println(queries.get(i));
+			writer.close();
+		}
+	}
+	
 	private static void genOG() throws IOException {
-		String ontofile = "/home/peng/projects/evaluations/benchmarks/owl/OG/";
+		String ontofile = "/home/sharpen/projects/evaluations/benchmarks/owl/OG/";
 		Program P = new DcoreParser().parseFile(ontofile + "OG.dlp");
 		List<Rule> rules = Utils.compute_single_rules(P.getRuleSet());
 		ihs = new IndexedByHeadPredRuleSet(rules);
 		predLevels = getPredLevels(rules);
 		System.out.println(predLevels.keySet());
-		String longQ = ontofile + "QueriesInDepth/";
+		String longQ = ontofile + "QueriesInLength/";
 		File f = new File(longQ);
 		if(!f.exists()) f.mkdir();
 		
 		List<ConjunctiveQuery> queries = new LinkedList<>();
-		queries.addAll(genQuery(1, 2, 5));
-		queries.addAll(genQuery(1, 5, 5));
-		queries.addAll(genQuery(1, 8, 5));
-		queries.addAll(genQuery(1, 11, 5));
-		queries.addAll(genQuery(1, 14, 5));
-		queries.addAll(genQuery(1, 17, 5));
-		queries.addAll(genQuery(1, 20, 5));
+		queries.addAll(genQuery(2, 40, 5, false));
+		queries.addAll(genQuery(4, 40, 5, false));
+		queries.addAll(genQuery(6, 40, 5, false));
+		queries.addAll(genQuery(7, 40, 5, false));
+		queries.addAll(genQuery(8, 40, 5, false));
+		queries.addAll(genQuery(9, 40, 5, false));
 		
 		for(int i = 0; i < queries.size(); i++) {
 			String qfile = longQ + "q" + (i + 1);
@@ -118,7 +201,7 @@ public class QueryGeneration {
 		ihs = new IndexedByHeadPredRuleSet(rules);
 		predLevels = getPredLevels(rules);
 		System.out.println(predLevels.keySet());
-		String longQ = ontofile + "QueriesInLength/";
+		String longQ = ontofile + "qa_QueriesInLength/";
 		File f = new File(longQ);
 		if(!f.exists()) f.mkdir();
 		
@@ -126,13 +209,11 @@ public class QueryGeneration {
 			System.out.println(r);
 		}
 		List<ConjunctiveQuery> queries = new LinkedList<>();
-		queries.addAll(genQuery(2, 5, 5));
-		queries.addAll(genQuery(4, 5, 5));
-		queries.addAll(genQuery(6, 5, 5));
-		queries.addAll(genQuery(8, 5, 5));
-		queries.addAll(genQuery(10, 5, 5));
-		queries.addAll(genQuery(12, 5, 5));
-		queries.addAll(genQuery(14, 5, 5));
+		queries.addAll(genQuery(2, 6, 3, true));
+		queries.addAll(genQuery(5, 6, 3, true));
+		queries.addAll(genQuery(8, 6, 3, true));
+		queries.addAll(genQuery(11, 6, 3, true));
+		queries.addAll(genQuery(14, 6, 3, true));
 		
 		for(int i = 0; i < queries.size(); i++) {
 			String qfile = longQ + "q" + (i + 1);
@@ -157,13 +238,13 @@ public class QueryGeneration {
 			System.out.println(r);
 		}
 		List<ConjunctiveQuery> queries = new LinkedList<>();
-		queries.addAll(genQuery(2, 4, 5));
-		queries.addAll(genQuery(4, 4, 5));
-		queries.addAll(genQuery(6, 4, 5));
-		queries.addAll(genQuery(8, 4, 5));
-		queries.addAll(genQuery(10, 4, 5));
-		queries.addAll(genQuery(12, 4, 5));
-		queries.addAll(genQuery(14, 4, 5));
+		queries.addAll(genQuery(2, 4, 5, true));
+		queries.addAll(genQuery(4, 4, 5, true));
+		queries.addAll(genQuery(6, 4, 5, true));
+		queries.addAll(genQuery(8, 4, 5, true));
+		queries.addAll(genQuery(10, 4, 5, true));
+		queries.addAll(genQuery(12, 4, 5, true));
+		queries.addAll(genQuery(14, 4, 5, true));
 		
 		for(int i = 0; i < queries.size(); i++) {
 			String qfile = longQ + "q" + (i + 1);
@@ -173,7 +254,7 @@ public class QueryGeneration {
 		}
 	}
 	
-	public static List<ConjunctiveQuery> genQuery(int len, int depth, int num) {				
+	public static List<ConjunctiveQuery> genQuery(int len, int depth, int num, boolean fixedDepth) {				
 		List<ConjunctiveQuery> qlist = new LinkedList<>();
 		
 		for(int i = 0; i < num; i++) {
@@ -181,10 +262,14 @@ public class QueryGeneration {
 		    List<Term> ansVar = new LinkedList<>();
 		    Variable joinVar = null;
 			Random rand = new Random();
-		
-			List<Predicate> preds = predLevels.get(depth);
+			
+			Set<Predicate> selected = new HashSet<>();
+			int first_depth = fixedDepth ? depth : (rand.nextInt(depth - 1) + 2);
+			
+			List<Predicate> preds = predLevels.get(first_depth);
 			if(preds == null) return null;
 			Predicate pred = preds.get(rand.nextInt(preds.size()));
+			selected.add(pred);
 			Set<Rule> brs = ihs.getRulesByPredicate(pred);
 		    List<Rule> lrs = new LinkedList<>(brs);
 		    Rule rr = null;
@@ -215,10 +300,12 @@ public class QueryGeneration {
 			int l = 1;
 			
 			while(l < len) {
-				int _depth = rand.nextInt(depth - 1) + 2;
+				int _depth = rand.nextInt(depth - 2) + 2;
 				List<Predicate> _preds = predLevels.get(_depth);
 				if(_preds == null) continue;
 				Predicate _pred = _preds.get(rand.nextInt(_preds.size()));
+				if(!selected.add(_pred)) continue;
+				
 				Set<Rule> _brs = ihs.getRulesByPredicate(_pred);
 			    List<Rule> _lrs = new LinkedList<>(_brs);
 			    

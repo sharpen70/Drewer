@@ -28,6 +28,8 @@ public class VLog {
 		String queriesfile = null;
 		String datafile = null;		
 		
+		boolean verbose = false;
+		
 		for(int i = 0; i < args.length; i++) {
 			if(args[i].startsWith("-")) {
 				String flag = args[i].substring(1);
@@ -38,6 +40,7 @@ public class VLog {
 				if(flag.equals("q")) {
 					queriesfile = args[++i];
 				}
+				if(flag.equals("v")) verbose = true;
 			}
 		}
 		
@@ -52,7 +55,7 @@ public class VLog {
 		DcoreParser parser = new DcoreParser();    	
     	Program P = parser.parseFile(ontologyfile);
     	
-    	System.out.println("Finish Parsing Files ...");   	   	
+    	if(verbose) System.out.println("Finish Parsing Files ...");   	   	
     	
     	Scanner scn = new Scanner(new File(queriesfile));
     	
@@ -64,29 +67,32 @@ public class VLog {
         	String qatom = getQueryAtom(query.getAnsVar());
         	String qr = qatom + " :- " + query.getBody().toVLog() + ".";
         	
-    	   	System.out.println("Querying: " + qr);      	   	        	
+        	if(verbose) System.out.println("Querying: " + qr);      	   	        	
         	
     	   	start = System.currentTimeMillis();
         	DatalogEngine engine = new DatalogEngine();
         	engine.setSkolemAlgorithm();
         	engine.addSourceFromCSVDir(datafile);
-        	engine.addRules(getQueryRelatedRuleSet(P.getRuleSet(), query));
+        	
+        	List<Rule> rs = getQueryRelatedRuleSet(P.getRuleSet(), query);
+        	engine.addRules(rs);
         	engine.addRules(qr);
         	engine.load();
         	end = System.currentTimeMillis();
-        	System.out.println("Finish Loading data, cost " + (end - start) + " ms");
+        	if(verbose) System.out.println("Finish Loading data, cost " + (end - start) + " ms");
         	
         	start = System.currentTimeMillis();
         	engine.materialize();
         	end = System.currentTimeMillis();
         	
-        	System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");       	
+        	if(verbose) System.out.println("Finish Vlog materialization, cost " + (end - start) + " ms");       	
         	
         	Column answers = engine.answerAtomicQuery(qatom);
         	end = System.currentTimeMillis();
         	tend = System.currentTimeMillis();
-        	System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + ", cost " + (end - start) + " ms");
-        	System.out.println("Total time cost " + (tend - tstart) + "ms");
+        	if(verbose) System.out.println("Finish answering queries, answer size " + answers.getTuples().size() + ", cost " + (end - start) + " ms");
+        	if(verbose) System.out.println("Total time cost " + (tend - tstart) + "ms");
+        	else System.out.println("Program Size: " + rs.size() + " Query Time: " + (end - start));
     	}
     	
     	scn.close();		
