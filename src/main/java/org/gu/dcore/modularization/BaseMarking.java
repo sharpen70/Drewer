@@ -64,7 +64,7 @@ public class BaseMarking {
 				}
 				
 				for(PredPosition npp : rbm.add(_source, pp)) {
-					Set<Rule> affected = this.onto.get(pp.getPredicate());
+					Set<Rule> affected = this.onto.get(npp.getPredicate());
 					if(affected != null) {
 						for(Rule ar : affected) {
 							queue.add(new Tuple<>(ar, _source, npp));
